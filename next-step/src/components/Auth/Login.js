@@ -11,31 +11,53 @@ const initialFieldValues = {
 };
 
 export const Login = (props) => {
-  const { setSession } = props;
-  const { values, handleInputChange } = useForm(initialFieldValues);
+  const { session, handleEndSession, setException } = props;
+  const { values, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
 
-  const [loggingIn, setLogginIn] = useState(false);
+  const validate = (fieldValues = values) => {
+    const temp = {};
+    temp.username = "";
+    temp.password = "";
+    if (!fieldValues.username) {
+      temp.username = "Field cannot be blank.";
+    }
+    if (!fieldValues.password) {
+      temp.password = "Field cannot be blank.";
+    }
+
+    setErrors({ ...temp });
+
+    if (!temp.username && !temp.password) {
+      return true;
+    }
+
+    return false;
+  };
 
   useEffect(() => {
-    setSession(null);
+    if (session) {
+      handleEndSession();
+    }
     userService.logout();
-  }, []);
+  }, [session]);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (values.username && values.password) {
-      setLogginIn(true);
+    if (validate()) {
       try {
-        const authenticated = await userService.login(
+        const response = await userService.login(
           values.username,
           values.password
         );
-        console.log(await authenticated);
-        localStorage.setItem("user", JSON.stringify(await authenticated));
-        await userService.getCurrentSession();
-        history.push(routes.ACCOUNT);
-      } catch (error) {}
+        (await response) &&
+          localStorage.setItem("user", JSON.stringify(response)) &&
+          history.push(routes.ACCOUNT);
+      } catch (error) {
+        setException(error);
+      }
     }
   }
 
@@ -56,6 +78,11 @@ export const Login = (props) => {
               value={values.username}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.username && {
+                  error: true,
+                  helperText: errors.username,
+                })}
             />
             <InputLabel className="mrgn-t8" htmlFor="password">
               Password
@@ -67,6 +94,11 @@ export const Login = (props) => {
               value={values.password}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.password && {
+                  error: true,
+                  helperText: errors.password,
+                })}
             />
 
             <div className="mrgn-t8">

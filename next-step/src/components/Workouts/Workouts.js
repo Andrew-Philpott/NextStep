@@ -13,30 +13,29 @@ import * as routes from "../../constants/route-constants";
 
 export const Workouts = (props) => {
   const [workouts, setWorkouts] = useState(null);
-  const { onStartSession } = props;
+  const { handleStartSession, setException } = props;
 
   useEffect(() => {
-    userService
-      .getAllWorkouts()
-      .then((response) => setWorkouts(response))
-      .catch((error) => console.log(error));
-  }, []);
+    if (!workouts) {
+      (async () => {
+        try {
+          const response = await userService.getAllWorkouts();
+          setWorkouts(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [workouts]);
 
   return (
     <Grid container>
       <div className="spacer" />
       <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
-      <Grid component={Paper} item xs={10} sm={8} md={8} lg={6} xl={6}>
+      <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         <h1>Workouts</h1>
-        <Link
-          component={Button}
-          className="button blue-background float-right"
-          to={routes.WORKOUTS_NEW}
-        >
-          Create Workout
-        </Link>
 
-        <TableContainer component={Paper}>
+        <TableContainer>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -52,16 +51,11 @@ export const Workouts = (props) => {
                 workouts.map((workout) => (
                   <TableRow key={workout.id}>
                     <TableCell component="th" scope="row">
-                      <Link
-                        style={{ textDecoration: "none" }}
-                        to={`/workouts/${workout.id}`}
-                      >
-                        {workout.name}
-                      </Link>
+                      <Link to={`/workouts/${workout.id}`}>{workout.name}</Link>
                     </TableCell>
                     <TableCell align="right">{workout.notes}</TableCell>
                     <TableCell align="right">
-                      <Button onClick={() => onStartSession(workout.id)}>
+                      <Button onClick={() => handleStartSession(workout.id)}>
                         <CheckIcon />
                       </Button>
                     </TableCell>
@@ -71,7 +65,15 @@ export const Workouts = (props) => {
           </Table>
         </TableContainer>
       </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
+      <Grid item xs={1} sm={2} md={2} lg={3} xl={3}>
+        <Button
+          component={Link}
+          className="button blue-background float-right"
+          to={routes.WORKOUTS_NEW}
+        >
+          Create New Workout
+        </Button>
+      </Grid>
     </Grid>
   );
 };

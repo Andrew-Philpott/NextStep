@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 export const useForm = (initialFieldValues) => {
   const [values, setValues] = useState(initialFieldValues);
-
+  const [errors, setErrors] = useState({});
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const fieldValue = { [name]: value };
@@ -14,6 +14,8 @@ export const useForm = (initialFieldValues) => {
   return {
     values,
     setValues,
+    errors,
+    setErrors,
     handleInputChange,
   };
 };

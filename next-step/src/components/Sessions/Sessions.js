@@ -5,27 +5,32 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { Paper, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { userService } from "../../services/user-service";
 
 export const Sessions = () => {
   const [sessions, setSessions] = useState(null);
-
+  const [errors, setErrors] = useState(null);
   useEffect(() => {
-    userService
-      .getAllSessions()
-      .then((response) => setSessions(response))
-      .catch((error) => console.log(error));
+    (async () => {
+      try {
+        const response = await userService.getAllSessions();
+        setSessions(response);
+      } catch (error) {
+        setErrors(error);
+      }
+    })();
   }, []);
 
   return (
     <Grid container>
+      <div className="spacer" />
       <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
-      <Grid component={Paper} item xs={10} sm={8} md={8} lg={6} xl={6}>
+      <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         <React.Fragment>
           <h1>Sessions</h1>
 
-          <TableContainer component={Paper}>
+          <TableContainer>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>

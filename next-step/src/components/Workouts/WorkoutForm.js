@@ -178,7 +178,7 @@ export const WorkoutForm = () => {
     <Grid container>
       <div className="spacer" />
       <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
-      <Grid component={Paper} item xs={10} sm={8} md={8} lg={6} xl={6}>
+      <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         {editing == true ? <h2>Edit workout</h2> : <h2>Create workout</h2>}
 
         <form autoComplete="off" onSubmit={handleSubmit}>
@@ -218,8 +218,8 @@ export const WorkoutForm = () => {
               const exerciseSets = `sets-${index}`;
               const exerciseIntensity = `intensity-${index}`;
               return (
-                <div className="mrgn-t16">
-                  <Grid key={index} container spacing={1}>
+                <div key={index} className="mrgn-t16">
+                  <Grid container spacing={1}>
                     <Grid item xs={3}>
                       <InputLabel htmlFor={exerciseName}>Exercise</InputLabel>
                       <TextField
@@ -364,18 +364,20 @@ export const WorkoutForm = () => {
                 </div>
               );
             })}
-          <Button
-            className="button blue-background"
-            onClick={() => handleAddExercise()}
-          >
-            Add Exercise
-          </Button>
-          <Button
-            className="button blue-background float-right"
-            onClick={() => handleSubmit()}
-          >
-            Submit
-          </Button>
+          <div className="mrgn-t8">
+            <Button
+              className="button blue-background"
+              onClick={() => handleAddExercise()}
+            >
+              Add Exercise
+            </Button>
+            <Button
+              className="button blue-background float-right"
+              onClick={() => handleSubmit()}
+            >
+              Submit
+            </Button>
+          </div>
         </form>
       </Grid>
       <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />

@@ -17,36 +17,50 @@ import * as routes from "./constants/route-constants";
 import { Account } from "./components/Auth/Account";
 import { userService } from "./services/user-service";
 import { history } from "./helpers/history";
+import { ErrorModal } from "./components/Other/ErrorModal";
 import "./App.css";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const [session, setSession] = useState(null);
-  // useEffect(() => {
-  //   userService.getCurrentSession((res) => {
-  //     setSession(res);
-  //   });
-  // }, []);
+  const [exception, setException] = useState(null);
 
-  const handleEndSession = (id) => {
+  useEffect(() => {
+    if (!session) {
+      (async () => {
+        try {
+          const response = await userService.getCurrentSession();
+          setSession(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [history.location, session]);
+
+  const handleEndSession = () => {
     const rating = parseInt(window.prompt("How would you rate that workout?"));
-
-    userService
-      .updateSession(id, {
-        rating: rating,
-      })
-      .then(setSession(null))
-      .catch((error) => console.log(error));
+    (async () => {
+      try {
+        await userService.updateSession(session.id, {
+          rating: rating,
+        });
+        setSession(null);
+      } catch (error) {
+        setException(error);
+      }
+    })();
   };
 
-  const onStartSession = (id) => {
+  const handleStartSession = (id) => {
     if (!session) {
-      userService
-        .createSession({ workoutId: id })
-        .then((response) => {
+      (async () => {
+        try {
+          const response = await userService.createSession({ workoutId: id });
           setSession(response);
-        })
-        .catch((error) => console.log(error));
+        } catch (error) {
+          setException(error);
+        }
+      })();
     } else {
       alert(
         "You must complete your current session before starting a new one."
@@ -57,15 +71,13 @@ function App() {
   return (
     <div className="App">
       <Router history={history}>
-        <NavigationBar
-          {...(loggedIn ? JSON.parse(localStorage.getItem("user")) : null)}
-        />
+        <NavigationBar />
 
         {session && (
           <div className="current-session">
             <Button
               className="button green-background white-border float-right mrgn-r8"
-              onClick={() => handleEndSession(session.id)}
+              onClick={() => handleEndSession()}
             >
               End session
             </Button>
@@ -75,50 +87,57 @@ function App() {
           </div>
         )}
 
-        {alert.message && (
-          <div className={`alert ${alert.type}`}>{alert.message}</div>
-        )}
+        {exception && <ErrorModal errors={exception} />}
         <Container maxWidth="lg">
           <Switch>
             <Route exact path={routes.LANDING} component={Home} />
             <UserRoute exact path={routes.ACCOUNT} component={Account} />
-            <UserRoute exact path={routes.RECORDS_NEW} component={RecordForm} />
+            <UserRoute
+              exact
+              path={routes.RECORDS_NEW}
+              component={() => <RecordForm {...{ setException }} />}
+            />
             <UserRoute
               exact
               path={routes.EXERCISES_LIST}
-              component={Exercises}
+              component={() => <Exercises {...{ setException }} />}
             />
             <UserRoute
               exact
               path={routes.EXERCISES_DETAILS}
-              component={ExerciseDetails}
+              component={() => <ExerciseDetails {...{ setException }} />}
             />
             <UserRoute
               exact
               path={routes.WORKOUTS_LIST}
-              component={() => <Workouts {...{ onStartSession }} />}
+              component={() => (
+                <Workouts {...{ handleStartSession, setException }} />
+              )}
             />
             <UserRoute
               exact
               path={routes.WORKOUTS_NEW}
-              component={WorkoutForm}
+              component={() => <WorkoutForm {...{ setException }} />}
             />
             <UserRoute
               exact
               path={routes.WORKOUTS_DETAILS}
-              component={WorkoutDetails}
+              component={() => <WorkoutDetails {...{ setException }} />}
             />
             <UserRoute
               exact
               path={routes.WORKOUTS_EDIT}
-              component={WorkoutForm}
+              component={() => <WorkoutForm {...{ setException }} />}
             />
             <UserRoute exact path={routes.SESSIONS_LIST} component={Sessions} />
             <Route
               path={routes.LOG_IN}
-              component={() => <Login {...{ setSession, setLoggedIn }} />}
+              component={() => <Login {...{ session, handleEndSession }} />}
             />
-            <Route path={routes.REGISTER} component={Register} />
+            <Route
+              path={routes.REGISTER}
+              component={() => <Register {...{ setException }} />}
+            />
             <Redirect from="*" to={routes.LANDING} />
           </Switch>
         </Container>

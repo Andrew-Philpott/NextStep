@@ -5,37 +5,49 @@ import { history } from "../../helpers/history";
 import { userService } from "../../services/user-service";
 import { exerciseService } from "../../services/exercise-service";
 
-export const ExerciseDetails = () => {
+export const ExerciseDetails = (props) => {
   const { id } = useParams();
+  const { setException } = props;
   const [values, setValues] = useState(null);
   const [exercise, setExercise] = useState(null);
+  const [errors, setErrors] = useState(null);
   const [record, setRecord] = useState(null);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    exerciseService
-      .get(id)
-      .then((response) => setExercise(response))
-      .catch((error) => console.log(error));
+    (async () => {
+      try {
+        const response = await exerciseService.get(id);
+        setExercise(response);
+      } catch (error) {
+        setException(error);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    userService
-      .getRecordsByExercise(id)
-      .then((response) => {
+    (async () => {
+      try {
+        const response = await userService.getRecordsByExercise(id);
         setValues(response);
         setRecord(response.sort((a, b) => (a.weight < b.weight ? 1 : -1))[0]);
-      })
-      .catch((error) => console.log(error));
+      } catch (error) {
+        setException(error);
+      }
+    })();
   }, []);
 
   const onDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this record?"))
-      userService
-        .deleteRecord(id)
-        .then(history.push("/records"))
-        .catch((error) => console.log(error));
+      (async () => {
+        try {
+          const response = await userService.deleteRecord(id);
+          history.push("/records");
+        } catch (error) {
+          setException(error);
+        }
+      })();
   };
 
   return (

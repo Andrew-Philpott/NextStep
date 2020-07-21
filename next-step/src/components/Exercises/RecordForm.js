@@ -12,16 +12,17 @@ import { exerciseService } from "../../services/exercise-service";
 import { userService } from "../../services/user-service";
 import { useParams } from "react-router-dom";
 
-export const RecordForm = () => {
-  const { id } = useParams();
-  const initialFieldValues = {
-    weight: "",
-    reps: "",
-    sets: "",
-    exerciseId: "",
-  };
-  const [exercises, setExercises] = React.useState(null);
+const initialFieldValues = {
+  weight: "",
+  reps: "",
+  sets: "",
+  exerciseId: "",
+};
 
+export const RecordForm = (props) => {
+  const { id } = useParams();
+  const { setException } = props;
+  const [exercises, setExercises] = React.useState(null);
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -62,21 +63,34 @@ export const RecordForm = () => {
   };
 
   useEffect(() => {
-    userService.getRecordsByExercise(id).then((record) => {
-      setValues(record);
-    });
-  }, []);
+    if (id) {
+      (async () => {
+        try {
+          const response = await userService.getRecordsByExercise(id);
+          setValues(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [id]);
 
   useEffect(() => {
-    exerciseService
-      .getAll()
-      .then((response) => setExercises(response))
-      .catch((error) => console.log(error));
-  }, []);
+    if (!exercises) {
+      (async () => {
+        try {
+          const response = await exerciseService.getAll();
+          setExercises(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [exercises]);
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (validate) {
+    if (validate()) {
       const record = {
         exerciseId: parseInt(values.exerciseId),
         weight: parseInt(values.weight),
@@ -84,16 +98,14 @@ export const RecordForm = () => {
         sets: parseInt(values.sets),
       };
 
-      if (
-        Number.isInteger(record.exerciseId) &&
-        Number.isInteger(record.reps) &&
-        Number.isInteger(record.sets)
-      ) {
-        userService
-          .createRecord(record)
-          .then(history.push("/records"))
-          .catch((error) => console.log(error));
-      }
+      (async () => {
+        try {
+          const response = await userService.createRecord(record);
+          (await response) && history.push("/records");
+        } catch (error) {
+          setException(error);
+        }
+      })();
     }
   }
 

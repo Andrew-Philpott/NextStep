@@ -1,34 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Button, Container, Typography } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
-import Paper from "@material-ui/core/Paper";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { Link } from "react-router-dom";
 import { exerciseService } from "../../services/exercise-service";
 
-export const Exercises = () => {
+export const Exercises = (props) => {
+  const { setException } = props;
   const [exercises, setExercises] = useState(null);
   useEffect(() => {
-    exerciseService
-      .getAll()
-      .then((response) => setExercises(response))
-      .catch((error) => console.log(error));
-  }, []);
+    if (!exercises) {
+      (async () => {
+        try {
+          const response = await exerciseService.getAll();
+          setExercises(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [exercises]);
 
   return (
     <Grid container>
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
-        <Container component={Paper}></Container>
-      </Grid>
+      <div className="spacer" />
+      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}></Grid>
       <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
         <React.Fragment>
           <h1>Exercises</h1>
 
-          <TableContainer component={Paper}>
+          <TableContainer>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -41,21 +46,17 @@ export const Exercises = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/* get records for an exercise type */}
                 {exercises &&
                   exercises.map((exercise) => (
                     <TableRow key={exercise.id}>
                       <TableCell component="th" scope="row">
-                        <Link
-                          style={{ textDecoration: "none" }}
-                          to={`/exercises/${exercise.id}`}
-                        >
+                        <Link to={`/exercises/${exercise.id}`}>
                           {exercise.name}
                         </Link>
                       </TableCell>
                       <TableCell align="left" />
                       <TableCell align="left">
-                        <ul style={{ paddingLeft: "0px" }}>
+                        <ul className="pad-l0">
                           {exercise.muscles
                             .filter(
                               (x) => x.primary === true,
@@ -78,7 +79,7 @@ export const Exercises = () => {
                         </ul>
                       </TableCell>
                       <TableCell align="left">
-                        <ul style={{ paddingLeft: "0px" }}>
+                        <ul className="pad-l0">
                           {exercise.muscles
                             .filter(
                               (x) => x.primary === false,

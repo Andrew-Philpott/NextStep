@@ -19,24 +19,48 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Register = () => {
-  const { values, handleInputChange } = useForm(initialFieldValues);
-  const [registering, setRegistering] = useState(false);
+export const Register = (props) => {
+  const { setException } = props;
+  const { values, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
 
-  useEffect(() => {
-    userService.logout();
-  }, []);
+  const validate = (fieldValues = values) => {
+    let temp = { ...errors };
+    if (!fieldValues.firstName) {
+      temp.firstName = "Field cannot be blank.";
+    }
+    if (!fieldValues.lastName) {
+      temp.lastName = "Field cannot be blank.";
+    }
+    if (!fieldValues.username) {
+      temp.username = "Field cannot be blank.";
+    }
+    if (!fieldValues.email) {
+      temp.email = "Field cannot be blank.";
+    }
+    if (!fieldValues.password) {
+      temp.password = "Field cannot be blank.";
+    }
+
+    setErrors({ ...temp });
+
+    if (
+      !temp.firstName &&
+      !temp.lastName &&
+      !temp.username &&
+      !temp.email &&
+      !temp.password
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (
-      values.firstName &&
-      values.lastName &&
-      values.username &&
-      values.email &&
-      values.password
-    ) {
+    if (validate()) {
       const user = {
         firstName: values.firstName,
         lastName: values.lastName,
@@ -44,11 +68,15 @@ export const Register = () => {
         email: values.email,
         password: e.target.password.value,
       };
-      setRegistering(true);
-      userService
-        .register(user)
-        .then(history.push(routes.LOG_IN))
-        .catch((error) => console.log(error));
+
+      (async () => {
+        try {
+          const response = await userService.register(user);
+          (await response) && history.push(routes.LOG_IN);
+        } catch (error) {
+          setException(error);
+        }
+      })();
     }
   }
 
@@ -69,6 +97,11 @@ export const Register = () => {
               value={values.firstName}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.firstName && {
+                  error: true,
+                  helperText: errors.firstName,
+                })}
             />
 
             <InputLabel className="mrgn-t8" htmlFor="lastName">
@@ -81,6 +114,11 @@ export const Register = () => {
               value={values.lastName}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.lastName && {
+                  error: true,
+                  helperText: errors.lastName,
+                })}
             />
 
             <InputLabel className="mrgn-t8" htmlFor="username">
@@ -93,6 +131,11 @@ export const Register = () => {
               value={values.username}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.username && {
+                  error: true,
+                  helperText: errors.username,
+                })}
             />
 
             <InputLabel className="mrgn-t8" htmlFor="email">
@@ -105,6 +148,11 @@ export const Register = () => {
               value={values.email}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.email && {
+                  error: true,
+                  helperText: errors.email,
+                })}
             />
 
             <InputLabel className="mrgn-t8" htmlFor="password">
@@ -117,6 +165,11 @@ export const Register = () => {
               value={values.password}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors &&
+                errors.password && {
+                  error: true,
+                  helperText: errors.password,
+                })}
             />
 
             <div className="mrgn-t8">
@@ -130,7 +183,6 @@ export const Register = () => {
                 Register
               </Button>
             </div>
-            {registering && <CircularProgress />}
           </form>
         </React.Fragment>
       </Grid>
