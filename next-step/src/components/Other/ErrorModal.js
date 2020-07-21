@@ -1,29 +1,29 @@
-import React, { usestate } from "react";
+import React, { useState } from "react";
 import Fade from "@material-ui/core/Fade";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 
 export const ErrorModal = (props) => {
-  const { errors, setErrors } = props;
-  const [open, setOpen] = usestate(true);
+  const { exception, setException } = props;
+  const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
-    setErrors(null);
+    setException(null);
   };
 
   return (
     <React.Fragment>
       <Modal
         open={open}
-        onclose={handleClose}
+        onClose={handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
       >
-        <Fade in={open}>{errors && <p>{errors}</p>}</Fade>
+        <Fade in={open}>{exception && <p>{exception.toString()}</p>}</Fade>
       </Modal>
     </React.Fragment>
   );

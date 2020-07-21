@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid, Container } from "@material-ui/core";
+import React from "react";
+import { Grid } from "@material-ui/core";
 import { HumanModel } from "./HumanModel";
-import { Recoveries } from "./Recoveries";
 
 export function Home() {
   return (

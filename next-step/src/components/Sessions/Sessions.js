@@ -8,25 +8,28 @@ import TableRow from "@material-ui/core/TableRow";
 import { Grid } from "@material-ui/core";
 import { userService } from "../../services/user-service";
 
-export const Sessions = () => {
+export const Sessions = (props) => {
   const [sessions, setSessions] = useState(null);
-  const [errors, setErrors] = useState(null);
+  const { setException } = props;
+
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await userService.getAllSessions();
-        setSessions(response);
-      } catch (error) {
-        setErrors(error);
-      }
-    })();
-  }, []);
+    if (!sessions) {
+      (async () => {
+        try {
+          const response = await userService.getAllSessions();
+          setSessions(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [sessions]);
 
   return (
     <Grid container>
       <div className="spacer" />
-      <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
-      <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
+      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}></Grid>
+      <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
         <React.Fragment>
           <h1>Sessions</h1>
 
@@ -37,9 +40,9 @@ export const Sessions = () => {
                   <TableCell component="th" scope="row">
                     Workout
                   </TableCell>
-                  <TableCell align="right">Start</TableCell>
-                  <TableCell align="right">End</TableCell>
-                  <TableCell align="right">Rating</TableCell>
+                  <TableCell align="left">Start</TableCell>
+                  <TableCell align="left">End</TableCell>
+                  <TableCell align="left">Rating</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -49,11 +52,9 @@ export const Sessions = () => {
                       <TableCell component="th" scope="row">
                         {session.workout.name}
                       </TableCell>
-                      <TableCell align="right">
-                        {session.workoutStart}
-                      </TableCell>
-                      <TableCell align="right">{session.workoutEnd}</TableCell>
-                      <TableCell align="right">{session.rating}</TableCell>
+                      <TableCell align="left">{session.workoutStart}</TableCell>
+                      <TableCell align="left">{session.workoutEnd}</TableCell>
+                      <TableCell align="left">{session.rating}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>
@@ -61,7 +62,7 @@ export const Sessions = () => {
           </TableContainer>
         </React.Fragment>
       </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
+      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}></Grid>
     </Grid>
   );
 };

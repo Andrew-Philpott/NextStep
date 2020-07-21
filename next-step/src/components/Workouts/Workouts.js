@@ -31,8 +31,8 @@ export const Workouts = (props) => {
   return (
     <Grid container>
       <div className="spacer" />
-      <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
-      <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
+      <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+      <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
         <h1>Workouts</h1>
 
         <TableContainer>
@@ -42,8 +42,8 @@ export const Workouts = (props) => {
                 <TableCell component="th" scope="row">
                   Name
                 </TableCell>
-                <TableCell align="right">Notes</TableCell>
-                <TableCell align="right">Start Session</TableCell>
+                <TableCell align="left">Notes</TableCell>
+                <TableCell align="left">Start Session</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -53,8 +53,8 @@ export const Workouts = (props) => {
                     <TableCell component="th" scope="row">
                       <Link to={`/workouts/${workout.id}`}>{workout.name}</Link>
                     </TableCell>
-                    <TableCell align="right">{workout.notes}</TableCell>
-                    <TableCell align="right">
+                    <TableCell align="left">{workout.notes}</TableCell>
+                    <TableCell align="left">
                       <Button onClick={() => handleStartSession(workout.id)}>
                         <CheckIcon />
                       </Button>
@@ -65,14 +65,16 @@ export const Workouts = (props) => {
           </Table>
         </TableContainer>
       </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={3} xl={3}>
-        <Button
-          component={Link}
-          className="button blue-background float-right"
-          to={routes.WORKOUTS_NEW}
-        >
-          Create New Workout
-        </Button>
+      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
+        <Grid container justify="center">
+          <Button
+            component={Link}
+            className="button blue-background float-right"
+            to={routes.WORKOUTS_NEW}
+          >
+            Create Workout
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );

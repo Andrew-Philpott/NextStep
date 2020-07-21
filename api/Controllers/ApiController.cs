@@ -457,6 +457,7 @@ namespace BodyJournalAPI.Controllers
     public async Task<IActionResult> GetCurrentSession()
     {
       var currentUserId = int.Parse(User.Identity.Name);
+
       var model = await _db.Session.GetCurrentSessionAsync(currentUserId);
       return Ok(model);
     }

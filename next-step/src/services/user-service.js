@@ -1,6 +1,5 @@
 import { authHeader } from "../helpers/authentication-header";
 import { handleResponse } from "../helpers/handle-response";
-import { history } from "../helpers/history";
 
 export const userService = {
   login,

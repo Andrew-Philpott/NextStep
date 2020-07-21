@@ -12,23 +12,32 @@ import { userService } from "../../services/user-service";
 import { history } from "../../helpers/history";
 import * as routes from "../../constants/route-constants";
 
-export const WorkoutDetails = () => {
+export const WorkoutDetails = (props) => {
   const { id } = useParams();
+  const { setException } = props;
   const [workout, setWorkout] = useState(null);
 
   const onDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
-      userService
-        .deleteWorkout(id)
-        .then(history.push(routes.WORKOUTS_LIST))
-        .catch((error) => console.log(error));
+      (async () => {
+        try {
+          const response = await userService.deleteWorkout(id);
+          (await response) && history.push(routes.WORKOUTS_LIST);
+        } catch (error) {
+          setException(error);
+        }
+      })();
   };
 
   useEffect(() => {
-    userService
-      .getWorkout(id)
-      .then((response) => setWorkout(response))
-      .catch((error) => console.log(error));
+    (async () => {
+      try {
+        const response = await userService.getWorkout(id);
+        (await response) && setWorkout(response);
+      } catch (error) {
+        setException(error);
+      }
+    })();
   }, []);
 
   return (

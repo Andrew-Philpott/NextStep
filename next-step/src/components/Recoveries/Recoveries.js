@@ -9,31 +9,35 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Table from "@material-ui/core/Table";
 import { Paper, Grid } from "@material-ui/core";
-import { HumanModel } from "./HumanModel";
+import { HumanModel } from "../Other/HumanModel";
 
-export const Recoveries = () => {
+export const Recoveries = (props) => {
   const [recoveries, setRecoveries] = useState(null);
-
+  const { setException } = props;
   useEffect(() => {
-    userService
-      .getAllRecoveries()
-      .then((response) => setRecoveries(response))
-      .catch((error) => console.log(error));
-  }, []);
+    if (!recoveries) {
+      (async () => {
+        try {
+          const response = await userService.getAllRecoveries();
+          (await response) && setRecoveries(response);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+    }
+  }, [recoveries]);
 
   const handleCreateRecovery = (muscleId) => {
     if (muscleId > 0 && muscleId <= 14) {
       const fatigue = parseInt(window.prompt("Level of fatigue"));
       if (fatigue) {
-        userService
-          .createRecovery({
+        (async () => {
+          const response = await userService.createRecovery({
             muscleId: muscleId,
             fatigue: fatigue,
-          })
-          .then((response) => {
-            setRecoveries([...recoveries, response]);
-          })
-          .catch((error) => console.log(error));
+          });
+          (await response) && setRecoveries([...recoveries, response]);
+        })();
       }
     }
   };
@@ -42,30 +46,38 @@ export const Recoveries = () => {
     if (id !== undefined) {
       const fatigue = parseInt(window.prompt("Level of fatigue"));
       if (fatigue) {
-        userService
-          .update(id, {
-            fatigue: fatigue,
-          })
-          .then((response) =>
-            setRecoveries([
-              ...recoveries.map((x) => (x.id == response.id ? response : x)),
-            ])
-          )
-          .catch((error) => console.log(error));
+        (async () => {
+          try {
+            const response = await userService.update(id, {
+              fatigue: fatigue,
+            });
+            (await response) &&
+              setRecoveries([
+                ...recoveries.map((x) => (x.id === response.id ? response : x)),
+              ]);
+          } catch (error) {
+            setException(error);
+          }
+        })();
       }
     }
   };
 
   const handleDeleteRecovery = (id) => {
     if (window.confirm("Are you sure you want to delete this recovery?"))
-      userService
-        .deleteRecovery(id)
-        .then(setRecoveries([...recoveries.filter((x) => x.id !== id)]))
-        .catch((error) => console.log(error));
+      (async () => {
+        try {
+          const response = await userService.deleteRecovery(id);
+          (await response) &&
+            setRecoveries([...recoveries.filter((x) => x.id !== id)]);
+        } catch (error) {
+          setException(error);
+        }
+      })();
   };
 
   return (
-    <>
+    <React.Fragment>
       <Grid container>
         <Grid item xs={12}>
           <h1>Recoveries</h1>
@@ -133,6 +145,6 @@ export const Recoveries = () => {
           </Grid>
         </Grid>
       </Grid>
-    </>
+    </React.Fragment>
   );
 };

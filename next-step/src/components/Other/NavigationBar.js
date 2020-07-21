@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -29,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const NavigationBar = (props) => {
-  console.log(props.user);
   const classes = useStyles();
   let user = JSON.parse(localStorage.getItem("user"));
   const [anchorEl, setAnchorEl] = React.useState(null);

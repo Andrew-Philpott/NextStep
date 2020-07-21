@@ -14,42 +14,52 @@ import { history } from "../../helpers/history";
 import * as routes from "../../constants/route-constants";
 import { exerciseService } from "../../services/exercise-service";
 
-export const WorkoutForm = () => {
-  const blankExercise = {
-    exerciseId: "",
-    intensity: "",
-    reps: "",
-    sets: "",
-    weight: "",
-  };
+const blankExercise = {
+  exerciseId: "",
+  intensity: "",
+  reps: "",
+  sets: "",
+  weight: "",
+};
 
-  const initialFieldValues = {
-    name: "",
-    notes: "",
-    exercises: [{ ...blankExercise }],
-  };
+const initialFieldValues = {
+  name: "",
+  notes: "",
+  exercises: [{ ...blankExercise }],
+};
 
-  const [errors, setErrors] = useState({});
+export const WorkoutForm = (props) => {
+  const { setException } = props;
   const { id } = useParams();
-  const { values, handleInputChange, setValues } = useForm(initialFieldValues);
+  const { values, setValues, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
   const [exerciseList, setExerciseList] = useState(null);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    exerciseService
-      .getAll()
-      .then((response) => setExerciseList(response))
-      .catch((error) => console.log(error));
+    (async () => {
+      try {
+        const response = await exerciseService.getAll();
+        (await response) && setExerciseList(response);
+      } catch (error) {
+        setException(error);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    if (id) {
-      userService
-        .getWorkout(id)
-        .then((response) => setValues(response), setEditing(true))
-        .catch((error) => console.log(error));
+    if (id && !editing) {
+      (async () => {
+        try {
+          const response = await userService.getWorkout(id);
+          (await response) && setValues(response) && setEditing(true);
+        } catch (error) {
+          setException(error);
+        }
+      })();
     }
-  }, []);
+  }, [id, editing]);
 
   const handleExerciseChange = (e) => {
     let updatedExercises = { ...values };
@@ -70,10 +80,14 @@ export const WorkoutForm = () => {
     let newState = { ...values };
     if (eid) {
       if (window.confirm("Are you sure you want to delete this exercise?"))
-        userService
-          .removeExercise(id, eid)
-          .then(newState.exercises.splice(index, 1))
-          .catch((error) => console.log(error));
+        (async () => {
+          try {
+            const response = await userService.removeExercise(id, eid);
+            (await response) && newState.exercises.splice(index, 1);
+          } catch (error) {
+            setException(error);
+          }
+        })();
     } else {
       newState.exercises.splice(index, 1);
     }
@@ -146,31 +160,32 @@ export const WorkoutForm = () => {
 
   const handleSubmit = () => {
     if (validate()) {
-      let workout = {};
-      if (editing) {
-        workout = {
-          name: values.name,
-          notes: values.notes,
-          updateExercises: values.exercises.filter((x) => x.id != null),
-          newExercises: values.exercises.filter((x) => x.id == null),
-        };
-        userService
-          .updateWorkout(id, workout)
-          .then(() => {
+      (async () => {
+        try {
+          let workout = {};
+          if (editing) {
+            workout = {
+              name: values.name,
+              notes: values.notes,
+              updateExercises: values.exercises.filter((x) => x.id != null),
+              newExercises: values.exercises.filter((x) => x.id == null),
+            };
+
+            await userService.updateWorkout(id, workout);
             history.push(routes.WORKOUTS_LIST);
-          })
-          .catch((error) => console.log(error));
-      } else {
-        workout = {
-          name: values.name,
-          notes: values.notes,
-          exercises: values.exercises,
-        };
-        userService
-          .createWorkout(workout)
-          .then(() => history.push(routes.WORKOUTS_LIST))
-          .catch((error) => console.log(error));
-      }
+          } else {
+            workout = {
+              name: values.name,
+              notes: values.notes,
+              exercises: values.exercises,
+            };
+            await userService.createWorkout(workout);
+            history.push(routes.WORKOUTS_LIST);
+          }
+        } catch (error) {
+          setException(error);
+        }
+      })();
     }
   };
 

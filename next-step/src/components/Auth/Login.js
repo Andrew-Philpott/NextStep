@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { userService } from "../../services/user-service";
 import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
 import { history } from "../../helpers/history";
@@ -52,9 +52,8 @@ export const Login = (props) => {
           values.username,
           values.password
         );
-        (await response) &&
-          localStorage.setItem("user", JSON.stringify(response)) &&
-          history.push(routes.ACCOUNT);
+        localStorage.setItem("user", JSON.stringify(response));
+        history.push(routes.ACCOUNT);
       } catch (error) {
         setException(error);
       }

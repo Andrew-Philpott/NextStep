@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
-import { Button, Container } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { UserRoute } from "./components/Auth/UserRoute";
 import { Home } from "./components/Other/Home";
 import { Exercises } from "./components/Exercises/Exercises";
@@ -14,7 +14,7 @@ import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { Sessions } from "./components/Sessions/Sessions";
 import { RecordForm } from "./components/Exercises/RecordForm";
 import * as routes from "./constants/route-constants";
-import { Account } from "./components/Auth/Account";
+import { Recoveries } from "./components/Recoveries/Recoveries";
 import { userService } from "./services/user-service";
 import { history } from "./helpers/history";
 import { ErrorModal } from "./components/Other/ErrorModal";
@@ -25,7 +25,7 @@ function App() {
   const [exception, setException] = useState(null);
 
   useEffect(() => {
-    if (!session) {
+    if (JSON.parse(localStorage.getItem("user") !== null && !session)) {
       (async () => {
         try {
           const response = await userService.getCurrentSession();
@@ -35,7 +35,7 @@ function App() {
         }
       })();
     }
-  }, [history.location, session]);
+  }, [session]);
 
   const handleEndSession = () => {
     const rating = parseInt(window.prompt("How would you rate that workout?"));
@@ -67,7 +67,7 @@ function App() {
       );
     }
   };
-
+  console.log(exception);
   return (
     <div className="App">
       <Router history={history}>
@@ -87,60 +87,74 @@ function App() {
           </div>
         )}
 
-        {exception && <ErrorModal errors={exception} />}
-        <Container maxWidth="lg">
-          <Switch>
-            <Route exact path={routes.LANDING} component={Home} />
-            <UserRoute exact path={routes.ACCOUNT} component={Account} />
-            <UserRoute
-              exact
-              path={routes.RECORDS_NEW}
-              component={() => <RecordForm {...{ setException }} />}
-            />
-            <UserRoute
-              exact
-              path={routes.EXERCISES_LIST}
-              component={() => <Exercises {...{ setException }} />}
-            />
-            <UserRoute
-              exact
-              path={routes.EXERCISES_DETAILS}
-              component={() => <ExerciseDetails {...{ setException }} />}
-            />
-            <UserRoute
-              exact
-              path={routes.WORKOUTS_LIST}
-              component={() => (
-                <Workouts {...{ handleStartSession, setException }} />
-              )}
-            />
-            <UserRoute
-              exact
-              path={routes.WORKOUTS_NEW}
-              component={() => <WorkoutForm {...{ setException }} />}
-            />
-            <UserRoute
-              exact
-              path={routes.WORKOUTS_DETAILS}
-              component={() => <WorkoutDetails {...{ setException }} />}
-            />
-            <UserRoute
-              exact
-              path={routes.WORKOUTS_EDIT}
-              component={() => <WorkoutForm {...{ setException }} />}
-            />
-            <UserRoute exact path={routes.SESSIONS_LIST} component={Sessions} />
-            <Route
-              path={routes.LOG_IN}
-              component={() => <Login {...{ session, handleEndSession }} />}
-            />
-            <Route
-              path={routes.REGISTER}
-              component={() => <Register {...{ setException }} />}
-            />
-            <Redirect from="*" to={routes.LANDING} />
-          </Switch>
-        </Container>
+        {exception && (
+          <ErrorModal exception={exception} setException={setException} />
+        )}
+
+        <Switch>
+          <Route exact path={routes.LANDING} component={Home} />
+          <UserRoute
+            exact
+            path={routes.ACCOUNT}
+            component={() => <Recoveries setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.RECORDS_NEW}
+            component={() => <RecordForm setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.EXERCISES_LIST}
+            component={() => <Exercises setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.EXERCISES_DETAILS}
+            component={() => <ExerciseDetails setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.WORKOUTS_LIST}
+            component={() => (
+              <Workouts
+                handleStartSession={handleStartSession}
+                setException={setException}
+              />
+            )}
+          />
+          <UserRoute
+            exact
+            path={routes.WORKOUTS_NEW}
+            component={() => <WorkoutForm setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.WORKOUTS_DETAILS}
+            component={() => <WorkoutDetails setException={setException} />}
+          />
+          <UserRoute
+            exact
+            path={routes.WORKOUTS_EDIT}
+            component={() => <WorkoutForm setException={setException} />}
+          />
+          <UserRoute exact path={routes.SESSIONS_LIST} component={Sessions} />
+          <Route
+            path={routes.LOG_IN}
+            component={() => (
+              <Login
+                session={session}
+                handleEndSession={handleEndSession}
+                setException={setException}
+              />
+            )}
+          />
+          <Route
+            path={routes.REGISTER}
+            component={() => <Register setException={setException} />}
+          />
+          <Redirect from="*" to={routes.LANDING} />
+        </Switch>
       </Router>
     </div>
   );

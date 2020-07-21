@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Grid,
-  TextField,
-  InputLabel,
-  CircularProgress,
-} from "@material-ui/core";
+import React from "react";
+import { Button, Grid, TextField, InputLabel } from "@material-ui/core";
 import * as routes from "../../constants/route-constants";
 import { userService } from "../../services/user-service";
 import { history } from "../../helpers/history";
@@ -71,8 +65,8 @@ export const Register = (props) => {
 
       (async () => {
         try {
-          const response = await userService.register(user);
-          (await response) && history.push(routes.LOG_IN);
+          await userService.register(user);
+          history.push(routes.LOG_IN);
         } catch (error) {
           setException(error);
         }
