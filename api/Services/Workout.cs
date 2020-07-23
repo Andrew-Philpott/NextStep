@@ -7,45 +7,48 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 namespace BodyJournalAPI.Services
 {
-  public interface IWorkoutService : IServiceBase<Workout>
+  public interface IWorkoutService
   {
     Task<Workout> GetWorkoutAsync(int userId, int id);
     Task<IEnumerable<Workout>> GetWorkoutsAsync(int userId);
-    void CreateWorkout(Workout model);
+    Task CreateWorkout(Workout model);
     void UpdateWorkout(Workout model);
     void DeleteWorkout(Workout model);
   }
-  public class WorkoutService : ServiceBase<Workout>,
+  public class WorkoutService :
   IWorkoutService
   {
-    public WorkoutService(BodyJournalContext bodyJournalContext) : base(bodyJournalContext)
+    private DataContext _context;
+    public WorkoutService(DataContext context)
     {
+      _context = context;
     }
     public async Task<Workout> GetWorkoutAsync(int userId, int id)
     {
-      Workout model = await FindByCondition(x => x.UserId == userId && x.Id == id).
+      return await _context.Workouts.Where(x => x.UserId == userId && x.Id == id).
       SingleOrDefaultAsync();
-
-      return model;
     }
     public async Task<IEnumerable<Workout>> GetWorkoutsAsync(int id)
     {
-      return await FindByCondition(x => x.UserId == id).OrderBy(x => x.Name).ToListAsync();
+      return await _context.Workouts.Where(x => x.UserId == id).OrderByDescending(x => x.Name).ToArrayAsync();
     }
 
-    public void CreateWorkout(Workout model)
+    public async Task CreateWorkout(Workout model)
     {
-      Create(model);
+      await _context.Workouts.AddAsync(model);
+      await _context.SaveChangesAsync();
     }
 
     public void UpdateWorkout(Workout model)
     {
-      Update(model);
+      _context.Workouts.Update(model);
+      _context.SaveChanges();
     }
 
     public void DeleteWorkout(Workout model)
     {
-      Delete(model);
+      _context.Workouts.Remove(model);
+      _context.SaveChanges();
     }
   }
 }

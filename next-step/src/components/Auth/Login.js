@@ -11,7 +11,7 @@ const initialFieldValues = {
 };
 
 export const Login = (props) => {
-  const { session, handleEndSession, setException } = props;
+  const { session, handleEndSession, setLoggedIn, setException } = props;
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -40,6 +40,7 @@ export const Login = (props) => {
     if (session) {
       handleEndSession();
     }
+    setLoggedIn(false);
     userService.logout();
   }, [session]);
 
@@ -47,16 +48,14 @@ export const Login = (props) => {
     e.preventDefault();
 
     if (validate()) {
-      try {
-        const response = await userService.login(
-          values.username,
-          values.password
-        );
-        localStorage.setItem("user", JSON.stringify(response));
-        history.push(routes.ACCOUNT);
-      } catch (error) {
-        setException(error);
-      }
+      userService
+        .login(values.username, values.password)
+        .then(() => {
+          history.push(routes.ACCOUNT);
+        })
+        .catch((error) => {
+          setException(error);
+        });
     }
   }
 

@@ -14,7 +14,7 @@ import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { Sessions } from "./components/Sessions/Sessions";
 import { RecordForm } from "./components/Exercises/RecordForm";
 import * as routes from "./constants/route-constants";
-import { Recoveries } from "./components/Recoveries/Recoveries";
+import { Account } from "./components/Auth/Account";
 import { userService } from "./services/user-service";
 import { history } from "./helpers/history";
 import { ErrorModal } from "./components/Other/ErrorModal";
@@ -23,19 +23,26 @@ import "./App.css";
 function App() {
   const [session, setSession] = useState(null);
   const [exception, setException] = useState(null);
-
-  useEffect(() => {
-    if (JSON.parse(localStorage.getItem("user") !== null && !session)) {
-      (async () => {
-        try {
-          const response = await userService.getCurrentSession();
-          setSession(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
-    }
-  }, [session]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const user = localStorage.getItem("user");
+  // useEffect(() => {
+  //   if (
+  //     JSON.parse(
+  //       localStorage.getItem("user") !== null &&
+  //         history.location.pathname == "/" &&
+  //         !session
+  //     )
+  //   ) {
+  //     (async () => {
+  //       try {
+  //         const response = await userService.getCurrentSession();
+  //         setSession(response);
+  //       } catch (error) {
+  //         setException(error);
+  //       }
+  //     })();
+  //   }
+  // }, [session]);
 
   const handleEndSession = () => {
     const rating = parseInt(window.prompt("How would you rate that workout?"));
@@ -71,7 +78,7 @@ function App() {
   return (
     <div className="App">
       <Router history={history}>
-        <NavigationBar />
+        <NavigationBar user={user} />
 
         {session && (
           <div className="current-session">
@@ -87,16 +94,16 @@ function App() {
           </div>
         )}
 
-        {exception && (
+        {/* {exception && (
           <ErrorModal exception={exception} setException={setException} />
-        )}
+        )} */}
 
         <Switch>
           <Route exact path={routes.LANDING} component={Home} />
           <UserRoute
             exact
             path={routes.ACCOUNT}
-            component={() => <Recoveries setException={setException} />}
+            component={() => <Account setException={setException} />}
           />
           <UserRoute
             exact
@@ -138,11 +145,16 @@ function App() {
             path={routes.WORKOUTS_EDIT}
             component={() => <WorkoutForm setException={setException} />}
           />
-          <UserRoute exact path={routes.SESSIONS_LIST} component={Sessions} />
+          <UserRoute
+            exact
+            path={routes.SESSIONS_LIST}
+            component={() => <Sessions setException={setException} />}
+          />
           <Route
             path={routes.LOG_IN}
             component={() => (
               <Login
+                setLoggedIn={setLoggedIn}
                 session={session}
                 handleEndSession={handleEndSession}
                 setException={setException}

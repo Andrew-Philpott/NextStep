@@ -8,43 +8,48 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BodyJournalAPI.Services
 {
-  public interface IUserExerciseService : IServiceBase<UserExercise>
+  public interface IUserExerciseService
   {
     Task<UserExercise> GetExerciseAsync(int userId, int id);
     Task<IEnumerable<UserExercise>> GetExercisesAsync(int userId);
-    void CreateExercise(UserExercise model);
+    Task CreateExercise(UserExercise model);
     void UpdateExercise(UserExercise model);
     void DeleteExercise(UserExercise model);
   }
-  public class UserExerciseService : ServiceBase<UserExercise>,
+  public class UserExerciseService :
   IUserExerciseService
   {
-    public UserExerciseService(BodyJournalContext bodyJournalContext) : base(bodyJournalContext)
+    private DataContext _context;
+    public UserExerciseService(DataContext context)
     {
+      _context = context;
     }
 
     public async Task<UserExercise> GetExerciseAsync(int userId, int id)
     {
-      return await FindByCondition(x => x.UserId == userId && x.Id == id).SingleOrDefaultAsync();
+      return await _context.UserExercises.Where(x => x.UserId == userId && x.Id == id).SingleOrDefaultAsync();
     }
 
     public async Task<IEnumerable<UserExercise>> GetExercisesAsync(int userId)
     {
-      return await FindByCondition(x => x.UserId == userId).ToListAsync();
+      return await _context.UserExercises.Where(x => x.UserId == userId).ToArrayAsync();
     }
-    public void CreateExercise(UserExercise model)
+    public async Task CreateExercise(UserExercise model)
     {
-      Create(model);
+      await _context.UserExercises.AddAsync(model);
+      await _context.SaveChangesAsync();
     }
 
     public void UpdateExercise(UserExercise model)
     {
-      Update(model);
+      _context.UserExercises.Update(model);
+      _context.SaveChanges();
     }
 
     public void DeleteExercise(UserExercise model)
     {
-      Delete(model);
+      _context.UserExercises.Remove(model);
+      _context.SaveChanges();
     }
   }
 }

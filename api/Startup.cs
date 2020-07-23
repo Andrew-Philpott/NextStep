@@ -23,11 +23,10 @@ namespace BodyJournalAPI
     }
     public void ConfigureServices(IServiceCollection services)
     {
+      services.AddDbContext<DataContext>(ServiceLifetime.Transient);
       services.AddCors();
       services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-      services.ConfigureSqlServerContext(_configuration);
-      services.ConfigureServiceWrapper();
       services.AddAutoMapper(typeof(Startup));
 
       var appSettingsSection = _configuration.GetSection("AppSettings");
@@ -69,8 +68,15 @@ namespace BodyJournalAPI
       });
 
       services.AddScoped<IUserService, UserService>();
+      services.AddScoped<IExerciseService, ExerciseService>();
+      services.AddScoped<IWorkoutService, WorkoutService>();
+      services.AddScoped<IRecordService, RecordService>();
+      services.AddScoped<IUserExerciseService, UserExerciseService>();
+      services.AddScoped<IRecoveryService, RecoveryService>();
+      services.AddScoped<ISessionService, SessionService>();
+      services.AddScoped<IExerciseWorkoutService, ExerciseWorkoutService>();
     }
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BodyJournalContext context)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext context)
     {
       context.Database.Migrate();
 

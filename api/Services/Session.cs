@@ -5,53 +5,57 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+
 namespace BodyJournalAPI.Services
 {
-  public interface ISessionService : IServiceBase<Session>
+  public interface ISessionService
   {
     Task<Session> GetSessionAsync(int userId, int id);
     Task<IEnumerable<Session>> GetSessionsAsync(int userId);
     Task<Session> GetCurrentSessionAsync(int userId);
-    void CreateSession(Session model);
+    Task CreateSession(Session model);
     void UpdateSession(Session model);
     void DeleteSession(Session model);
   }
-  public class SessionService : ServiceBase<Session>,
+  public class SessionService :
   ISessionService
   {
-    public SessionService(BodyJournalContext bodyJournalContext) : base(bodyJournalContext)
+    private DataContext _context;
+    public SessionService(DataContext context)
     {
+      _context = context;
     }
     public async Task<Session> GetSessionAsync(int userId, int id)
     {
-      Session model = await FindByCondition(x => x.UserId == userId && x.Id == id).
-      SingleOrDefaultAsync();
-
-      return model;
+      return await _context.Sessions.AsQueryable().AsNoTracking().Where(x => x.UserId == userId && x.Id == id).
+       SingleOrDefaultAsync();
     }
     public async Task<IEnumerable<Session>> GetSessionsAsync(int id)
     {
-      return await FindByCondition(x => x.UserId == id).Include(e => e.Workout).OrderBy(x => x.WorkoutStart).ToListAsync();
+      return await _context.Sessions.AsQueryable().AsNoTracking().Where(x => x.UserId == id).Include(e => e.Workout).ToArrayAsync();
     }
 
     public async Task<Session> GetCurrentSessionAsync(int id)
     {
-      return await FindByCondition(x => x.WorkoutEnd == null).OrderByDescending(x => x.WorkoutStart).LastOrDefaultAsync();
+      return await _context.Sessions.AsQueryable().AsNoTracking().Where(x => x.WorkoutEnd == null).OrderByDescending(x => x.WorkoutStart).LastOrDefaultAsync();
     }
 
-    public void CreateSession(Session model)
+    public async Task CreateSession(Session model)
     {
-      Create(model);
+      await _context.Sessions.AddAsync(model);
+      await _context.SaveChangesAsync();
     }
 
     public void UpdateSession(Session model)
     {
-      Update(model);
+      _context.Sessions.Update(model);
+      _context.SaveChanges();
     }
 
     public void DeleteSession(Session model)
     {
-      Delete(model);
+      _context.Sessions.Remove(model);
+      _context.SaveChanges();
     }
   }
 }

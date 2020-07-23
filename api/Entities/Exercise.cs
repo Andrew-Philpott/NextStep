@@ -6,6 +6,6 @@ namespace BodyJournalAPI.Entities
   {
     public int Id { get; set; }
     public string Name { get; set; }
-    public ICollection<ExerciseMuscle> Muscles { get; set; }
+    public virtual ICollection<ExerciseMuscle> Muscles { get; set; }
   }
 }

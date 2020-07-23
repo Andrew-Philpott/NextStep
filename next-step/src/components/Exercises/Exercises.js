@@ -12,8 +12,9 @@ import { exerciseService } from "../../services/exercise-service";
 export const Exercises = (props) => {
   const { setException } = props;
   const [exercises, setExercises] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    if (!exercises) {
+    if (!loaded) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
@@ -23,7 +24,7 @@ export const Exercises = (props) => {
         }
       })();
     }
-  }, [exercises]);
+  }, [loaded]);
 
   return (
     <Grid container>
@@ -47,62 +48,67 @@ export const Exercises = (props) => {
               </TableHead>
               <TableBody>
                 {exercises &&
-                  exercises.map((exercise) => (
-                    <TableRow key={exercise.id}>
-                      <TableCell component="th" scope="row">
-                        <Link to={`/exercises/${exercise.id}`}>
-                          {exercise.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell align="left" />
-                      <TableCell align="left">
-                        <ul className="pad-l0">
-                          {exercise.muscles
-                            .filter(
-                              (x) => x.primary === true,
-                              (x) => {
-                                return x;
-                              }
-                            )
-                            .sort((a, b) => (a.id < b.id ? 1 : -1))
-                            .map((muscle, index) => (
-                              <li
-                                style={{
-                                  listStyle: "none",
-                                  textAlign: "left",
-                                }}
-                                key={index}
-                              >
-                                {muscle.muscle.name}
-                              </li>
-                            ))}
-                        </ul>
-                      </TableCell>
-                      <TableCell align="left">
-                        <ul className="pad-l0">
-                          {exercise.muscles
-                            .filter(
-                              (x) => x.primary === false,
-                              (x) => {
-                                return x;
-                              }
-                            )
-                            .sort((a, b) => (a.id < b.id ? 1 : -1))
-                            .map((muscle, index) => (
-                              <li
-                                style={{
-                                  listStyle: "none",
-                                  textAlign: "left",
-                                }}
-                                key={index}
-                              >
-                                {muscle.muscle.name}
-                              </li>
-                            ))}
-                        </ul>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  exercises.map(
+                    (exercise) => (
+                      console.log(exercise),
+                      (
+                        <TableRow key={exercise.id}>
+                          <TableCell component="th" scope="row">
+                            <Link to={`/exercises/${exercise.id}`}>
+                              {exercise.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell align="left" />
+                          <TableCell align="left">
+                            <ul className="pad-l0">
+                              {exercise.muscles
+                                .filter(
+                                  (x) => x.primary === true,
+                                  (x) => {
+                                    return x;
+                                  }
+                                )
+                                .sort((a, b) => (a.id < b.id ? 1 : -1))
+                                .map((muscle, index) => (
+                                  <li
+                                    style={{
+                                      listStyle: "none",
+                                      textAlign: "left",
+                                    }}
+                                    key={index}
+                                  >
+                                    {muscle.muscle.name}
+                                  </li>
+                                ))}
+                            </ul>
+                          </TableCell>
+                          <TableCell align="left">
+                            <ul className="pad-l0">
+                              {exercise.muscles
+                                .filter(
+                                  (x) => x.primary === false,
+                                  (x) => {
+                                    return x;
+                                  }
+                                )
+                                .sort((a, b) => (a.id < b.id ? 1 : -1))
+                                .map((muscle, index) => (
+                                  <li
+                                    style={{
+                                      listStyle: "none",
+                                      textAlign: "left",
+                                    }}
+                                    key={index}
+                                  >
+                                    {muscle.muscle.name}
+                                  </li>
+                                ))}
+                            </ul>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )
+                  )}
               </TableBody>
             </Table>
           </TableContainer>

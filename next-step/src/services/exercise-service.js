@@ -10,15 +10,16 @@ export const exerciseService = {
 
 const getOptions = {
   method: "GET",
-  headers: authHeader(),
 };
 
-function get(id) {
-  return fetch(`http://localhost:5000${path}/${id}`, getOptions).then(
+async function get(id) {
+  return await fetch(`http://localhost:5000${path}/${id}`, getOptions).then(
     handleResponse
   );
 }
 
-function getAll() {
-  return fetch(`http://localhost:5000${path}`, getOptions).then(handleResponse);
+async function getAll() {
+  return await fetch(`http://localhost:5000/api/exercises`, getOptions).then(
+    handleResponse
+  );
 }

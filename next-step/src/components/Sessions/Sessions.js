@@ -10,20 +10,23 @@ import { userService } from "../../services/user-service";
 
 export const Sessions = (props) => {
   const [sessions, setSessions] = useState(null);
-  const { setException } = props;
+  const [loaded, setLoaded] = useState(false);
+  // const { setException } = props;
 
   useEffect(() => {
-    if (!sessions) {
-      (async () => {
-        try {
-          const response = await userService.getAllSessions();
+    if (!loaded) {
+      userService
+        .getAllSessions()
+        .then((response) => {
           setSessions(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
+          setLoaded(true);
+        })
+        .catch((error) => {
+          console.log(error);
+          // setException(error);
+        });
     }
-  }, [sessions]);
+  }, [loaded]);
 
   return (
     <Grid container>

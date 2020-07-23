@@ -7,9 +7,9 @@ namespace BodyJournalAPI.Entities
     public int Id { get; set; }
     [ForeignKey(nameof(Exercise))]
     public int ExerciseId { get; set; }
-    public virtual Exercise Exercise { get; set; }
+    public Exercise Exercise { get; set; }
     [ForeignKey(nameof(Workout))]
     public int WorkoutId { get; set; }
-    public virtual Workout Workout { get; set; }
+    public Workout Workout { get; set; }
   }
 }

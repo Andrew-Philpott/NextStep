@@ -1,66 +1,64 @@
 
 using BodyJournalAPI.Entities;
 using BodyJournalAPI.Helpers;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BodyJournalAPI.Services
 {
-  public interface IRecoveryService : IServiceBase<Recovery>
+  public interface IRecoveryService
   {
     Task<Recovery> GetRecoveryAsync(int userId, int id);
     Task<IEnumerable<Recovery>> GetRecoveriesAsync(int userId);
-    // Task<Recovery> GetCurrentMuscleRecoveryAsync(int id, int muscleId);
-    // Task<IEnumerable<Recovery>> GetCurrentRecoveriesAsync(int userId);
-    void CreateRecoveries(List<Recovery> model);
-    void CreateRecovery(Recovery model);
+    Task CreateRecoveries(List<Recovery> model);
+    Task CreateRecovery(Recovery model);
     void UpdateRecovery(Recovery model);
     void DeleteRecovery(Recovery model);
   }
-  public class RecoveryService : ServiceBase<Recovery>,
+  public class RecoveryService :
   IRecoveryService
   {
-    public RecoveryService(BodyJournalContext bodyJournalContext) : base(bodyJournalContext)
+    private DataContext _context;
+    public RecoveryService(DataContext context)
     {
+      _context = context;
     }
 
     public async Task<Recovery> GetRecoveryAsync(int userId, int id)
     {
-      return await FindByCondition(x => x.UserId == userId && x.Id == id).SingleOrDefaultAsync();
+      return await _context.Recovery.AsQueryable().AsNoTracking().Where(x => x.UserId == userId && x.Id == id).SingleOrDefaultAsync();
     }
-
-    // public async Task<Recovery> GetCurrentMuscleRecoveryAsync(int id, int muscleId)
-    // {
-    //   return await FindByCondition(x => x.UserId == id && x.MuscleId == muscleId).OrderByDescending(x => x.Time).FirstOrDefaultAsync();
-    // }
 
     public async Task<IEnumerable<Recovery>> GetRecoveriesAsync(int userId)
     {
-      return await FindByCondition(x => x.UserId == userId).ToListAsync();
+      return await _context.Recovery.AsQueryable().AsNoTracking().Where(x => x.UserId == userId).ToArrayAsync();
     }
 
-    public void CreateRecoveries(List<Recovery> model)
+    public async Task CreateRecoveries(List<Recovery> model)
     {
       foreach (Recovery item in model)
       {
-        Create(item);
+        await _context.Recovery.AddAsync(item);
       }
     }
-    public void CreateRecovery(Recovery model)
+    public async Task CreateRecovery(Recovery model)
     {
-      Create(model);
+      await _context.Recovery.AddAsync(model);
+      await _context.SaveChangesAsync();
     }
 
     public void UpdateRecovery(Recovery model)
     {
-      Update(model);
+      _context.Recovery.Update(model);
+      _context.SaveChanges();
     }
 
     public void DeleteRecovery(Recovery model)
     {
-      Delete(model);
+      _context.Recovery.Remove(model);
+      _context.SaveChanges();
     }
   }
 }

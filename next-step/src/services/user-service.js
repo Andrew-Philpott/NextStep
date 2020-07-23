@@ -78,11 +78,14 @@ async function login(username, password) {
     body: JSON.stringify({ username, password }),
   };
 
-  const response = await fetch(
+  return await fetch(
     `http://localhost:5000/api/users/authenticate`,
     requestOptions
-  );
-  return await handleResponse(response);
+  )
+    .then(handleResponse)
+    .then((user) => {
+      localStorage.setItem("user", JSON.stringify(user));
+    });
 }
 
 function logout() {
@@ -191,8 +194,8 @@ async function getSession(id) {
   ).then(handleResponse);
 }
 
-async function getAllSessions() {
-  return await fetch(`http://localhost:5000${paths.session}`, getOptions).then(
+function getAllSessions() {
+  return fetch(`http://localhost:5000${paths.session}`, getOptions).then(
     handleResponse
   );
 }
@@ -232,8 +235,8 @@ async function getExercise(id) {
   ).then(handleResponse);
 }
 
-async function getAllExercises() {
-  return await fetch(`http://localhost:5000${paths.exercise}`, getOptions).then(
+function getAllExercises() {
+  return fetch(`http://localhost:5000${paths.exercise}`, getOptions).then(
     handleResponse
   );
 }

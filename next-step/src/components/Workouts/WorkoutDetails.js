@@ -76,19 +76,23 @@ export const WorkoutDetails = (props) => {
             </TableBody>
           </Table>
         </TableContainer>
-        <Link
-          component={Button}
-          className="button green-background"
-          to={workout && `/workouts/edit/${workout.id}`}
-        >
-          Edit
-        </Link>
-        <Button
-          onClick={() => onDelete(workout.id)}
-          className="button red-background"
-        >
-          Delete
-        </Button>
+        {workout && (
+          <div className="mrgn-t8">
+            <Link
+              component={Button}
+              className="button green-background"
+              to={`/workouts/edit/${workout.id}`}
+            >
+              Edit
+            </Link>
+            <Button
+              onClick={() => onDelete(workout.id)}
+              className="button red-background"
+            >
+              Delete
+            </Button>
+          </div>
+        )}
       </Container>
     </>
   );

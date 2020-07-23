@@ -21,98 +21,139 @@ namespace BodyJournalAPI.Controllers
   [Route("[controller]")]
   public class ApiController : ControllerBase
   {
-    private IServiceWrapper _db;
+    private IExerciseService _exerciseService;
+    private IExerciseWorkoutService _exerciseWorkoutService;
+    private IRecordService _recordService;
+    private IRecoveryService _recoveryService;
+    private ISessionService _sessionService;
+    private IUserService _userService;
+    private IUserExerciseService _userExerciseService;
+    private IWorkoutService _workoutService;
     private IMapper _mapper;
     private readonly AppSettings _appSettings;
-    public ApiController(IServiceWrapper db, IMapper mapper, IOptions<AppSettings> appSettings)
+    public ApiController(IExerciseService exerciseService, IExerciseWorkoutService exerciseWorkoutService, IRecordService recordService, IRecoveryService recoveryService, ISessionService sessionService, IUserService userService, IWorkoutService workoutService, IUserExerciseService userExerciseService, IMapper mapper, IOptions<AppSettings> appSettings)
     {
+      _exerciseService = exerciseService;
+      _exerciseWorkoutService = exerciseWorkoutService;
+      _recordService = recordService;
+      _recoveryService = recoveryService;
+      _sessionService = sessionService;
+      _userService = userService;
+      _userExerciseService = userExerciseService;
+      _workoutService = workoutService;
       _mapper = mapper;
-      _db = db;
       _appSettings = appSettings.Value;
     }
     #region Users
     [AllowAnonymous]
     [HttpPost("users/authenticate")]
-    public IActionResult Authenticate([FromBody] AuthenticateUser model)
+    public async Task<IActionResult> Authenticate([FromBody] AuthenticateUser model)
     {
-      var user = _db.User.Authenticate(model.UserName, model.Password);
-      if (user == null)
-        return BadRequest(new { message = "Username or password is incorrect" });
+      try
+      {
+        var user = await _userService.Authenticate(model.UserName, model.Password);
+        if (user == null)
+          return BadRequest(new { message = "Username or password is incorrect" });
 
-      var tokenHandler = new JwtSecurityTokenHandler();
-      var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-      var tokenDescriptor = new SecurityTokenDescriptor
-      {
-        Subject = new ClaimsIdentity(new Claim[]
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
+          Subject = new ClaimsIdentity(new Claim[]
+          {
             new Claim(ClaimTypes.Name, user.Id.ToString())
-        }),
-        Expires = DateTime.UtcNow.AddDays(7),
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-      };
-      var token = tokenHandler.CreateToken(tokenDescriptor);
-      var JWToken = tokenHandler.WriteToken(token);
-      return Ok(new
+          }),
+          Expires = DateTime.UtcNow.AddDays(1),
+          SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var JWToken = tokenHandler.WriteToken(token);
+        return Ok(new
+        {
+          Id = user.Id,
+          Username = user.UserName,
+          FirstName = user.FirstName,
+          LastName = user.LastName,
+          Token = JWToken
+        });
+      }
+      catch (Exception)
       {
-        Id = user.Id,
-        Username = user.UserName,
-        FirstName = user.FirstName,
-        LastName = user.LastName,
-        Token = JWToken
-      });
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [AllowAnonymous]
     [HttpPost("users/register")]
     public async Task<IActionResult> Register([FromBody] RegisterUser model)
     {
-      var user = _mapper.Map<User>(model);
       try
       {
-        _db.User.CreateUser(user, model.Password);
-        await _db.SaveAsync();
+        var user = _mapper.Map<User>(model);
+        await _userService.CreateUser(user, model.Password);
         return Ok();
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return BadRequest(new { message = ex.Message });
+        return StatusCode(500, "Internal server error.");
       }
     }
 
     [HttpGet("users/{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-      var user = _db.User.GetUserById(id);
-      var model = _mapper.Map<ViewUser>(user);
-      return Ok(model);
+      try
+      {
+        var entity = await _userService.GetUserById(id);
+        if (entity == null)
+          return NotFound();
+
+        return Ok(_mapper.Map<ViewUser>(entity));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPut("users/{id}")]
-    public IActionResult Update(int id, [FromBody] UpdateUser model)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateUser model)
     {
-      var user = _mapper.Map<User>(model);
-      user.Id = id;
-
       try
       {
-        _db.User.UpdateUser(user, model.Password);
+        var entity = await _userService.GetUserById(id);
+        if (entity == null)
+          return NotFound();
+
+        var user = _mapper.Map<User>(model);
+        user.Id = id;
+        await _userService.UpdateUser(user, model.Password);
         return Ok();
       }
-      catch (Exception ex)
+      catch (Exception)
       {
-        return BadRequest(new { message = ex.Message });
+        return StatusCode(500, "Internal server error.");
       }
     }
 
     [HttpDelete("users/{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-      var entity = _db.User.GetUserById(id);
-      if (entity == null)
-        return BadRequest(new { message = "User not in database" });
-      _db.User.DeleteUser(entity);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var entity = await _userService.GetUserById(id);
+        if (entity == null)
+          return NotFound();
+
+        _userService.DeleteUser(entity);
+
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
+
     }
     #endregion
 
@@ -123,15 +164,36 @@ namespace BodyJournalAPI.Controllers
     [HttpGet("exercises/{id}")]
     public async Task<IActionResult> Exercise(int id)
     {
-      var model = await _db.Exercise.GetExerciseAsync(id);
-      return Ok(model);
+      try
+      {
+        var entity = await _exerciseService.GetExerciseAsync(id);
+
+        if (entity == null)
+          return NotFound();
+
+        return Ok(entity);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     [AllowAnonymous]
     [HttpGet("exercises")]
     public async Task<IActionResult> Exercises()
     {
-      var model = await _db.Exercise.GetExercisesAsync();
-      return Ok(model);
+      try
+      {
+        var entities = await _exerciseService.GetExercisesAsync();
+        if (entities == null)
+          return NotFound(new { message = "Exercises not found." });
+
+        return Ok(entities);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     #endregion
 
@@ -139,234 +201,316 @@ namespace BodyJournalAPI.Controllers
     [HttpGet("users/exercises/{id}")]
     public async Task<IActionResult> GetExercise(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.UserExercise.GetExerciseAsync(currentUserId, id);
-      var model = _mapper.Map<UserExercise>(entity);
-      return Ok(model);
+      try
+      {
+        var entity = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+
+        if (entity == null)
+          return NotFound(new { message = "Exercise does not exist." });
+
+        return Ok(_mapper.Map<UserExercise>(entity));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/exercises")]
     public async Task<IActionResult> GetExercises()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entities = await _db.UserExercise.GetExercisesAsync(currentUserId);
-      var model = _mapper.Map<IEnumerable<UserExercise>>(entities);
-      return Ok(model);
+      try
+      {
+        var entities = await _userExerciseService.GetExercisesAsync(int.Parse(User.Identity.Name));
+
+        return Ok(_mapper.Map<IEnumerable<UserExercise>>(entities));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPost("users/exercises")]
     public async Task<IActionResult> CreateExercise([FromBody] CreateExercise model)
     {
-      if (!ModelState.IsValid)
+      try
       {
-        return BadRequest(new { message = "Invalid model" });
+        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        if (exercise == null)
+          return NotFound(new { message = "Exercise does not exist in database" });
+
+        UserExercise entity = _mapper.Map<UserExercise>(model);
+        entity.Name = exercise.Name;
+        entity.UserId = int.Parse(User.Identity.Name);
+        await _userExerciseService.CreateExercise(entity);
+        ExerciseWorkout exerciseWorkout = new ExerciseWorkout() { WorkoutId = model.WorkoutId, ExerciseId = entity.Id };
+        await _exerciseWorkoutService.CreateExerciseWorkout(exerciseWorkout);
+        return Ok();
       }
-      var exercise = await _db.Exercise.GetExerciseAsync(model.ExerciseId);
-      if (exercise == null)
-        return BadRequest(new { message = "Exercise does not exist in database" });
-      var currentUserId = int.Parse(User.Identity.Name);
-      UserExercise entity = _mapper.Map<UserExercise>(model);
-      entity.Name = exercise.Name;
-      entity.UserId = currentUserId;
-      _db.UserExercise.CreateExercise(entity);
-      await _db.SaveAsync();
-      ExerciseWorkout exerciseWorkout = new ExerciseWorkout() { WorkoutId = model.WorkoutId, ExerciseId = entity.Id };
-      _db.ExerciseWorkout.Create(exerciseWorkout);
-      await _db.SaveAsync();
-      return Ok();
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPut("users/exercises/{id}")]
     public async Task<IActionResult> UpdateExercise(int id, [FromBody] UpdateExercise model)
     {
-      if (!ModelState.IsValid)
+      try
       {
-        return BadRequest(new { message = "Invalid model" });
+        var entity = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Exercise not in database for user" });
+        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        if (exercise == null)
+          return NotFound(new { message = "Exercise type does not exist in database" });
+
+        _mapper.Map(model, entity);
+        entity.Name = exercise.Name;
+        _userExerciseService.UpdateExercise(entity);
+
+        return Ok();
       }
-      var currentUserId = int.Parse(User.Identity.Name);
-
-      var entity = await _db.UserExercise.GetExerciseAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Exercise not in database for user" });
-      var exercise = await _db.Exercise.GetExerciseAsync(model.ExerciseId);
-      if (exercise == null)
-        return BadRequest(new { message = "Exercise type does not exist in database" });
-
-      _mapper.Map(model, entity);
-      entity.Name = exercise.Name;
-      _db.UserExercise.UpdateExercise(entity);
-      await _db.SaveAsync();
-      return Ok();
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpDelete("users/exercises/{id}")]
     public async Task<IActionResult> DeleteExercise(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.UserExercise.GetExerciseAsync(currentUserId, id);
-      if (model == null)
-        return BadRequest(new { message = "Exercise not in database" });
-      _db.UserExercise.DeleteExercise(model);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var model = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+        if (model == null)
+          return NotFound(new { message = "Exercise does not exist." });
+
+        _userExerciseService.DeleteExercise(model);
+
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     #endregion
 
     [HttpGet("users/records")]
     public async Task<IActionResult> GetRecords()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entities = await _db.Record.GetRecordsAsync(currentUserId);
-      var model = _mapper.Map<IEnumerable<ViewRecord>>(entities);
-      return Ok(model);
+      try
+      {
+        var entities = await _recordService.GetRecordsAsync(int.Parse(User.Identity.Name));
+
+        return Ok(_mapper.Map<IEnumerable<ViewRecord>>(entities));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/records/{id}")]
     public async Task<IActionResult> GetRecord(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entities = await _db.Record.GetRecordAsync(currentUserId, id);
-      var model = _mapper.Map<ViewRecord>(entities);
-      return Ok(model);
+      try
+      {
+        var entity = await _recordService.GetRecordAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Record does not exist." });
+
+        return Ok(_mapper.Map<ViewRecord>(entity));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/records/exercises/{id}")]
     public async Task<IActionResult> GetRecordsByExercise(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var exercise = await _db.Exercise.GetExerciseAsync(id);
-      var entities = await _db.Record.GetRecordsByExerciseAsync(currentUserId, id);
+      try
+      {
+        var entity = await _exerciseService.GetExerciseAsync(id);
+        if (entity == null)
+          return NotFound(new { message = "Record does not exist." });
 
-      var model = _mapper.Map<IEnumerable<ViewRecord>>(entities);
-      return Ok(model);
+        var entities = await _recordService.GetRecordsByExerciseAsync(int.Parse(User.Identity.Name), id);
+
+        return Ok(_mapper.Map<IEnumerable<ViewRecord>>(entities));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPost("users/records")]
     public async Task<IActionResult> CreateRecord([FromBody] CreateRecord model)
     {
-      if (!ModelState.IsValid)
+      try
       {
-        return BadRequest(new { message = "Invalid model" });
+        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        if (exercise == null)
+          return NotFound(new { message = "Exercise does not exist." });
+
+        Record entity = _mapper.Map<Record>(model);
+        entity.UserId = int.Parse(User.Identity.Name);
+        await _recordService.CreateRecord(entity);
+        return Ok();
       }
-      var exercise = await _db.Exercise.GetExerciseAsync(model.ExerciseId);
-      if (exercise == null)
-        return BadRequest(new { message = "Exercise does not exist in database" });
-      var currentUserId = int.Parse(User.Identity.Name);
-      Record entity = _mapper.Map<Record>(model);
-      entity.UserId = currentUserId;
-      _db.Record.CreateRecord(entity);
-      await _db.SaveAsync();
-      return Ok();
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpDelete("users/records/{id}")]
     public async Task<IActionResult> DeleteRecord(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.Record.GetRecordAsync(currentUserId, id);
-      if (model == null)
-        return BadRequest(new { message = "Record not in database" });
-      _db.Record.DeleteRecord(model);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var model = await _recordService.GetRecordAsync(int.Parse(User.Identity.Name), id);
+        if (model == null)
+          return NotFound(new { message = "Record not in database" });
+
+        _recordService.DeleteRecord(model);
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     #region Workouts
     [HttpGet("users/workouts/{id}")]
     public async Task<IActionResult> GetWorkout(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      ViewWorkout model = _mapper.Map<ViewWorkout>(await _db.Workout.GetWorkoutAsync(currentUserId, id));
+      try
+      {
+        ViewWorkout model = _mapper.Map<ViewWorkout>(await _workoutService.GetWorkoutAsync(int.Parse(User.Identity.Name), id));
 
-      IEnumerable<ExerciseWorkout> exerciseWorkouts = await _db.ExerciseWorkout.GetExerciseWorkoutsAsync(id);
+        IEnumerable<ExerciseWorkout> exerciseWorkouts = await _exerciseWorkoutService.GetExerciseWorkoutsAsync(id);
 
-      IEnumerable<UserExercise> exercises = await _db.UserExercise.GetExercisesAsync(currentUserId);
+        IEnumerable<UserExercise> exercises = await _userExerciseService.GetExercisesAsync(int.Parse(User.Identity.Name));
 
-      IEnumerable<UserExercise> e = from ex in exercises join ew in exerciseWorkouts on ex.Id equals ew.ExerciseId select ex;
+        IEnumerable<UserExercise> e = from ex in exercises join ew in exerciseWorkouts on ex.Id equals ew.ExerciseId select ex;
 
-      model.Exercises = _mapper.Map<IEnumerable<ViewExercise>>(e);
-      return Ok(model);
+        model.Exercises = _mapper.Map<IEnumerable<ViewExercise>>(e);
+        return Ok(model);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/workouts")]
     public async Task<IActionResult> GetWorkouts()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.Workout.GetWorkoutsAsync(currentUserId);
-      return Ok(model);
+      try
+      {
+        return Ok(await _workoutService.GetWorkoutsAsync(int.Parse(User.Identity.Name)));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPost("users/workouts")]
     public async Task<IActionResult> CreateWorkout([FromBody] CreateWorkout model)
     {
-      if (!ModelState.IsValid)
+      try
       {
-        return BadRequest(new { message = "Invalid model" });
-      }
-      var currentUserId = int.Parse(User.Identity.Name);
-      Workout entity = _mapper.Map<Workout>(model);
-      entity.UserId = currentUserId;
-      _db.Workout.CreateWorkout(entity);
-      await _db.SaveAsync();
-      foreach (CreateExercise item in model.Exercises)
-      {
-        item.WorkoutId = entity.Id;
-        await CreateExercise(item);
-      }
+        Workout entity = _mapper.Map<Workout>(model);
+        entity.UserId = int.Parse(User.Identity.Name);
+        await _workoutService.CreateWorkout(entity);
 
-      return Ok();
+        foreach (CreateExercise item in model.Exercises)
+        {
+          item.WorkoutId = entity.Id;
+          await CreateExercise(item);
+        }
+
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPut("users/workouts/{id}")]
     public async Task<IActionResult> UpdateWorkout(int id, [FromBody] UpdateWorkout model)
     {
-      if (!ModelState.IsValid)
+      try
       {
-        return BadRequest(new { message = "Invalid model" });
-      }
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Workout.GetWorkoutAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Workout does not exist in the database" });
-      _mapper.Map(model, entity);
-      _db.Workout.UpdateWorkout(entity);
+        var entity = await _workoutService.GetWorkoutAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Workout does not exist in the database" });
 
-      foreach (UpdateExercise updateExercise in model.UpdateExercises)
+        _mapper.Map(model, entity);
+        _workoutService.UpdateWorkout(entity);
+
+        foreach (UpdateExercise updateExercise in model.UpdateExercises)
+        {
+          await UpdateExercise(updateExercise.Id, updateExercise);
+        }
+
+        foreach (CreateExercise item in model.NewExercises)
+        {
+          item.WorkoutId = entity.Id;
+          await CreateExercise(item);
+        }
+
+        return Ok();
+      }
+      catch (Exception)
       {
-        await UpdateExercise(updateExercise.Id, updateExercise);
+        return StatusCode(500, "Internal server error.");
       }
-
-      foreach (CreateExercise item in model.NewExercises)
-      {
-        item.WorkoutId = entity.Id;
-        await CreateExercise(item);
-      }
-
-      return Ok();
     }
 
     [HttpDelete("users/workouts/{id}")]
     public async Task<IActionResult> DeleteWorkout(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.Workout.GetWorkoutAsync(currentUserId, id);
-      if (model == null)
-        return BadRequest(new { message = "Workout does not exist in the database" });
-      _db.Workout.DeleteWorkout(model);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var model = await _workoutService.GetWorkoutAsync(int.Parse(User.Identity.Name), id);
+        if (model == null)
+          return NotFound(new { message = "Workout does not exist in the database" });
+
+        _workoutService.DeleteWorkout(model);
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpDelete("users/workouts/{id}/exercises/{eid}")]
     public async Task<IActionResult> DeleteExerciseFromWorkout(int id, int eid)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.ExerciseWorkout.GetExerciseWorkoutAsync(id, eid);
-      if (model == null)
-        return BadRequest(new { message = "Association does not exist in the database" });
-      _db.ExerciseWorkout.Delete(model);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var model = await _exerciseWorkoutService.GetExerciseWorkoutAsync(id, eid);
+        if (model == null)
+          return NotFound(new { message = "Association does not exist in the database" });
+
+        _exerciseWorkoutService.DeleteExerciseWorkout(model);
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     #endregion
 
@@ -374,70 +518,88 @@ namespace BodyJournalAPI.Controllers
     [HttpGet("users/recoveries/{id}")]
     public async Task<IActionResult> GetRecovery(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Recovery.GetRecoveryAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Recovery does not exist in the database" });
-      var model = _mapper.Map<ViewRecovery>(entity);
+      try
+      {
+        var entity = await _recoveryService.GetRecoveryAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Recovery does not exist in the database" });
 
-      return Ok(model);
+        return Ok(_mapper.Map<ViewRecovery>(entity));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     [HttpGet("users/recoveries")]
     public async Task<IActionResult> GetRecoveries()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entities = await _db.Recovery.GetRecoveriesAsync(currentUserId);
-      var model = _mapper.Map<IEnumerable<ViewRecovery>>(entities);
+      try
+      {
+        var entities = await _recoveryService.GetRecoveriesAsync(int.Parse(User.Identity.Name));
 
-      return Ok(model);
+        return Ok(_mapper.Map<IEnumerable<ViewRecovery>>(entities));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
-
-    // [HttpGet("users/recoveries/current")]
-    // public async Task<IActionResult> GetCurrentRecoveries()
-    // {
-    //   var currentUserId = int.Parse(User.Identity.Name);
-    //   var entities = await _db.Recovery.GetCurrentRecoveriesAsync(currentUserId);
-
-    //   var model = _mapper.Map<IEnumerable<ViewRecovery>>(entities);
-    //   return Ok(model);
-    // }
 
     [HttpPost("users/recoveries")]
     public async Task<IActionResult> CreateRecovery([FromBody] CreateRecovery model)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = _mapper.Map<Recovery>(model);
-      entity.UserId = currentUserId;
-      _db.Recovery.CreateRecovery(entity);
-      await _db.SaveAsync();
-      return Ok(entity);
+      try
+      {
+        var entity = _mapper.Map<Recovery>(model);
+        entity.UserId = int.Parse(User.Identity.Name);
+        await _recoveryService.CreateRecovery(entity);
+
+        return Ok(entity);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPut("users/recoveries/{id}")]
     public async Task<IActionResult> UpdateRecovery(int id, [FromBody] UpdateRecovery model)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Recovery.GetRecoveryAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Recovery does not exist in the database" });
-      _mapper.Map(model, entity);
-      _db.Recovery.UpdateRecovery(entity);
-      await _db.SaveAsync();
-      var updatedRecovery = await _db.Recovery.GetRecoveryAsync(currentUserId, id);
-      return Ok(updatedRecovery);
+      try
+      {
+        var entity = await _recoveryService.GetRecoveryAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Recovery does not exist in the database" });
+
+        _mapper.Map(model, entity);
+        _recoveryService.UpdateRecovery(entity);
+
+        var updatedRecovery = await _recoveryService.GetRecoveryAsync(int.Parse(User.Identity.Name), id);
+        return Ok(updatedRecovery);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpDelete("users/recoveries/{id}")]
     public async Task<IActionResult> DeleteRecovery(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Recovery.GetRecoveryAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Recovery does not exist in the database" });
+      try
+      {
+        var entity = await _recoveryService.GetRecoveryAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Recovery does not exist in the database." });
 
-      _db.Recovery.DeleteRecovery(entity);
-      await _db.SaveAsync();
-      return Ok();
+        _recoveryService.DeleteRecovery(entity);
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     #endregion
 
@@ -445,69 +607,105 @@ namespace BodyJournalAPI.Controllers
     [HttpGet("users/sessions/{id}")]
     public async Task<IActionResult> GetSession(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Session.GetSessionAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Session does not exist in the database" });
-      var model = _mapper.Map<ViewSession>(entity);
-      return Ok(model);
+      try
+      {
+        var entity = await _sessionService.GetSessionAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound(new { message = "Session does not exist in the database." });
+
+        var model = _mapper.Map<ViewSession>(entity);
+        return Ok(model);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/sessions/current")]
     public async Task<IActionResult> GetCurrentSession()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-
-      var model = await _db.Session.GetCurrentSessionAsync(currentUserId);
-      return Ok(model);
+      try
+      {
+        var model = await _sessionService.GetCurrentSessionAsync(int.Parse(User.Identity.Name));
+        return Ok(model);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpGet("users/sessions")]
     public async Task<IActionResult> GetSessions()
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entities = await _db.Session.GetSessionsAsync(currentUserId);
-      return Ok(entities);
+      try
+      {
+        return Ok(await _sessionService.GetSessionsAsync(int.Parse(User.Identity.Name)));
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPost("users/sessions")]
     public async Task<IActionResult> CreateSession([FromBody] CreateSession model)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = _mapper.Map<Session>(model);
-      entity.UserId = currentUserId;
-      _db.Session.CreateSession(entity);
-      await _db.SaveAsync();
-      return Ok(entity);
+      try
+      {
+        var entity = _mapper.Map<Session>(model);
+        entity.UserId = int.Parse(User.Identity.Name);
+        await _sessionService.CreateSession(entity);
+
+        return Ok(entity);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpPut("users/sessions/{id}")]
     public async Task<IActionResult> UpdateSession(int id, [FromBody] UpdateSession model)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var entity = await _db.Session.GetSessionAsync(currentUserId, id);
-      if (entity == null)
-        return BadRequest(new { message = "Session does not exist in the database" });
+      try
+      {
+        var entity = await _sessionService.GetSessionAsync(int.Parse(User.Identity.Name), id);
+        if (entity == null)
+          return NotFound();
 
-      if (entity.WorkoutEnd == null)
-        entity.WorkoutEnd = DateTime.Now.ToString("MM/dd/yyyy H:mm");
+        if (entity.WorkoutEnd == null)
+          entity.WorkoutEnd = DateTime.Now.ToString("MM/dd/yyyy H:mm");
 
-      _mapper.Map(model, entity);
-      _db.Session.UpdateSession(entity);
-      await _db.SaveAsync();
-      return Ok();
+        _mapper.Map(model, entity);
+        _sessionService.UpdateSession(entity);
+
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
 
     [HttpDelete("users/sessions/{id}")]
     public async Task<IActionResult> DeleteSession(int id)
     {
-      var currentUserId = int.Parse(User.Identity.Name);
-      var model = await _db.Session.GetSessionAsync(currentUserId, id);
-      if (model == null)
-        return BadRequest(new { message = "Session does not exist in the database" });
-      _db.Session.DeleteSession(model);
-      await _db.SaveAsync();
-      return Ok();
+      try
+      {
+        var model = await _sessionService.GetSessionAsync(int.Parse(User.Identity.Name), id);
+        if (model == null)
+          return NotFound();
+
+        _sessionService.DeleteSession(model);
+
+        return Ok();
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, "Internal server error.");
+      }
     }
     #endregion
   }

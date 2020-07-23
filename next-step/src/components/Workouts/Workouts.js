@@ -13,20 +13,23 @@ import * as routes from "../../constants/route-constants";
 
 export const Workouts = (props) => {
   const [workouts, setWorkouts] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   const { handleStartSession, setException } = props;
 
   useEffect(() => {
-    if (!workouts) {
-      (async () => {
-        try {
-          const response = await userService.getAllWorkouts();
+    if (!loaded) {
+      userService
+        .getAllWorkouts()
+        .then((response) => {
           setWorkouts(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
+          setLoaded(true);
+        })
+        .catch((error) => {
+          console.log(error);
+          // setException(error);
+        });
     }
-  }, [workouts]);
+  }, [loaded]);
 
   return (
     <Grid container>

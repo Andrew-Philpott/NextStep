@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const NavigationBar = (props) => {
   const classes = useStyles();
-  let user = JSON.parse(localStorage.getItem("user"));
+  const { user } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);

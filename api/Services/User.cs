@@ -6,40 +6,43 @@ using System.Linq;
 using System;
 using System.Text;
 using System.Security.Cryptography;
-using BodyJournalAPI.Services;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 namespace BodyJournalAPI.Services
 {
   public interface IUserService
   {
-    User Authenticate(string username, string password);
-    IEnumerable<User> GetAllUsers();
-    User GetUserById(int id);
-    User CreateUser(User user, string password);
-    void UpdateUser(User user, string password = null);
+    Task<User> Authenticate(string username, string password);
+    Task<IEnumerable<User>> GetAllUsers();
+    Task<User> GetUserById(int id);
+    Task CreateUser(User user, string password);
+    Task UpdateUser(User user, string password = null);
     void DeleteUser(User user);
   }
-  public class UserService : ServiceBase<User>,
+  public class UserService :
   IUserService
   {
-    public UserService(BodyJournalContext bodyJournalContext) : base(bodyJournalContext)
+    private DataContext _context;
+    public UserService(DataContext context)
     {
+      _context = context;
     }
-    public User GetUserById(int id)
+    public async Task<User> GetUserById(int id)
     {
-      return FindByCondition(x => x.Id == id).SingleOrDefault();
+      return await _context.Users.FindAsync(id);
     }
 
-    public IEnumerable<User> GetAllUsers()
+    public async Task<IEnumerable<User>> GetAllUsers()
     {
-      return FindAll();
+      return await _context.Users.ToListAsync();
     }
-    public User Authenticate(string username, string password)
+    public async Task<User> Authenticate(string username, string password)
     {
       if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         return null;
 
-      User user = FindByCondition(x => x.UserName == username).SingleOrDefault();
+      User user = await _context.Users.Where(x => x.UserName == username).SingleOrDefaultAsync();
 
       if (user == null)
         return null;
@@ -49,12 +52,13 @@ namespace BodyJournalAPI.Services
 
       return user;
     }
-    public User CreateUser(User user, string password)
+    public async Task CreateUser(User user, string password)
     {
       if (string.IsNullOrWhiteSpace(password))
         throw new Exception("Password is required");
 
-      if (FindAll().Any(x => x.UserName == user.UserName))
+      var result = await _context.Users.Where(x => x.UserName == user.UserName).SingleOrDefaultAsync();
+      if (result != null)
         throw new Exception($"Username {user.UserName} is already taken");
 
       byte[] passwordHash, passwordSalt;
@@ -63,22 +67,22 @@ namespace BodyJournalAPI.Services
       user.PasswordHash = passwordHash;
       user.PasswordSalt = passwordSalt;
 
-      Create(user);
-
-      return user;
+      await _context.Users.AddAsync(user);
+      await _context.SaveChangesAsync();
     }
 
-    public void UpdateUser(User user, string password = null)
+    public async Task UpdateUser(User user, string password = null)
     {
-      var userToUpdate = GetUserById(user.Id);
+      var userToUpdate = await GetUserById(user.Id);
 
       if (userToUpdate == null)
         throw new Exception("User not found");
 
       if (!string.IsNullOrWhiteSpace(user.UserName) && user.UserName != userToUpdate.UserName)
       {
-        if (FindAll().Any(x => x.UserName == user.UserName))
-          throw new Exception("Username " + user.UserName + " is already taken");
+        var result = await _context.Users.Where(x => x.UserName == user.UserName).SingleOrDefaultAsync();
+        if (result != null)
+          throw new Exception($"Username {user.UserName} is already taken");
 
         userToUpdate.UserName = user.UserName;
       }
@@ -97,12 +101,13 @@ namespace BodyJournalAPI.Services
         user.PasswordSalt = passwordSalt;
       }
 
-      UpdateUser(userToUpdate);
+      _context.Users.Update(userToUpdate);
+      _context.SaveChanges();
     }
 
     public void DeleteUser(User model)
     {
-      Delete(model);
+      _context.Users.Remove(model);
     }
 
     private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
