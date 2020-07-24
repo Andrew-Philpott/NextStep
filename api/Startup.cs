@@ -71,7 +71,7 @@ namespace BodyJournalAPI
       services.AddScoped<IExerciseService, ExerciseService>();
       services.AddScoped<IWorkoutService, WorkoutService>();
       services.AddScoped<IRecordService, RecordService>();
-      services.AddScoped<IUserExerciseService, UserExerciseService>();
+      services.AddScoped<IExerciseTypeService, ExerciseTypeService>();
       services.AddScoped<IRecoveryService, RecoveryService>();
       services.AddScoped<ISessionService, SessionService>();
       services.AddScoped<IExerciseWorkoutService, ExerciseWorkoutService>();
@@ -82,10 +82,10 @@ namespace BodyJournalAPI
 
       app.UseRouting();
 
-      app.UseCors(x => x
-          .AllowAnyOrigin()
-          .AllowAnyMethod()
-          .AllowAnyHeader());
+      app.UseCors(options =>
+      options.WithOrigins("http://localhost:3000")
+      .AllowAnyHeader()
+      .AllowAnyMethod());
 
       app.UseAuthentication();
       app.UseAuthorization();

@@ -11,7 +11,7 @@ import { userService } from "../../services/user-service";
 export const Sessions = (props) => {
   const [sessions, setSessions] = useState(null);
   const [loaded, setLoaded] = useState(false);
-  // const { setException } = props;
+  const { setException } = props;
 
   useEffect(() => {
     if (!loaded) {
@@ -22,8 +22,7 @@ export const Sessions = (props) => {
           setLoaded(true);
         })
         .catch((error) => {
-          console.log(error);
-          // setException(error);
+          setException(error);
         });
     }
   }, [loaded]);

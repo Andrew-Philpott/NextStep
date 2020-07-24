@@ -5,16 +5,20 @@ import { HumanModel } from "../Other/HumanModel";
 
 export const Account = (props) => {
   const [recoveries, setRecoveries] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   const { setException } = props;
   useEffect(() => {
-    userService
-      .getAllRecoveries((response) => {
-        setRecoveries(response);
-      })
-      .catch((error) => {
-        setException(error);
-      });
-  }, []);
+    if (!loaded) {
+      userService
+        .getAllRecoveries()
+        .then((response) => {
+          setRecoveries(response);
+        })
+        .catch((error) => {
+          setException(error);
+        });
+    }
+  }, [loaded]);
 
   const handleCreateRecovery = (muscleId) => {
     if (muscleId > 0 && muscleId <= 14) {
@@ -25,7 +29,7 @@ export const Account = (props) => {
             muscleId: muscleId,
             fatigue: fatigue,
           });
-          (await response) && setRecoveries([...recoveries, response]);
+          setRecoveries([...recoveries, response]);
         })();
       }
     }

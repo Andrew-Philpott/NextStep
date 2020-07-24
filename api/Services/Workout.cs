@@ -30,7 +30,7 @@ namespace BodyJournalAPI.Services
     }
     public async Task<IEnumerable<Workout>> GetWorkoutsAsync(int id)
     {
-      return await _context.Workouts.Where(x => x.UserId == id).OrderByDescending(x => x.Name).ToArrayAsync();
+      return await _context.Workouts.Include(x => x.Exercises).Where(x => x.UserId == id).OrderByDescending(x => x.Name).ToArrayAsync();
     }
 
     public async Task CreateWorkout(Workout model)

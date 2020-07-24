@@ -86,11 +86,8 @@ export const NavigationBar = (props) => {
       <MenuItem component={Link} to={routes.WORKOUTS_LIST}>
         Workouts
       </MenuItem>
-      <MenuItem component={Link} to={routes.EXERCISES_LIST}>
-        Exercises
-      </MenuItem>
-      <MenuItem component={Link} to={routes.SESSIONS_LIST}>
-        Sessions
+      <MenuItem component={Link} to={routes.RECORDS}>
+        Records
       </MenuItem>
       {user == null ? (
         <MenuItem component={Link} to={routes.LOG_IN}>
@@ -119,11 +116,8 @@ export const NavigationBar = (props) => {
                   <Link className="nav-link" to={routes.WORKOUTS_LIST}>
                     Workouts
                   </Link>
-                  <Link className="nav-link" to={routes.EXERCISES_LIST}>
-                    Exercises
-                  </Link>
-                  <Link className="nav-link" to={routes.SESSIONS_LIST}>
-                    Sessions
+                  <Link className="nav-link" to={routes.RECORDS}>
+                    Records
                   </Link>
                 </>
               )}

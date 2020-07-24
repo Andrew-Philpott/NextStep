@@ -25,7 +25,7 @@ namespace BodyJournalAPI.Helpers
     public DbSet<ExerciseWorkout> ExerciseWorkouts { get; set; }
     public DbSet<Recovery> Recovery { get; set; }
     public DbSet<ExerciseMuscle> ExerciseMuscles { get; set; }
-    public DbSet<UserExercise> UserExercises { get; set; }
+    public DbSet<ExerciseType> ExerciseTypes { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Muscle> Muscles { get; set; }
 
@@ -49,34 +49,34 @@ namespace BodyJournalAPI.Helpers
       );
 
 
-      builder.Entity<Exercise>().HasData(
-        new Exercise() { Id = 1, Name = "Squat" },
-        new Exercise() { Id = 2, Name = "Leg Press" },
-        new Exercise() { Id = 3, Name = "Lunge" },
-        new Exercise() { Id = 4, Name = "Deadlift" },
-        new Exercise() { Id = 5, Name = "Leg extension" },
-        new Exercise() { Id = 6, Name = "Leg curl" },
-        new Exercise() { Id = 7, Name = "Standing calf raise" },
-        new Exercise() { Id = 8, Name = "Seated calf raise" },
-        new Exercise() { Id = 9, Name = "Hip adductor" },
-        new Exercise() { Id = 10, Name = "Bench press" },
-        new Exercise() { Id = 11, Name = "Chest fly" },
-        new Exercise() { Id = 12, Name = "Push-up" },
-        new Exercise() { Id = 13, Name = "Pull-down" },
-        new Exercise() { Id = 14, Name = "Pull-up" },
-        new Exercise() { Id = 15, Name = "Bent-over row" },
-        new Exercise() { Id = 16, Name = "Upright row" },
-        new Exercise() { Id = 17, Name = "Shoulder press" },
-        new Exercise() { Id = 18, Name = "Shoulder fly" },
-        new Exercise() { Id = 19, Name = "Lateral raise" },
-        new Exercise() { Id = 20, Name = "Shoulder shrug" },
-        new Exercise() { Id = 21, Name = "Pushdown" },
-        new Exercise() { Id = 22, Name = "Triceps extension" },
-        new Exercise() { Id = 23, Name = "Biceps curl" },
-        new Exercise() { Id = 24, Name = "Crunch" },
-        new Exercise() { Id = 25, Name = "Russian twist" },
-        new Exercise() { Id = 26, Name = "Leg raise" },
-        new Exercise() { Id = 27, Name = "Back extension" });
+      builder.Entity<ExerciseType>().HasData(
+        new ExerciseType() { Id = 1, Name = "Squat" },
+        new ExerciseType() { Id = 2, Name = "Leg Press" },
+        new ExerciseType() { Id = 3, Name = "Lunge" },
+        new ExerciseType() { Id = 4, Name = "Deadlift" },
+        new ExerciseType() { Id = 5, Name = "Leg extension" },
+        new ExerciseType() { Id = 6, Name = "Leg curl" },
+        new ExerciseType() { Id = 7, Name = "Standing calf raise" },
+        new ExerciseType() { Id = 8, Name = "Seated calf raise" },
+        new ExerciseType() { Id = 9, Name = "Hip adductor" },
+        new ExerciseType() { Id = 10, Name = "Bench press" },
+        new ExerciseType() { Id = 11, Name = "Chest fly" },
+        new ExerciseType() { Id = 12, Name = "Push-up" },
+        new ExerciseType() { Id = 13, Name = "Pull-down" },
+        new ExerciseType() { Id = 14, Name = "Pull-up" },
+        new ExerciseType() { Id = 15, Name = "Bent-over row" },
+        new ExerciseType() { Id = 16, Name = "Upright row" },
+        new ExerciseType() { Id = 17, Name = "Shoulder press" },
+        new ExerciseType() { Id = 18, Name = "Shoulder fly" },
+        new ExerciseType() { Id = 19, Name = "Lateral raise" },
+        new ExerciseType() { Id = 20, Name = "Shoulder shrug" },
+        new ExerciseType() { Id = 21, Name = "Pushdown" },
+        new ExerciseType() { Id = 22, Name = "Triceps extension" },
+        new ExerciseType() { Id = 23, Name = "Biceps curl" },
+        new ExerciseType() { Id = 24, Name = "Crunch" },
+        new ExerciseType() { Id = 25, Name = "Russian twist" },
+        new ExerciseType() { Id = 26, Name = "Leg raise" },
+        new ExerciseType() { Id = 27, Name = "Back extension" });
 
       builder.Entity<Muscle>().HasData(
         new Muscle() { Id = 1, Name = "Calves" },
@@ -212,18 +212,18 @@ namespace BodyJournalAPI.Helpers
           new ExerciseMuscle { ExerciseMuscleId = 82, ExerciseId = 23, MuscleId = 14, Primary = false }
        );
       //pectorals, deltoids, triceps
-      builder.Entity<UserExercise>().HasData(
-             new UserExercise() { Id = 1, ExerciseId = 10, Name = "Bench Press", Weight = 180, Reps = 8, Sets = 3, Intensity = 4, UserId = 1 },
+      builder.Entity<Exercise>().HasData(
+             new Exercise() { Id = 1, ExerciseId = 10, Name = "Bench Press", Weight = 180, Reps = 8, Sets = 3, Intensity = 4, UserId = 1 },
              //calves, quads, hamstrings, gluteus, hips, abdominals, lower back
-             new UserExercise() { Id = 2, ExerciseId = 1, Name = "Squat", Weight = 250, Reps = 15, Sets = 3, Intensity = 4 });
+             new Exercise() { Id = 2, ExerciseId = 1, Name = "Squat", Weight = 250, Reps = 15, Sets = 3, Intensity = 4 });
 
       builder.Entity<Workout>().HasData(
                  new Workout() { Id = 1, Name = "Full Body", Notes = "Rest 1 minute between sets", UserId = 1 });
       //calves, quads, hamstrings, gluteus, hips, abdominals, lower back
 
       builder.Entity<ExerciseWorkout>().HasData(
-        new ExerciseWorkout() { Id = 1, WorkoutId = 1, ExerciseId = 1 },
-        new ExerciseWorkout() { Id = 2, WorkoutId = 1, ExerciseId = 2 }
+        new ExerciseWorkout() { ExerciseWorkoutId = 1, WorkoutId = 1, ExerciseId = 1 },
+        new ExerciseWorkout() { ExerciseWorkoutId = 2, WorkoutId = 1, ExerciseId = 2 }
       );
 
       builder.Entity<Session>().HasData(

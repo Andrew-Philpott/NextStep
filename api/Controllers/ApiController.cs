@@ -27,11 +27,11 @@ namespace BodyJournalAPI.Controllers
     private IRecoveryService _recoveryService;
     private ISessionService _sessionService;
     private IUserService _userService;
-    private IUserExerciseService _userExerciseService;
+    private IExerciseTypeService _exerciseTypeService;
     private IWorkoutService _workoutService;
     private IMapper _mapper;
     private readonly AppSettings _appSettings;
-    public ApiController(IExerciseService exerciseService, IExerciseWorkoutService exerciseWorkoutService, IRecordService recordService, IRecoveryService recoveryService, ISessionService sessionService, IUserService userService, IWorkoutService workoutService, IUserExerciseService userExerciseService, IMapper mapper, IOptions<AppSettings> appSettings)
+    public ApiController(IExerciseService exerciseService, IExerciseWorkoutService exerciseWorkoutService, IRecordService recordService, IRecoveryService recoveryService, ISessionService sessionService, IUserService userService, IWorkoutService workoutService, IExerciseTypeService exerciseTypeService, IMapper mapper, IOptions<AppSettings> appSettings)
     {
       _exerciseService = exerciseService;
       _exerciseWorkoutService = exerciseWorkoutService;
@@ -39,7 +39,7 @@ namespace BodyJournalAPI.Controllers
       _recoveryService = recoveryService;
       _sessionService = sessionService;
       _userService = userService;
-      _userExerciseService = userExerciseService;
+      _exerciseTypeService = exerciseTypeService;
       _workoutService = workoutService;
       _mapper = mapper;
       _appSettings = appSettings.Value;
@@ -166,7 +166,7 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var entity = await _exerciseService.GetExerciseAsync(id);
+        var entity = await _exerciseTypeService.GetExerciseTypeAsync(id);
 
         if (entity == null)
           return NotFound();
@@ -184,7 +184,7 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var entities = await _exerciseService.GetExercisesAsync();
+        var entities = await _exerciseTypeService.GetExerciseTypesAsync();
         if (entities == null)
           return NotFound(new { message = "Exercises not found." });
 
@@ -197,18 +197,18 @@ namespace BodyJournalAPI.Controllers
     }
     #endregion
 
-    #region userexercises
+    #region exerciseTypes
     [HttpGet("users/exercises/{id}")]
     public async Task<IActionResult> GetExercise(int id)
     {
       try
       {
-        var entity = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+        var entity = await _exerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
 
         if (entity == null)
           return NotFound(new { message = "Exercise does not exist." });
 
-        return Ok(_mapper.Map<UserExercise>(entity));
+        return Ok(_mapper.Map<Exercise>(entity));
       }
       catch (Exception)
       {
@@ -221,9 +221,9 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var entities = await _userExerciseService.GetExercisesAsync(int.Parse(User.Identity.Name));
+        var entities = await _exerciseService.GetExercisesAsync(int.Parse(User.Identity.Name));
 
-        return Ok(_mapper.Map<IEnumerable<UserExercise>>(entities));
+        return Ok(_mapper.Map<IEnumerable<Exercise>>(entities));
       }
       catch (Exception)
       {
@@ -236,14 +236,14 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        var exercise = await _exerciseTypeService.GetExerciseTypeAsync(model.ExerciseId);
         if (exercise == null)
           return NotFound(new { message = "Exercise does not exist in database" });
 
-        UserExercise entity = _mapper.Map<UserExercise>(model);
+        Exercise entity = _mapper.Map<Exercise>(model);
         entity.Name = exercise.Name;
         entity.UserId = int.Parse(User.Identity.Name);
-        await _userExerciseService.CreateExercise(entity);
+        await _exerciseService.CreateExercise(entity);
         ExerciseWorkout exerciseWorkout = new ExerciseWorkout() { WorkoutId = model.WorkoutId, ExerciseId = entity.Id };
         await _exerciseWorkoutService.CreateExerciseWorkout(exerciseWorkout);
         return Ok();
@@ -259,16 +259,16 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var entity = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+        var entity = await _exerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
         if (entity == null)
           return NotFound(new { message = "Exercise not in database for user" });
-        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        var exercise = await _exerciseTypeService.GetExerciseTypeAsync(model.ExerciseId);
         if (exercise == null)
           return NotFound(new { message = "Exercise type does not exist in database" });
 
         _mapper.Map(model, entity);
         entity.Name = exercise.Name;
-        _userExerciseService.UpdateExercise(entity);
+        _exerciseService.UpdateExercise(entity);
 
         return Ok();
       }
@@ -283,11 +283,11 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var model = await _userExerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
+        var model = await _exerciseService.GetExerciseAsync(int.Parse(User.Identity.Name), id);
         if (model == null)
           return NotFound(new { message = "Exercise does not exist." });
 
-        _userExerciseService.DeleteExercise(model);
+        _exerciseService.DeleteExercise(model);
 
         return Ok();
       }
@@ -335,7 +335,7 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var entity = await _exerciseService.GetExerciseAsync(id);
+        var entity = await _exerciseTypeService.GetExerciseTypeAsync(id);
         if (entity == null)
           return NotFound(new { message = "Record does not exist." });
 
@@ -354,7 +354,7 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        var exercise = await _exerciseService.GetExerciseAsync(model.ExerciseId);
+        var exercise = await _exerciseTypeService.GetExerciseTypeAsync(model.ExerciseId); ;
         if (exercise == null)
           return NotFound(new { message = "Exercise does not exist." });
 
@@ -395,13 +395,7 @@ namespace BodyJournalAPI.Controllers
       {
         ViewWorkout model = _mapper.Map<ViewWorkout>(await _workoutService.GetWorkoutAsync(int.Parse(User.Identity.Name), id));
 
-        IEnumerable<ExerciseWorkout> exerciseWorkouts = await _exerciseWorkoutService.GetExerciseWorkoutsAsync(id);
-
-        IEnumerable<UserExercise> exercises = await _userExerciseService.GetExercisesAsync(int.Parse(User.Identity.Name));
-
-        IEnumerable<UserExercise> e = from ex in exercises join ew in exerciseWorkouts on ex.Id equals ew.ExerciseId select ex;
-
-        model.Exercises = _mapper.Map<IEnumerable<ViewExercise>>(e);
+        _mapper.Map<IEnumerable<ViewExercise>>(model.Exercises);
         return Ok(model);
       }
       catch (Exception)
@@ -415,7 +409,11 @@ namespace BodyJournalAPI.Controllers
     {
       try
       {
-        return Ok(await _workoutService.GetWorkoutsAsync(int.Parse(User.Identity.Name)));
+        var entities = await _workoutService.GetWorkoutsAsync(int.Parse(User.Identity.Name));
+        IEnumerable<ViewWorkout> mappedEntities = _mapper.Map<IEnumerable<ViewWorkout>>(entities);
+
+
+        return Ok(mappedEntities);
       }
       catch (Exception)
       {

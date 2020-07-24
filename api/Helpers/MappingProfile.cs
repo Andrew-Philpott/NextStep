@@ -9,11 +9,11 @@ namespace BodyJournalAPI.Helpers
     public MappingProfile()
     {
       #region Exercise
-      CreateMap<UserExercise, ViewExercise>();
+      CreateMap<Exercise, ViewExercise>();
 
-      CreateMap<CreateExercise, UserExercise>();
+      CreateMap<CreateExercise, Exercise>();
 
-      CreateMap<UpdateExercise, UserExercise>();
+      CreateMap<UpdateExercise, Exercise>();
       #endregion
 
       #region Workout

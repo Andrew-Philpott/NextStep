@@ -14,7 +14,7 @@ namespace BodyJournalAPI
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
-              webBuilder.UseStartup<Startup>().UseUrls("http://localhost:5000");
+              webBuilder.UseStartup<Startup>();
             });
   }
 }

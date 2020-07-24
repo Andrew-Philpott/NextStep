@@ -1,16 +1,20 @@
+
 using BodyJournalAPI.Entities;
 using BodyJournalAPI.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace BodyJournalAPI.Services
 {
   public interface IExerciseService
   {
-    Task<Exercise> GetExerciseAsync(int id);
-    Task<IEnumerable<Exercise>> GetExercisesAsync();
+    Task<Exercise> GetExerciseAsync(int userId, int id);
+    Task<IEnumerable<Exercise>> GetExercisesAsync(int userId);
+    Task CreateExercise(Exercise model);
+    void UpdateExercise(Exercise model);
+    void DeleteExercise(Exercise model);
   }
   public class ExerciseService :
   IExerciseService
@@ -20,13 +24,32 @@ namespace BodyJournalAPI.Services
     {
       _context = context;
     }
-    public async Task<IEnumerable<Exercise>> GetExercisesAsync()
+
+    public async Task<Exercise> GetExerciseAsync(int userId, int id)
     {
-      return await _context.Exercises.AsQueryable().AsNoTracking().Include(exercise => exercise.Muscles).ThenInclude(muscle => muscle.Muscle).OrderBy(x => x.Name).ToArrayAsync();
+      return await _context.Exercises.Where(x => x.UserId == userId && x.Id == id).SingleOrDefaultAsync();
     }
-    public async Task<Exercise> GetExerciseAsync(int id)
+
+    public async Task<IEnumerable<Exercise>> GetExercisesAsync(int userId)
     {
-      return await _context.Exercises.AsQueryable().AsNoTracking().Include(x => x.Muscles).ThenInclude(muscle => muscle.Muscle).Where(x => x.Id == id).SingleOrDefaultAsync();
+      return await _context.Exercises.Where(x => x.UserId == userId).ToArrayAsync();
+    }
+    public async Task CreateExercise(Exercise model)
+    {
+      await _context.Exercises.AddAsync(model);
+      await _context.SaveChangesAsync();
+    }
+
+    public void UpdateExercise(Exercise model)
+    {
+      _context.Exercises.Update(model);
+      _context.SaveChanges();
+    }
+
+    public void DeleteExercise(Exercise model)
+    {
+      _context.Exercises.Remove(model);
+      _context.SaveChanges();
     }
   }
 }

@@ -3,16 +3,16 @@ import { Router, Route, Switch, Redirect } from "react-router-dom";
 import { Button } from "@material-ui/core";
 import { UserRoute } from "./components/Auth/UserRoute";
 import { Home } from "./components/Other/Home";
-import { Exercises } from "./components/Exercises/Exercises";
+import { Records } from "./components/Records/Records";
 import { Workouts } from "./components/Workouts/Workouts";
 import { Login } from "./components/Auth/Login";
 import { Register } from "./components/Auth/Register";
 import { NavigationBar } from "./components/Other/NavigationBar";
-import { ExerciseDetails } from "./components/Exercises/ExerciseDetails";
+import { ExerciseDetails } from "./components/Records/ExerciseDetails";
 import { WorkoutDetails } from "./components/Workouts/WorkoutDetails";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { Sessions } from "./components/Sessions/Sessions";
-import { RecordForm } from "./components/Exercises/RecordForm";
+import { RecordForm } from "./components/Records/RecordForm";
 import * as routes from "./constants/route-constants";
 import { Account } from "./components/Auth/Account";
 import { userService } from "./services/user-service";
@@ -74,12 +74,9 @@ function App() {
       );
     }
   };
-  console.log(exception);
   return (
-    <div className="App">
+    <div style={{ height: "100%", width: "100%" }} className="App">
       <Router history={history}>
-        <NavigationBar user={user} />
-
         {session && (
           <div className="current-session">
             <Button
@@ -93,7 +90,7 @@ function App() {
             </span>
           </div>
         )}
-
+        <NavigationBar user={user} />
         {/* {exception && (
           <ErrorModal exception={exception} setException={setException} />
         )} */}
@@ -112,8 +109,8 @@ function App() {
           />
           <UserRoute
             exact
-            path={routes.EXERCISES_LIST}
-            component={() => <Exercises setException={setException} />}
+            path={routes.RECORDS}
+            component={() => <Records setException={setException} />}
           />
           <UserRoute
             exact

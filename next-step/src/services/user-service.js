@@ -26,9 +26,6 @@ export const userService = {
   deleteSession,
   getExercise,
   getAllExercises,
-  createExercise,
-  updateExercise,
-  deleteExercise,
   getWorkout,
   getAllWorkouts,
   createWorkout,
@@ -239,27 +236,6 @@ function getAllExercises() {
   return fetch(`http://localhost:5000${paths.exercise}`, getOptions).then(
     handleResponse
   );
-}
-
-async function createExercise(model) {
-  return await fetch(
-    `http://localhost:5000${paths.exercise}`,
-    postOptions(model)
-  ).then(handleResponse);
-}
-
-async function updateExercise(id, model) {
-  return await fetch(
-    `http://localhost:5000${paths.exercise}/${id}`,
-    putOptions(model)
-  ).then(handleResponse);
-}
-
-async function deleteExercise(id) {
-  return await fetch(
-    `http://localhost:5000${paths.exercise}/${id}`,
-    deleteOptions
-  ).then(handleResponse);
 }
 
 async function getWorkout(id) {

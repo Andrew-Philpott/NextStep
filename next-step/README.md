@@ -59,7 +59,7 @@ What additional tools, frameworks, libraries, APIs, or other resources will thes
 - Change directory to the app directory
 - \$npm install
 - \$npm run start
-- _app will run on localhost:8080_
+- _app will run on localhost:5000_
 
 ## View URLs
 

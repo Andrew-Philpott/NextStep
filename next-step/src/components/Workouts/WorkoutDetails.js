@@ -7,7 +7,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Table from "@material-ui/core/Table";
 import { Link } from "react-router-dom";
-import { Paper, Button, Container } from "@material-ui/core";
+import { Paper, Button, Grid } from "@material-ui/core";
 import { userService } from "../../services/user-service";
 import { history } from "../../helpers/history";
 import * as routes from "../../constants/route-constants";
@@ -42,58 +42,65 @@ export const WorkoutDetails = (props) => {
 
   return (
     <>
-      {workout && <h1>{workout.name}</h1>}
-      <Container maxWidth="sm">
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  Exercise
-                </TableCell>
-                <TableCell align="right">Weight</TableCell>
-                <TableCell align="right">Reps</TableCell>
-                <TableCell align="right">Sets</TableCell>
-                <TableCell align="right">intensity</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {workout &&
-                workout.exercises &&
-                workout.exercises.map((exercise, index) => {
-                  return (
-                    <TableRow key={index}>
-                      <TableCell component="th" scope="row">
-                        {exercise.name}
-                      </TableCell>
-                      <TableCell align="right">{exercise.weight}</TableCell>
-                      <TableCell align="right">{exercise.reps}</TableCell>
-                      <TableCell align="right">{exercise.sets}</TableCell>
-                      <TableCell align="right">{exercise.intensity}</TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {workout && (
-          <div className="mrgn-t8">
-            <Link
-              component={Button}
-              className="button green-background"
-              to={`/workouts/edit/${workout.id}`}
-            >
-              Edit
-            </Link>
-            <Button
-              onClick={() => onDelete(workout.id)}
-              className="button red-background"
-            >
-              Delete
-            </Button>
-          </div>
-        )}
-      </Container>
+      <Grid container>
+        <div className="spacer" />
+        <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+        <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
+          {workout && <h1>{workout.name}</h1>}
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                    Exercise
+                  </TableCell>
+                  <TableCell align="right">Weight</TableCell>
+                  <TableCell align="right">Reps</TableCell>
+                  <TableCell align="right">Sets</TableCell>
+                  <TableCell align="right">intensity</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {workout &&
+                  workout.exercises &&
+                  workout.exercises.map((exercise, index) => {
+                    return (
+                      <TableRow key={index}>
+                        <TableCell component="th" scope="row">
+                          {exercise.name}
+                        </TableCell>
+                        <TableCell align="right">{exercise.weight}</TableCell>
+                        <TableCell align="right">{exercise.reps}</TableCell>
+                        <TableCell align="right">{exercise.sets}</TableCell>
+                        <TableCell align="right">
+                          {exercise.intensity}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {workout && (
+            <div className="mrgn-t8">
+              <Link
+                component={Button}
+                className="button green-background"
+                to={`/workouts/edit/${workout.id}`}
+              >
+                Edit
+              </Link>
+              <Button
+                onClick={() => onDelete(workout.id)}
+                className="button red-background"
+              >
+                Delete
+              </Button>
+            </div>
+          )}
+        </Grid>
+        <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+      </Grid>
     </>
   );
 };

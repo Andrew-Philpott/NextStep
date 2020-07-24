@@ -1,5 +1,5 @@
 export const ACCOUNT = "/account";
-export const EXERCISES_LIST = "/exercises";
+export const RECORDS = "/records";
 export const EXERCISES_NEW = "/exercises/new";
 export const EXERCISES_DETAILS = "/exercises/:id";
 export const EXERCISES_EDIT = "/exercises/edit/:id";

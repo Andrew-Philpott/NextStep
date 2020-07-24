@@ -5,11 +5,39 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { Paper, Button, Grid } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import CheckIcon from "@material-ui/icons/Check";
 import { userService } from "../../services/user-service";
 import * as routes from "../../constants/route-constants";
+
+export const Workout = (props) => {
+  const { handleStartSession, name, description, id } = props;
+  return (
+    <div
+      style={{
+        backgroundColor: "green",
+        width: "80%",
+        height: "20%",
+        position: "relative",
+      }}
+    >
+      <div
+        className="text-align-center"
+        style={{ backgroundColor: "white", width: "20%" }}
+      >
+        <h2>{name}</h2>
+      </div>
+      <Button
+        style={{ position: "absolute", bottom: "0px", right: "0px" }}
+        onClick={() => handleStartSession(id)}
+      >
+        Start Workout
+      </Button>
+      <p>{description}</p>
+    </div>
+  );
+};
 
 export const Workouts = (props) => {
   const [workouts, setWorkouts] = useState(null);
@@ -25,8 +53,7 @@ export const Workouts = (props) => {
           setLoaded(true);
         })
         .catch((error) => {
-          console.log(error);
-          // setException(error);
+          setException(error);
         });
     }
   }, [loaded]);
@@ -35,10 +62,11 @@ export const Workouts = (props) => {
     <Grid container>
       <div className="spacer" />
       <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+
       <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
         <h1>Workouts</h1>
-
-        <TableContainer>
+        <Grid container direction="row" justify="center">
+          {/* <TableContainer>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -49,24 +77,33 @@ export const Workouts = (props) => {
                 <TableCell align="left">Start Session</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {workouts &&
-                workouts.map((workout) => (
-                  <TableRow key={workout.id}>
-                    <TableCell component="th" scope="row">
-                      <Link to={`/workouts/${workout.id}`}>{workout.name}</Link>
-                    </TableCell>
-                    <TableCell align="left">{workout.notes}</TableCell>
-                    <TableCell align="left">
-                      <Button onClick={() => handleStartSession(workout.id)}>
-                        <CheckIcon />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
+            <TableBody> */}
+
+          {workouts &&
+            workouts.map((workout) => (
+              <Workout
+                key={workout.id}
+                id={workout.id}
+                handleStartSession={handleStartSession}
+                name={workout.name}
+              />
+            ))}
+        </Grid>
+
+        {/* <TableRow key={workout.id}>
+          <TableCell component="th" scope="row">
+            // <Link to={`/workouts/${workout.id}`}>{workout.name}</Link>
+          </TableCell>
+          // <TableCell align="left">{workout.notes}</TableCell>
+          <TableCell align="left">
+            <Button onClick={() => handleStartSession(workout.id)}>
+              // <CheckIcon />
+            </Button>
+          </TableCell>
+        </TableRow> */}
+        {/* </TableBody>
           </Table>
-        </TableContainer>
+        </TableContainer> */}
       </Grid>
       <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
         <Grid container justify="center">
