@@ -6,41 +6,13 @@
 
 #### By **Andrew Philpott**
 
-[About](#About) | [Capstone Proposal](#Capstone-Proposal) | [Installation and Configuration](#Installation-and-Configuration) | [View URLs](#View-URLs) | [API Endpoints](#API-Endpoints) | [Bugs](#Known-Bugs) | [Technologies](#Technologies-Used) | [Contact](#Support-and-Contact-Details)
+[About](#About) | [Installation and Configuration](#Installation-and-Configuration) | [View URLs](#View-URLs) | [API Endpoints](#API-Endpoints) | [Bugs](#Known-Bugs) | [Technologies](#Technologies-Used) | [Contact](#Support-and-Contact-Details)
 
 </div>
 
 ## About
 
 A personalized fitness tracker that allows you to track your workouts, muscle fatigue and recovery.
-
-## Capstone Proposal
-
-Project's Purpose or Goal: Track workouts, muscle fatigue, and recovery.
-
-List the absolute minimum features the project requires to meet this purpose or goal:
-
-- _The application will display muscle fatigue levels with a color coded body model for fast and easy identification of what muscle group(s) to workout next._
-- _The application will have complete CRUD functionality of workouts, exercises, muscle fatigue, sessions (when a workout was performed), and personal records._
-- _The application will utilize authentication to display information relevant to the user._
-
-What tools, frameworks, libraries, APIs, modules and/or other resources (whatever is specific to your track, and your language) will you use to create this MVP? List them all here. Be specific.
-
-- _React for styling and conditional rendering of the user interface._
-- _C# .Net Core RESTful API for data management._
-- _Google Slides for component diagrams and process flow._
-
-If you finish developing the minimum viable product (MVP) with time to spare, what will you work on next? Describe these features here: Be specific.
-
-- _Implement health information from the Fitbit API to fine tune workout suggestions._
-- _Implement statistics for workouts vs muscle fatigue, exercise vs muscle fatigue._
-- _Implement premium memberships for more functionality._
-
-What additional tools, frameworks, libraries, APIs, or other resources will these additional features require?
-
-- _Azure Active Directory for authentication._
-- _BootStrap, Material UI, and Google Charts for styling._
-- _Markdown for Readme._
 
 ## Installation and Configuration:
 
@@ -59,7 +31,7 @@ What additional tools, frameworks, libraries, APIs, or other resources will thes
 - Change directory to the app directory
 - \$npm install
 - \$npm run start
-- _app will run on localhost:5000_
+- _app will run on localhost:3000_
 
 ## View URLs
 

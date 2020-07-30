@@ -75,8 +75,11 @@ export const RecordForm = (props) => {
         try {
           const response = await recordService.createRecord(record);
           (await response) && history.push("/records");
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
+          history.push("/error");
         }
       })();
     }

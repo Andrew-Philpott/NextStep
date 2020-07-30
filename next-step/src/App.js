@@ -4,10 +4,10 @@ import {
   Route,
   Switch,
   Redirect,
-  useHistory,
 } from "react-router-dom";
 import { Button } from "@material-ui/core";
 import { UserRoute } from "./components/Auth/UserRoute";
+import { useOnlineStatus } from "./components/Other/useOnlineStatus";
 import { Home } from "./components/Other/Home";
 import { Records } from "./components/Records/Records";
 import { Workouts } from "./components/Workouts/Workouts";
@@ -28,32 +28,41 @@ function App() {
   const [session, setSession] = useState(null);
   const [exercises, setExercises] = useState(null);
   const [exception, setException] = useState(null);
-  const user = localStorage.getItem("user");
-  const history = useHistory();
+  const [user, setUser] = useState(localStorage.getItem("user"));
+  const online = useOnlineStatus();
+
+  useEffect(() => {}, [user]);
+
+  const handleLogout = () => {
+    userService.logout();
+    setUser(null);
+  };
 
   useEffect(() => {
-    if (!exercises && user) {
+    if (!exercises && user && online) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
           (await response) && setExercises(response);
-        } catch (error) {
-          setException(error);
-          history.push("/error");
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
         }
       })();
     }
   }, [exercises]);
 
   useEffect(() => {
-    if (!session && user) {
+    if (!session && user && online) {
       (async () => {
         try {
           const response = await sessionService.getCurrentSession();
           (await response) && setSession(response);
-        } catch (error) {
-          setException(error);
-          history.push("/error");
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
         }
       })();
     }
@@ -67,9 +76,10 @@ function App() {
           rating: rating,
         });
         (await response) && setSession(response);
-      } catch (error) {
-        setException(error);
-        history.push("/error");
+      } catch {
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
       }
     })();
   };
@@ -80,8 +90,10 @@ function App() {
         try {
           const response = await userService.createSession({ workoutId: id });
           setSession(response);
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
         }
       })();
     } else {
@@ -91,12 +103,11 @@ function App() {
     }
   };
 
-  console.log(session);
   return (
     <div id="App">
       <div>
         <Router>
-          <NavigationBar user={user} />
+          <NavigationBar onLogout={handleLogout} user={user} />
           {session && (
             <div className="current-session">
               <Button
@@ -112,7 +123,12 @@ function App() {
           )}
 
           <Switch>
-            <Route exact path={routes.LANDING} component={Home} />
+            {exception && <ErrorPage exception={exception} />}
+            <Route
+              exact
+              path={routes.LANDING}
+              component={() => <Home setException={setException} />}
+            />
             <Route
               exact
               path={routes.ERROR}
@@ -177,7 +193,9 @@ function App() {
             />
             <Route
               path={routes.LOG_IN}
-              component={() => <Login setException={setException} />}
+              component={() => (
+                <Login setUser={setUser} setException={setException} />
+              )}
             />
             <Route
               path={routes.REGISTER}

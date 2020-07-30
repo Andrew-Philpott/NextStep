@@ -11,7 +11,7 @@ const initialFieldValues = {
 };
 
 export const Login = (props) => {
-  const { setException } = props;
+  const { setUser, setException } = props;
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -37,10 +37,6 @@ export const Login = (props) => {
     return false;
   };
 
-  useEffect(() => {
-    userService.logout();
-  }, []);
-
   function handleSubmit(e) {
     e.preventDefault();
     if (validate()) {
@@ -52,9 +48,15 @@ export const Login = (props) => {
           );
           (await response) &&
             localStorage.setItem("user", JSON.stringify(response));
-          (await response) && history.push(routes.ACCOUNT);
-        } catch (error) {
-          setException(error);
+          (await response) && setUser(JSON.stringify(response));
+          (await response) &&
+            setTimeout(() => {
+              history.push("/account");
+            }, 20);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
           history.push("/error");
         }
       })();

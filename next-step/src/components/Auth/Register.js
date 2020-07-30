@@ -66,8 +66,10 @@ export const Register = (props) => {
       try {
         const response = await userService.register(user);
         (await response) && history.push(routes.LOG_IN);
-      } catch (error) {
-        setException(error);
+      } catch {
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
         history.push("/error");
       }
     }

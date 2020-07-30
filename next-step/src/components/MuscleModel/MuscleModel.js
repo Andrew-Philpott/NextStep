@@ -5,7 +5,7 @@ import { Grid } from "@material-ui/core";
 import { recoveryService } from "../../services";
 import { useHistory } from "react-router-dom";
 
-export const MuscleModel = ({ ...props }) => {
+export const MuscleModel = (props) => {
   const { active, setException } = props;
   const [recoveries, setRecoveries] = useState(null);
   const history = useHistory();
@@ -36,8 +36,10 @@ export const MuscleModel = ({ ...props }) => {
         try {
           const response = await recoveryService.getAllRecoveries();
           (await response) && setRecoveries(response);
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
           history.push("/error");
         }
       })();

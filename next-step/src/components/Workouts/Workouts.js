@@ -5,10 +5,12 @@ import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
 import { Workout } from "../Workouts/Workout";
+import { useHistory } from "react-router-dom";
 
-export const Workouts = (props) => {
+export const Workouts = ({ ...props }) => {
   const [workouts, setWorkouts] = useState(null);
   const { onCreateSession, setException } = props;
+  const history = useHistory();
 
   const handleDeleteWorkout = (id) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
@@ -19,7 +21,10 @@ export const Workouts = (props) => {
             (await response) && workouts.filter((x) => x.workoutId !== id);
           (await newState) && setWorkouts(newState);
         } catch (error) {
-          setException(error);
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
+          history.push("/error");
         }
       })();
   };
@@ -30,7 +35,10 @@ export const Workouts = (props) => {
         const response = await workoutService.getAllWorkouts();
         (await response) && setWorkouts(response);
       } catch (error) {
-        setException(error);
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+        history.push("/error");
       }
     })();
   }, []);
@@ -76,7 +84,7 @@ export const Workouts = (props) => {
       </Grid>
       <Grid item xs={2} sm={4} md={4} lg={4} xl={4}>
         <div className="spacer" />
-        <MuscleModel active={true} />
+        <MuscleModel setException={setException} active={true} />
       </Grid>
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
     </Grid>

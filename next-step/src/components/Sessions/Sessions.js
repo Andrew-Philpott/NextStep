@@ -20,9 +20,11 @@ export const Sessions = (props) => {
         try {
           const response = await sessionService.getAllSessions();
           (await response) && setSessions(response);
-        } catch (error) {
-          setException(error);
-          history.push("error");
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
+          history.push("/error");
         }
       })();
     }

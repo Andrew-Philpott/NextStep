@@ -15,9 +15,11 @@ export const Records = (props) => {
         try {
           const response = await recordService.getPRsForExercises();
           (await response) && setRecords(response);
-        } catch (error) {
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
           history.push("/error");
-          setException(error);
         }
       })();
     }

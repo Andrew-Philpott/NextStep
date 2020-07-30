@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const NavigationBar = (props) => {
   const classes = useStyles();
-  const { user } = props;
+  const { user, onLogout } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -66,7 +66,12 @@ export const NavigationBar = (props) => {
       <MenuItem onClick={handleMenuClose} component={Link} to={routes.ACCOUNT}>
         My account
       </MenuItem>
-      <MenuItem onClick={handleMenuClose} component={Link} to={routes.LOG_OUT}>
+      <MenuItem
+        onClick={function () {
+          handleMenuClose();
+          onLogout();
+        }}
+      >
         Log out
       </MenuItem>
     </Menu>

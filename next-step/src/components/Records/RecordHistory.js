@@ -21,8 +21,10 @@ export const RecordHistory = (props) => {
             setRecord(
               response.sort((a, b) => (a.weight < b.weight ? 1 : -1))[0]
             );
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
           history.push("/error");
         }
       })();
@@ -35,8 +37,11 @@ export const RecordHistory = (props) => {
         try {
           await userService.deleteRecord(id);
           history.push("/records");
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
+          history.push("/error");
         }
       })();
   };

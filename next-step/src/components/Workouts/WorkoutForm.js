@@ -45,8 +45,11 @@ export const WorkoutForm = (props) => {
           (await response) && console.log(response);
           (await response) && setValues(response);
           (await response) && setEditing(true);
-        } catch (error) {
-          setException(error);
+        } catch {
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
+          history.push("/error");
         } finally {
           setLoading(false);
         }
