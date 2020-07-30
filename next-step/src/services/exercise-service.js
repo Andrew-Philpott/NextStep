@@ -1,5 +1,5 @@
 import { handleResponse } from "../helpers/handle-response";
-import { authHeader } from "../helpers/authentication-header";
+import { getOptions } from "./request-options";
 
 const path = "/api/exercises";
 
@@ -8,18 +8,18 @@ export const exerciseService = {
   getAll,
 };
 
-const getOptions = {
-  method: "GET",
-};
-
 async function get(id) {
-  return await fetch(`http://localhost:5000${path}/${id}`, getOptions).then(
-    handleResponse
+  const response = await fetch(
+    `http://localhost:5000${path}/${id}`,
+    getOptions
   );
+  return await handleResponse(response);
 }
 
 async function getAll() {
-  return await fetch(`http://localhost:5000/api/exercises`, getOptions).then(
-    handleResponse
+  const response = await fetch(
+    `http://localhost:5000/api/exercises`,
+    getOptions
   );
+  return await handleResponse(response);
 }

@@ -1,31 +1,24 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using BodyJournalAPI.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
-namespace BodyJournalAPI
+namespace BodyJournalAPI.Helpers
 {
-  public class Startup
+  public static class ServiceExtensions
   {
-    private readonly IConfiguration _configuration;
-
-    public Startup(IConfiguration configuration)
+    public static void ConfigureSqlServerContext(this IServiceCollection services, IConfiguration config)
     {
-      _configuration = configuration;
+      var connectionString = config["ConnectionStrings:DefaultConnection"];
+      services.AddDbContext<DataContext>(o => o.UseSqlServer(connectionString));
     }
-    public void ConfigureServices(IServiceCollection services)
-    {
-      services.ConfigureSqlServerContext(_configuration);
-      services.AddCors();
-      services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-      var appSettingsSection = _configuration.GetSection("AppSettings");
+    public static void ConfigureJWTAuthentication(this IServiceCollection services, IConfiguration config)
+    {
+      var appSettingsSection = config.GetSection("AppSettings");
       services.Configure<AppSettings>(appSettingsSection);
 
       var appSettings = appSettingsSection.Get<AppSettings>();
@@ -61,25 +54,6 @@ namespace BodyJournalAPI
           ValidateIssuer = false,
           ValidateAudience = false
         };
-      });
-    }
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext context)
-    {
-      context.Database.Migrate();
-
-      app.UseRouting();
-
-      app.UseCors(options =>
-      options.WithOrigins("http://localhost:3000")
-      .AllowAnyHeader()
-      .AllowAnyMethod());
-
-      app.UseAuthentication();
-      app.UseAuthorization();
-
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
       });
     }
   }

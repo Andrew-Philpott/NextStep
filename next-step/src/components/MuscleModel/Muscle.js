@@ -1,9 +1,16 @@
 import React from "react";
 
 export const Muscle = (props) => {
-  const { recoveries, draw, muscleId, onCreateRecovery } = props;
+  const { exercises, recoveries, draw, muscleId, onCreateRecovery } = props;
   let fatigue = "";
   let color = "";
+  if (exercises) {
+    const weightedIntensities = exercises.muscles.filter(
+      (x) => x.muscleId === muscleId
+    );
+    console.log(weightedIntensities);
+  }
+
   if (recoveries) {
     const fatigueExists = recoveries.filter(
       (x) => x.muscleId === muscleId,

@@ -1,8 +1,8 @@
 import React from "react";
 import { Button, Grid, TextField, InputLabel } from "@material-ui/core";
 import * as routes from "../../constants/route-constants";
-import { userService } from "../../services/user-service";
-import { history } from "../../helpers/history";
+import { userService } from "../../services";
+import { useHistory } from "react-router-dom";
 import { useForm } from "../Other/useForm";
 
 const initialFieldValues = {
@@ -18,6 +18,7 @@ export const Register = (props) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
+  const history = useHistory();
 
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
@@ -51,9 +52,8 @@ export const Register = (props) => {
     return false;
   };
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-
     if (validate()) {
       const user = {
         firstName: values.firstName,
@@ -63,14 +63,13 @@ export const Register = (props) => {
         password: e.target.password.value,
       };
 
-      (async () => {
-        try {
-          await userService.register(user);
-          history.push(routes.LOG_IN);
-        } catch (error) {
-          setException(error);
-        }
-      })();
+      try {
+        const response = await userService.register(user);
+        (await response) && history.push(routes.LOG_IN);
+      } catch (error) {
+        setException(error);
+        history.push("/error");
+      }
     }
   }
 
@@ -80,7 +79,7 @@ export const Register = (props) => {
       <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         <React.Fragment>
           <h2 className="mrgn-t8">Register</h2>
-          <form name="form" onSubmit={handleSubmit}>
+          <form method="POST" name="form" onSubmit={handleSubmit}>
             <InputLabel className="mrgn-t8" htmlFor="firstName">
               First Name
             </InputLabel>

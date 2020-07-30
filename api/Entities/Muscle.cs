@@ -4,8 +4,12 @@ namespace BodyJournalAPI.Entities
 {
   public class Muscle
   {
-    public int Id { get; set; }
+    public Muscle()
+    {
+      this.ExerciseTypes = new HashSet<ExerciseTypeMuscle>();
+    }
+    public byte MuscleId { get; set; }
     public string Name { get; set; }
-    public virtual ICollection<ExerciseMuscle> Exercises { get; set; }
+    public ICollection<ExerciseTypeMuscle> ExerciseTypes { get; set; }
   }
 }

@@ -1,138 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import { Link } from "react-router-dom";
-import { exerciseService } from "../../services/exercise-service";
-
-export const Record = (props) => {
-  return (
-    <React.Fragment>
-      <h1>{props.name}</h1>
-      {props.muscles
-        .filter((x) => x.primary === true)
-        .sort((a, b) => (a.id < b.id ? 1 : -1))
-        .map((muscle, index) => (
-          <li
-            style={{
-              listStyle: "none",
-              textAlign: "left",
-            }}
-            key={index}
-          >
-            {muscle.muscle.name}
-          </li>
-        ))}
-      {props.muscles
-        .filter((x) => x.primary === false)
-        .sort((a, b) => (a.id < b.id ? 1 : -1))
-        .map((muscle, index) => (
-          <li
-            style={{
-              listStyle: "none",
-              textAlign: "left",
-            }}
-            key={index}
-          >
-            {muscle.muscle.name}
-          </li>
-        ))}
-      <h1></h1>
-    </React.Fragment>
-  );
-};
+import { recordService } from "../../services";
+import { Record } from "./Record";
+import { useHistory } from "react-router-dom";
 
 export const Records = (props) => {
-  const { setException } = props;
-  const [exercises, setExercises] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const { exercises, setException } = props;
+  const [records, setRecords] = useState(null);
+  const history = useHistory();
+
   useEffect(() => {
-    if (!loaded) {
+    if (!records) {
       (async () => {
         try {
-          const response = await exerciseService.getAll();
-          setExercises(response);
-          setLoaded(true);
+          const response = await recordService.getPRsForExercises();
+          (await response) && setRecords(response);
         } catch (error) {
+          history.push("/error");
           setException(error);
         }
       })();
     }
-  }, [loaded]);
+  }, [records]);
 
   return (
-    <Grid container>
-      <div className="spacer" />
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}></Grid>
-      <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
-        <React.Fragment>
-          <h1>Records</h1>
-
-          {exercises &&
-            exercises.map((exercise) => (
-              <Record {...exercise} />
-              // <TableRow key={exercise.id}>
-              //   <TableCell component="th" scope="row">
-              //     <Link to={`/exercises/${exercise.id}`}>
-              //       {exercise.name}
-              //     </Link>
-              //   </TableCell>
-
-              //   <TableCell align="left">
-              //     <ul className="pad-l0">
-              //       {exercise.muscles
-              //         .filter(
-              //           (x) => x.primary === true,
-              //           (x) => {
-              //             return x;
-              //           }
-              //         )
-              //         .sort((a, b) => (a.id < b.id ? 1 : -1))
-              //         .map((muscle, index) => (
-              //           <li
-              //             style={{
-              //               listStyle: "none",
-              //               textAlign: "left",
-              //             }}
-              //             key={index}
-              //           >
-              //             {muscle.muscle.name}
-              //           </li>
-              //         ))}
-              //     </ul>
-              //   </TableCell>
-              //   <TableCell align="left">
-              //     <ul className="pad-l0">
-              //       {exercise.muscles
-              //         .filter(
-              //           (x) => x.primary === false,
-              //           (x) => {
-              //             return x;
-              //           }
-              //         )
-              //         .sort((a, b) => (a.id < b.id ? 1 : -1))
-              //         .map((muscle, index) => (
-              //           <li
-              //             style={{
-              //               listStyle: "none",
-              //               textAlign: "left",
-              //             }}
-              //             key={index}
-              //           >
-              //             {muscle.muscle.name}
-              //           </li>
-              //         ))}
-              //     </ul>
-              //   </TableCell>
-              // </TableRow>
-            ))}
-        </React.Fragment>
-      </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
-    </Grid>
+    <React.Fragment>
+      {records ? (
+        <Grid container>
+          <div className="spacer" />
+          <Grid item xs={1} sm={2} md={3} lg={3} xl={3} />
+          <Grid item xs={10} sm={8} md={6} lg={6} xl={6}>
+            <h1>Records</h1>
+            <Grid container direction="row" justify="center">
+              {exercises &&
+                records &&
+                exercises.map((exercise) => (
+                  <Record
+                    key={exercise.exerciseTypeId}
+                    exercise={exercise}
+                    record={
+                      records
+                        ? records.filter(
+                            (x) => x.exerciseTypeId === exercise.exerciseTypeId
+                          )[0]
+                        : null
+                    }
+                    setException={setException}
+                  />
+                ))}
+            </Grid>
+          </Grid>
+          <Grid item xs={1} sm={2} md={3} lg={3} xl={3} />
+        </Grid>
+      ) : (
+        <div>
+          <h1>Loading</h1>
+        </div>
+      )}
+    </React.Fragment>
   );
 };

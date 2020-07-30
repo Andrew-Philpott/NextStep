@@ -9,7 +9,7 @@
 // import DeleteIcon from "@material-ui/icons/Delete";
 // import Table from "@material-ui/core/Table";
 // import { Paper, Grid } from "@material-ui/core";
-// import { HumanModel } from "../Other/HumanModel";
+// import { MuscleModel } from "../MuscleModel/MuscleModel";
 
 // export const Recoveries = (props) => {
 //   const [recoveries, setRecoveries] = useState(null);

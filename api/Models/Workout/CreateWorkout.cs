@@ -9,6 +9,6 @@ namespace BodyJournalAPI.Models
     public string Name { get; set; }
     public string Notes { get; set; }
     [Required]
-    public IEnumerable<CreateExercise> Exercises { get; set; }
+    public List<CreateExercise> Exercises { get; set; }
   }
 }

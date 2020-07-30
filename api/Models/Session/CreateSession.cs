@@ -5,6 +5,6 @@ namespace BodyJournalAPI.Models
   public class CreateSession
   {
     [Required]
-    public int WorkoutId { get; set; }
+    public long WorkoutId { get; set; }
   }
 }

@@ -7,6 +7,7 @@ body,
   margin: 0;
 }
 
+p,
 h1,
 h2,
 h3,
@@ -40,6 +41,10 @@ h6 {
   background-color: #00acee !important;
 }
 
+.blue-color {
+  color: #00acee !important;
+}
+
 .current-session > span {
   margin-right: 10px;
 }
@@ -54,6 +59,10 @@ h6 {
 
 .green-background {
   background-color: #66bb6a !important;
+}
+
+.green-color {
+  color: #66bb6a !important;
 }
 
 .mrgn-0 {
@@ -76,31 +85,58 @@ h6 {
   margin-top: 24px !important;
 }
 
+.muscle-model {
+  position: sticky;
+  top: 0px;
+}
+
 .nav-link {
   text-decoration: none;
   color: white;
-  margin-right: 50px;
+  margin-right: 35px;
 }
 
 .nav-link:hover {
-  text-decoration: none;
+  color: #65c9ff;
 }
 
 .no-decoration {
   text-decoration: none;
 }
 
+.orange-background {
+  background-color: orange;
+}
+
 .pad-l0 {
   padding-left: 0px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.position-relative {
+  position: relative;
 }
 
 .red-background {
   background-color: #ef5350 !important;
 }
 
+.red-color {
+  color: #ef5350 !important;
+}
+
+.gray-background {
+  background-color: gray !important;
+}
+
 .spacer {
-  width: 100% !important;
-  height: 16px !important;
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
 }
 
 .text-align-center {
@@ -109,4 +145,16 @@ h6 {
 
 .white-border {
   border: 1px solid white !important;
+}
+
+.workout-container {
+  border: 1px solid green;
+  height: 250px;
+  position: relative;
+}
+
+.workout-container > div > .left {
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-bottom: 10px;
 }

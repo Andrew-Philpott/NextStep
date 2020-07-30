@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { userService } from "../../services/user-service";
+import { userService } from "../../services";
 import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
-import { history } from "../../helpers/history";
+import { useHistory } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { useForm } from "../Other/useForm";
 
@@ -11,10 +11,11 @@ const initialFieldValues = {
 };
 
 export const Login = (props) => {
-  const { session, handleEndSession, setLoggedIn, setException } = props;
+  const { setException } = props;
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
+  const history = useHistory();
 
   const validate = (fieldValues = values) => {
     const temp = {};
@@ -37,25 +38,26 @@ export const Login = (props) => {
   };
 
   useEffect(() => {
-    if (session) {
-      handleEndSession();
-    }
-    setLoggedIn(false);
     userService.logout();
-  }, [session]);
+  }, []);
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
-
     if (validate()) {
-      userService
-        .login(values.username, values.password)
-        .then(() => {
-          history.push(routes.ACCOUNT);
-        })
-        .catch((error) => {
+      (async () => {
+        try {
+          const response = await userService.login(
+            values.username,
+            values.password
+          );
+          (await response) &&
+            localStorage.setItem("user", JSON.stringify(response));
+          (await response) && history.push(routes.ACCOUNT);
+        } catch (error) {
           setException(error);
-        });
+          history.push("/error");
+        }
+      })();
     }
   }
 
@@ -65,7 +67,7 @@ export const Login = (props) => {
       <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         <React.Fragment>
           <h2 className="mrgn-t8">Log in</h2>
-          <form name="form" onSubmit={handleSubmit}>
+          <form method="POST" name="form" onSubmit={handleSubmit}>
             <InputLabel className="mrgn-t8" htmlFor="username">
               User Name
             </InputLabel>

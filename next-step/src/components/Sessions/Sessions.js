@@ -6,26 +6,27 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { Grid } from "@material-ui/core";
-import { userService } from "../../services/user-service";
+import { sessionService } from "../../services";
+import { useHistory } from "react-router-dom";
 
 export const Sessions = (props) => {
-  const [sessions, setSessions] = useState(null);
-  const [loaded, setLoaded] = useState(false);
   const { setException } = props;
+  const [sessions, setSessions] = useState(null);
+  const history = useHistory();
 
   useEffect(() => {
-    if (!loaded) {
-      userService
-        .getAllSessions()
-        .then((response) => {
-          setSessions(response);
-          setLoaded(true);
-        })
-        .catch((error) => {
+    if (!sessions) {
+      (async () => {
+        try {
+          const response = await sessionService.getAllSessions();
+          (await response) && setSessions(response);
+        } catch (error) {
           setException(error);
-        });
+          history.push("error");
+        }
+      })();
     }
-  }, [loaded]);
+  }, [sessions]);
 
   return (
     <Grid container>

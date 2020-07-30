@@ -8,22 +8,6 @@ namespace BodyJournalAPI.Helpers
   {
     public MappingProfile()
     {
-      #region Exercise
-      CreateMap<Exercise, ViewExercise>();
-
-      CreateMap<CreateExercise, Exercise>();
-
-      CreateMap<UpdateExercise, Exercise>();
-      #endregion
-
-      #region Workout
-      CreateMap<Workout, ViewWorkout>();
-
-      CreateMap<CreateWorkout, Workout>();
-
-      CreateMap<UpdateWorkout, Workout>();
-      #endregion
-
       #region Recovery
       CreateMap<CreateRecovery, Recovery>();
 

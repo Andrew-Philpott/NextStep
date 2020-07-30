@@ -4,15 +4,13 @@ namespace BodyJournalAPI.Models
 {
   public class CreateExercise
   {
-    public int? Weight { get; set; }
     [Required]
-    public int Reps { get; set; }
+    public short Weight { get; set; }
     [Required]
-    public int Sets { get; set; }
+    public byte Reps { get; set; }
     [Required]
-    public int Intensity { get; set; }
+    public byte Sets { get; set; }
     [Required]
-    public int ExerciseId { get; set; }
-    public int WorkoutId { get; set; }
+    public short ExerciseTypeId { get; set; }
   }
 }

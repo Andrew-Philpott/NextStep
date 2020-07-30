@@ -5,15 +5,15 @@ namespace BodyJournalAPI.Entities
 {
   public class Record
   {
-    public int Id { get; set; }
-    public int Weight { get; set; }
-    public int Reps { get; set; }
-    public int Sets { get; set; }
+    public short RecordId { get; set; }
+    public short? Weight { get; set; }
+    public byte Reps { get; set; }
+    public byte Sets { get; set; }
     public string Time { get; set; } = DateTime.Now.ToString("MM/dd/yyyy H:mm");
-    [ForeignKey(nameof(User))]
     public int UserId { get; set; }
-    [ForeignKey(nameof(Exercise))]
-    public int ExerciseId { get; set; }
+    public virtual User User { get; set; }
+    public short ExerciseTypeId { get; set; }
+    public virtual ExerciseType ExerciseType { get; set; }
   }
 }
 

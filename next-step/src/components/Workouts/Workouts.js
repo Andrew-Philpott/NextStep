@@ -1,121 +1,84 @@
 import React, { useEffect, useState } from "react";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
 import { Button, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import CheckIcon from "@material-ui/icons/Check";
-import { userService } from "../../services/user-service";
+import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
-
-export const Workout = (props) => {
-  const { handleStartSession, name, description, id } = props;
-  return (
-    <div
-      style={{
-        backgroundColor: "green",
-        width: "80%",
-        height: "20%",
-        position: "relative",
-      }}
-    >
-      <div
-        className="text-align-center"
-        style={{ backgroundColor: "white", width: "20%" }}
-      >
-        <h2>{name}</h2>
-      </div>
-      <Button
-        style={{ position: "absolute", bottom: "0px", right: "0px" }}
-        onClick={() => handleStartSession(id)}
-      >
-        Start Workout
-      </Button>
-      <p>{description}</p>
-    </div>
-  );
-};
+import { MuscleModel } from "../MuscleModel/MuscleModel";
+import { Workout } from "../Workouts/Workout";
 
 export const Workouts = (props) => {
   const [workouts, setWorkouts] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-  const { handleStartSession, setException } = props;
+  const { onCreateSession, setException } = props;
+
+  const handleDeleteWorkout = (id) => {
+    if (window.confirm("Are you sure you want to delete this workout?"))
+      (async () => {
+        try {
+          const response = await workoutService.deleteWorkout(id);
+          const newState =
+            (await response) && workouts.filter((x) => x.workoutId !== id);
+          (await newState) && setWorkouts(newState);
+        } catch (error) {
+          setException(error);
+        }
+      })();
+  };
 
   useEffect(() => {
-    if (!loaded) {
-      userService
-        .getAllWorkouts()
-        .then((response) => {
-          setWorkouts(response);
-          setLoaded(true);
-        })
-        .catch((error) => {
-          setException(error);
-        });
-    }
-  }, [loaded]);
+    (async () => {
+      try {
+        const response = await workoutService.getAllWorkouts();
+        (await response) && setWorkouts(response);
+      } catch (error) {
+        setException(error);
+      }
+    })();
+  }, []);
 
   return (
     <Grid container>
       <div className="spacer" />
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
-
-      <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
-        <h1>Workouts</h1>
-        <Grid container direction="row" justify="center">
-          {/* <TableContainer>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  Name
-                </TableCell>
-                <TableCell align="left">Notes</TableCell>
-                <TableCell align="left">Start Session</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody> */}
-
-          {workouts &&
-            workouts.map((workout) => (
-              <Workout
-                key={workout.id}
-                id={workout.id}
-                handleStartSession={handleStartSession}
-                name={workout.name}
-              />
-            ))}
-        </Grid>
-
-        {/* <TableRow key={workout.id}>
-          <TableCell component="th" scope="row">
-            // <Link to={`/workouts/${workout.id}`}>{workout.name}</Link>
-          </TableCell>
-          // <TableCell align="left">{workout.notes}</TableCell>
-          <TableCell align="left">
-            <Button onClick={() => handleStartSession(workout.id)}>
-              // <CheckIcon />
-            </Button>
-          </TableCell>
-        </TableRow> */}
-        {/* </TableBody>
-          </Table>
-        </TableContainer> */}
-      </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
+      <Grid item xs={9}></Grid>
+      <Grid item xs={3}>
         <Grid container justify="center">
           <Button
             component={Link}
-            className="button blue-background float-right"
+            className="button blue-background"
             to={routes.WORKOUTS_NEW}
           >
             Create Workout
           </Button>
         </Grid>
       </Grid>
+
+      <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
+      <Grid item xs={8} sm={6} md={6} lg={6} xl={6}>
+        <Grid container direction="column" justify="center">
+          {workouts && workouts.length !== 0 ? (
+            <h1>Workouts</h1>
+          ) : (
+            <h1 className="text-align-center">
+              You dont have any workouts yet
+            </h1>
+          )}
+          {workouts &&
+            workouts.map((workout, index) => (
+              <Workout
+                key={index}
+                id={workout.workoutId}
+                onDeleteWorkout={handleDeleteWorkout}
+                onCreateSession={onCreateSession}
+                exercises={workout.exercises}
+                name={workout.name}
+              />
+            ))}
+        </Grid>
+      </Grid>
+      <Grid item xs={2} sm={4} md={4} lg={4} xl={4}>
+        <div className="spacer" />
+        <MuscleModel active={true} />
+      </Grid>
+      <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
     </Grid>
   );
 };

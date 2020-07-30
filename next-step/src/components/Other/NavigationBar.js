@@ -86,7 +86,7 @@ export const NavigationBar = (props) => {
       <MenuItem component={Link} to={routes.WORKOUTS_LIST}>
         Workouts
       </MenuItem>
-      <MenuItem component={Link} to={routes.RECORDS}>
+      <MenuItem component={Link} to={routes.RECORDS_LIST}>
         Records
       </MenuItem>
       {user == null ? (
@@ -116,7 +116,7 @@ export const NavigationBar = (props) => {
                   <Link className="nav-link" to={routes.WORKOUTS_LIST}>
                     Workouts
                   </Link>
-                  <Link className="nav-link" to={routes.RECORDS}>
+                  <Link className="nav-link" to={routes.RECORDS_LIST}>
                     Records
                   </Link>
                 </>
@@ -127,13 +127,8 @@ export const NavigationBar = (props) => {
                 </Link>
               ) : (
                 <span
+                  className="nav-link pointer"
                   onClick={handleProfileMenuOpen}
-                  style={{
-                    color: "white",
-                    backgroundColor: "#00acee",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
                 >
                   Account
                 </span>

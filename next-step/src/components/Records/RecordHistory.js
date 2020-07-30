@@ -1,37 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Grid } from "@material-ui/core";
-import { history } from "../../helpers/history";
+import { useHistory } from "react-router-dom";
 import { userService } from "../../services/user-service";
 import { exerciseService } from "../../services/exercise-service";
 
-export const ExerciseDetails = (props) => {
+export const RecordHistory = (props) => {
   const { id } = useParams();
   const { setException } = props;
   const [exercise, setExercise] = useState(null);
   const [record, setRecord] = useState(null);
-
-  useEffect(() => {
-    if (id && !exercise) {
-      (async () => {
-        try {
-          const response = await exerciseService.get(id);
-          setExercise(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
-    }
-  }, [id, exercise]);
+  const history = useHistory();
 
   useEffect(() => {
     if (id && !record) {
       (async () => {
         try {
-          const response = await userService.getRecordsByExercise(id);
-          setRecord(response.sort((a, b) => (a.weight < b.weight ? 1 : -1))[0]);
+          const response = await userService.getRecordByExercise(id);
+          (await response) &&
+            setRecord(
+              response.sort((a, b) => (a.weight < b.weight ? 1 : -1))[0]
+            );
         } catch (error) {
           setException(error);
+          history.push("/error");
         }
       })();
     }

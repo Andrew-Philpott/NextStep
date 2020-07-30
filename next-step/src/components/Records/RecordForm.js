@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   InputLabel,
@@ -7,9 +7,8 @@ import {
   Grid,
 } from "@material-ui/core";
 import { useForm } from "../Other/useForm";
-import { history } from "../../helpers/history";
-import { exerciseService } from "../../services/exercise-service";
-import { userService } from "../../services/user-service";
+import { useHistory } from "react-router-dom";
+import { recordService } from "../../services";
 import { useParams } from "react-router-dom";
 
 const initialFieldValues = {
@@ -20,12 +19,12 @@ const initialFieldValues = {
 };
 
 export const RecordForm = (props) => {
-  const { id } = useParams();
-  const { setException } = props;
-  const [exercises, setExercises] = React.useState(null);
+  const { exerciseTypeId } = useParams();
+  const { exercises, setException } = props;
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
+  const history = useHistory();
 
   const validate = (fieldValues = values) => {
     let temp = { ...errors };
@@ -62,32 +61,6 @@ export const RecordForm = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (id) {
-      (async () => {
-        try {
-          const response = await userService.getRecordsByExercise(id);
-          setValues(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (!exercises) {
-      (async () => {
-        try {
-          const response = await exerciseService.getAll();
-          setExercises(response);
-        } catch (error) {
-          setException(error);
-        }
-      })();
-    }
-  }, [exercises]);
-
   function handleSubmit(e) {
     e.preventDefault();
     if (validate()) {
@@ -100,7 +73,7 @@ export const RecordForm = (props) => {
 
       (async () => {
         try {
-          const response = await userService.createRecord(record);
+          const response = await recordService.createRecord(record);
           (await response) && history.push("/records");
         } catch (error) {
           setException(error);
@@ -116,31 +89,6 @@ export const RecordForm = (props) => {
         <h2>Create Record</h2>
         <form autoComplete="off" onSubmit={handleSubmit}>
           <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <InputLabel className="mrgn-t16" htmlFor="exerciseId">
-                Exercise
-              </InputLabel>
-              <TextField
-                onChange={handleInputChange}
-                value={values.exerciseId}
-                select
-                name="exerciseId"
-                id="exerciseId"
-                variant="outlined"
-              >
-                <MenuItem key={""} value={""}></MenuItem>
-                {exercises &&
-                  exercises
-                    .sort((a, b) => (a.name > b.name ? 1 : -1))
-                    .map((item) => {
-                      return (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      );
-                    })}
-              </TextField>
-            </Grid>
             <Grid item xs={2}>
               <InputLabel className="mrgn-t16" htmlFor="weight">
                 Weight

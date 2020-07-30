@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using BodyJournalAPI.Entities;
 
 namespace BodyJournalAPI.Models
 {
@@ -8,8 +9,7 @@ namespace BodyJournalAPI.Models
     [Required]
     public string Name { get; set; }
     public string Notes { get; set; }
-    [Required]
-    public IEnumerable<UpdateExercise> UpdateExercises { get; set; }
-    public IEnumerable<CreateExercise> NewExercises { get; set; }
+    public List<UpdateExercise> UpdateExercises { get; set; }
+    public List<CreateExercise> CreateExercises { get; set; }
   }
 }
