@@ -1,30 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, FormEvent, useState } from "react";
 import { userService } from "../../services";
 import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { useForm } from "../Other/useForm";
 
+interface Props {
+  setUser: (fn: (value: string) => void) => void;
+  setException: (value: string) => void;
+}
+
 const initialFieldValues = {
   username: "",
   password: "",
 };
 
-export const Login = (props) => {
+export const Login: React.FC<Props> = (props) => {
   const { setUser, setException } = props;
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
   const history = useHistory();
 
-  const validate = (fieldValues = values) => {
-    const temp = {};
+  const validate = () => {
+    const temp = initialFieldValues;
     temp.username = "";
     temp.password = "";
-    if (!fieldValues.username) {
+    if (!values.username) {
       temp.username = "Field cannot be blank.";
     }
-    if (!fieldValues.password) {
+    if (!values.password) {
       temp.password = "Field cannot be blank.";
     }
 
@@ -37,7 +42,7 @@ export const Login = (props) => {
     return false;
   };
 
-  function handleSubmit(e) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
       (async () => {
@@ -46,10 +51,10 @@ export const Login = (props) => {
             values.username,
             values.password
           );
-          (await response) &&
-            localStorage.setItem("user", JSON.stringify(response));
-          (await response) && setUser(JSON.stringify(response));
-          (await response) &&
+          const stringify = await JSON.parse(response);
+          localStorage.setItem("user", stringify);
+          (await stringify) && setUser(stringify);
+          (await stringify) &&
             setTimeout(() => {
               history.push("/account");
             }, 20);

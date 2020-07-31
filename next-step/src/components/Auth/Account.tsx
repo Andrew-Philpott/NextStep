@@ -2,9 +2,11 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
 
-export const Account = (props) => {
-  const { setException } = props;
+interface Props {
+  setException: () => void;
+}
 
+export const Account: React.FC<Props> = ({ setException }) => {
   return (
     <Grid container>
       <div className="spacer" />
