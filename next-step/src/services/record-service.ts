@@ -18,7 +18,7 @@ export const recordService = {
   deleteRecord,
 };
 
-async function getRecord(id) {
+async function getRecord(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     getOptions
@@ -26,7 +26,7 @@ async function getRecord(id) {
   return await handleResponse(response);
 }
 
-async function getAllRecordsForExercise(id) {
+async function getAllRecordsForExercise(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/exercises/${id}`,
     getOptions
@@ -34,7 +34,7 @@ async function getAllRecordsForExercise(id) {
   return await handleResponse(response);
 }
 
-async function getPRsForExercises(id) {
+async function getPRsForExercises(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/exercises/pr`,
     getOptions
@@ -47,7 +47,7 @@ async function getAllRecords() {
   return await handleResponse(response);
 }
 
-async function createRecord(model) {
+async function createRecord(model: object) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -55,7 +55,7 @@ async function createRecord(model) {
   return await handleResponse(response);
 }
 
-async function updateRecord(id, model) {
+async function updateRecord(id: number, model: object) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
@@ -63,7 +63,7 @@ async function updateRecord(id, model) {
   return await handleResponse(response);
 }
 
-async function deleteRecord(id) {
+async function deleteRecord(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     deleteOptions

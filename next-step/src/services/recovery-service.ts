@@ -6,18 +6,17 @@ import {
   deleteOptions,
 } from "./request-options";
 
-const path = "/api/users/sessions";
+const path = "/api/users/recoveries";
 
-export const sessionService = {
-  getSession,
-  getAllSessions,
-  getCurrentSession,
-  createSession,
-  updateSession,
-  deleteSession,
+export const recoveryService = {
+  getRecovery,
+  getAllRecoveries,
+  createRecovery,
+  updateRecovery,
+  deleteRecovery,
 };
 
-async function getSession(id) {
+async function getRecovery(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     getOptions
@@ -25,20 +24,12 @@ async function getSession(id) {
   return await handleResponse(response);
 }
 
-async function getAllSessions() {
+async function getAllRecoveries() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
   return await handleResponse(response);
 }
 
-async function getCurrentSession() {
-  const response = await fetch(
-    `http://localhost:5000${path}/current`,
-    getOptions
-  );
-  return await handleResponse(response);
-}
-
-async function createSession(model) {
+async function createRecovery(model: object) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -46,7 +37,7 @@ async function createSession(model) {
   return await handleResponse(response);
 }
 
-async function updateSession(id, model) {
+async function updateRecovery(id: number, model: object) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
@@ -54,7 +45,7 @@ async function updateSession(id, model) {
   return await handleResponse(response);
 }
 
-async function deleteSession(id) {
+async function deleteRecovery(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     deleteOptions

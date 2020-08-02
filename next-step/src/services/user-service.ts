@@ -11,13 +11,13 @@ export const userService = {
   deleteUser,
 };
 
-async function login(username, password) {
+async function login(username: string, password: string) {
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   };
-
+  console.log(username, password);
   const response = await fetch(
     `http://localhost:5000${path}/authenticate`,
     requestOptions
@@ -29,7 +29,7 @@ function logout() {
   localStorage.removeItem("user");
 }
 
-async function register(model) {
+async function register(model: object) {
   const response = await fetch(
     `http://localhost:5000/api/users/register`,
     postOptions(model)
@@ -37,7 +37,7 @@ async function register(model) {
   return await handleResponse(response);
 }
 
-async function updateUser(model) {
+async function updateUser(model: object) {
   const response = await fetch(
     `http://localhost:5000/api/users`,
     putOptions(model)
@@ -45,7 +45,7 @@ async function updateUser(model) {
   return await handleResponse(response);
 }
 
-async function deleteUser(id) {
+async function deleteUser(id: number) {
   const response = await fetch(
     `http://localhost:5000/api/users/${id}`,
     deleteOptions

@@ -8,7 +8,7 @@ export const exerciseService = {
   getAll,
 };
 
-async function get(id) {
+async function get(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     getOptions

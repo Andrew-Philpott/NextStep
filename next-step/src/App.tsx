@@ -6,7 +6,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import { Button } from "@material-ui/core";
-import { UserRoute } from "./components/Auth/UserRoute";
+import { PrivateRoute } from "./components/Auth/PrivateRoute";
 import { useOnlineStatus } from "./components/Other/useOnlineStatus";
 import { Home } from "./components/Other/Home";
 import { Records } from "./components/Records/Records";
@@ -23,12 +23,25 @@ import { Account } from "./components/Auth/Account";
 import { userService, sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
 import "./App.css";
+import { isNumber } from "util";
+import * as types from "./types/types";
 
-function App() {
-  const [session, setSession] = useState(null);
+function setUserFromLocalStorage() {
+  const jsonParserUnknown = (jsonString: string): unknown =>
+    JSON.parse(jsonString);
+  let userAsStringOrNull: string | null = localStorage.getItem("user");
+  let user: types.User = null;
+  if (userAsStringOrNull) {
+    user = jsonParserUnknown(userAsStringOrNull) as types.User;
+  }
+  return user;
+}
+
+const App = () => {
+  const [session, setSession] = useState<types.Session>(null);
   const [exercises, setExercises] = useState(null);
-  const [exception, setException] = useState(null);
-  const [user, setUser] = useState(localStorage.getItem("user"));
+  const [exception, setException] = useState("");
+  const [user, setUser] = useState<types.User>(setUserFromLocalStorage);
   const online = useOnlineStatus();
 
   useEffect(() => {}, [user]);
@@ -39,15 +52,16 @@ function App() {
   };
 
   useEffect(() => {
-    if (!exercises && user && online) {
+    if (!exercises) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
           (await response) && setExercises(response);
         } catch {
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          );
+          console.log("error");
+          // setException(
+          //   "We're having some technical difficulties. Please try again later."
+          // );
         }
       })();
     }
@@ -68,11 +82,13 @@ function App() {
     }
   }, [session]);
 
-  const handleEndSession = () => {
-    const rating = parseInt(window.prompt("How would you rate that workout?"));
-    (async () => {
+  const handleEndSession = async (id: number) => {
+    const answer = window.prompt("How would you rate that workout?");
+    let rating: number = 0;
+    if (isNumber(answer) && answer >= 1 && answer <= 5) {
+      rating = parseInt(answer);
       try {
-        const response = await userService.updateSession(session.sessionId, {
+        const response = await sessionService.updateSession(id, {
           rating: rating,
         });
         (await response) && setSession(response);
@@ -81,14 +97,16 @@ function App() {
           "We're having some technical difficulties. Please try again later."
         );
       }
-    })();
+    }
   };
 
-  const handleCreateSession = (id) => {
+  const handleCreateSession = (id: number) => {
     if (!session) {
       (async () => {
         try {
-          const response = await userService.createSession({ workoutId: id });
+          const response = await sessionService.createSession({
+            workoutId: id,
+          });
           setSession(response);
         } catch {
           setException(
@@ -112,7 +130,7 @@ function App() {
             <div className="current-session">
               <Button
                 className="button green-background white-border float-right mrgn-r8"
-                onClick={() => handleEndSession()}
+                onClick={() => handleEndSession(session.sessionId)}
               >
                 End session
               </Button>
@@ -134,29 +152,30 @@ function App() {
               path={routes.ERROR}
               component={() => <ErrorPage exception={exception} />}
             />
-            <UserRoute
+            <PrivateRoute
               exact
+              user={user}
               path={routes.ACCOUNT}
               component={() => <Account setException={setException} />}
             />
-            <UserRoute
+            <PrivateRoute
               exact
               path={routes.RECORDS_NEW}
               component={() => <RecordForm setException={setException} />}
             />
-            <UserRoute
+            <PrivateRoute
               exact
               path={routes.RECORDS_LIST}
               component={() => (
                 <Records exercises={exercises} setException={setException} />
               )}
             />
-            <UserRoute
+            <PrivateRoute
               exact
               path={routes.RECORD_HISTORY}
               component={() => <RecordHistory setException={setException} />}
             />
-            <UserRoute
+            <PrivateRoute
               exact
               path={routes.WORKOUTS_LIST}
               component={() => (
@@ -167,7 +186,7 @@ function App() {
                 />
               )}
             />
-            <UserRoute
+            <PrivateRoute
               path={routes.WORKOUTS_NEW}
               component={() => (
                 <WorkoutForm
@@ -176,8 +195,9 @@ function App() {
                 />
               )}
             />
-            <UserRoute
+            <PrivateRoute
               exact
+              user={user}
               path={routes.WORKOUTS_EDIT}
               component={() => (
                 <WorkoutForm
@@ -186,7 +206,7 @@ function App() {
                 />
               )}
             />
-            <UserRoute
+            <PrivateRoute
               exact
               path={routes.SESSIONS_LIST}
               component={() => <Sessions setException={setException} />}
@@ -207,5 +227,5 @@ function App() {
       </div>
     </div>
   );
-}
+};
 export default App;

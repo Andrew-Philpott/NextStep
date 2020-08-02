@@ -1,9 +1,13 @@
-import React from "react";
+import React, { FormEvent } from "react";
 import { Button, Grid, TextField, InputLabel } from "@material-ui/core";
 import * as routes from "../../constants/route-constants";
 import { userService } from "../../services";
 import { useHistory } from "react-router-dom";
 import { useForm } from "../Other/useForm";
+
+interface Props {
+  setException: (value: string) => void;
+}
 
 const initialFieldValues = {
   firstName: "",
@@ -13,8 +17,7 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Register = (props) => {
-  const { setException } = props;
+export const Register: React.FC<Props> = ({ setException }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -52,7 +55,7 @@ export const Register = (props) => {
     return false;
   };
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
       const user = {
@@ -60,7 +63,7 @@ export const Register = (props) => {
         lastName: values.lastName,
         username: values.username,
         email: values.email,
-        password: e.target.password.value,
+        password: values.password,
       };
 
       try {

@@ -4,9 +4,10 @@ import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { useForm } from "../Other/useForm";
+import { User } from "../../types/types";
 
 interface Props {
-  setUser: (fn: (value: string) => void) => void;
+  setUser: (value: User) => void;
   setException: (value: string) => void;
 }
 
@@ -15,8 +16,7 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Login: React.FC<Props> = (props) => {
-  const { setUser, setException } = props;
+export const Login: React.FC<Props> = ({ setUser, setException }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -42,29 +42,28 @@ export const Login: React.FC<Props> = (props) => {
     return false;
   };
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
-      (async () => {
-        try {
-          const response = await userService.login(
-            values.username,
-            values.password
-          );
-          const stringify = await JSON.parse(response);
-          localStorage.setItem("user", stringify);
-          (await stringify) && setUser(stringify);
-          (await stringify) &&
-            setTimeout(() => {
-              history.push("/account");
-            }, 20);
-        } catch {
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          );
-          history.push("/error");
-        }
-      })();
+      try {
+        const response = await userService.login(
+          values.username,
+          values.password
+        );
+        const stringify = JSON.stringify(response);
+        localStorage.setItem("user", stringify);
+        JSON.parse(stringify);
+        setUser(response);
+        setTimeout(() => {
+          history.push("/account");
+        }, 20);
+      } catch (error) {
+        console.log(error);
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+        history.push("/error");
+      }
     }
   }
 

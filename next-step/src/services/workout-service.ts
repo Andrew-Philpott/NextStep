@@ -17,7 +17,7 @@ export const workoutService = {
   deleteWorkout,
 };
 
-async function getWorkout(id) {
+async function getWorkout(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     getOptions
@@ -30,7 +30,7 @@ async function getAllWorkouts() {
   return await handleResponse(response);
 }
 
-async function createWorkout(model) {
+async function createWorkout(model: object) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -38,7 +38,7 @@ async function createWorkout(model) {
   return await handleResponse(response);
 }
 
-async function updateWorkout(id, model) {
+async function updateWorkout(id: number, model: object) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
@@ -46,7 +46,7 @@ async function updateWorkout(id, model) {
   return await handleResponse(response);
 }
 
-async function deleteWorkout(id) {
+async function deleteWorkout(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     deleteOptions
