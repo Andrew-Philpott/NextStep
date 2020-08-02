@@ -1,29 +1,28 @@
 import React from "react";
+import { Recovery } from "../../types/types";
 
-export const Muscle = (props) => {
-  const { exercises, recoveries, draw, muscleId, onCreateRecovery } = props;
-  let fatigue = "";
-  let color = "";
-  if (exercises) {
-    const weightedIntensities = exercises.muscles.filter(
-      (x) => x.muscleId === muscleId
-    );
-    console.log(weightedIntensities);
-  }
+type Props = {
+  recoveries: Array<Recovery>;
+  draw: string | undefined;
+  muscleId: number;
+  onCreateRecovery: (value: number) => void;
+};
+
+export const Muscle: React.FunctionComponent<Props> = (props) => {
+  const { recoveries, draw, muscleId, onCreateRecovery } = props;
+  let fatigue: number = 0;
+  let color: string = "";
 
   if (recoveries) {
-    const fatigueExists = recoveries.filter(
-      (x) => x.muscleId === muscleId,
-      (x) => {
-        return x;
-      }
-    );
+    const fatigueExists = recoveries.filter((x) => x.muscleId === muscleId);
 
     if (fatigueExists.length !== 0) {
-      fatigue = fatigueExists.sort((a, b) => (a.id < b.id ? 1 : -1))[0].fatigue;
+      fatigue = fatigueExists.sort((a, b) =>
+        a.recoveryId < b.recoveryId ? 1 : -1
+      )[0].fatigue;
     }
   } else {
-    fatigue = null;
+    fatigue = 0;
   }
 
   if (fatigue === null) {

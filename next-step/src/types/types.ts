@@ -10,3 +10,10 @@ export type Session =
     }
   | null
   | undefined;
+export type Recovery = {
+  recoveryId: number;
+  fatigue: number;
+  time: string;
+  userId: number;
+  muscleId: number;
+};
