@@ -6,8 +6,6 @@ type Props = {
 };
 
 export const ErrorPage: React.FunctionComponent<Props> = ({ exception }) => {
-  console.log(exception);
-
   return (
     <React.Fragment>
       <h1>Error Page</h1>

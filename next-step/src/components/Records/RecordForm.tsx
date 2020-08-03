@@ -29,9 +29,13 @@ export const RecordForm: React.FunctionComponent<Props> = ({
   setException,
 }) => {
   const { exerciseTypeId } = useParams();
-  const { values, setValues, errors, setErrors, handleInputChange } = useForm(
-    initialFieldValues
-  );
+  const {
+    values,
+    errors,
+    setErrors,
+    setSubmitted,
+    handleInputChange,
+  } = useForm(initialFieldValues);
   const history = useHistory();
 
   const validate = (fieldValues = values) => {
@@ -71,6 +75,7 @@ export const RecordForm: React.FunctionComponent<Props> = ({
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setSubmitted(true);
     if (validate()) {
       const record = {
         exerciseId: parseInt(values.exerciseId),
@@ -91,6 +96,7 @@ export const RecordForm: React.FunctionComponent<Props> = ({
         }
       })();
     }
+    setSubmitted(false);
   }
 
   return (

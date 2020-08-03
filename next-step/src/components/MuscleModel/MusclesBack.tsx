@@ -4,13 +4,13 @@ import { Recovery } from "../../types/types";
 
 type Props = {
   onCreateRecovery: (muscleId: number) => void;
-  calves: Recovery | null | undefined;
-  hamstrings: Recovery | null | undefined;
-  glutes: Recovery | null | undefined;
-  triceps: Recovery | null | undefined;
-  forearms: Recovery | null | undefined;
-  lats: Recovery | null | undefined;
-  trapezius: Recovery | null | undefined;
+  calves: Recovery | null;
+  hamstrings: Recovery | null;
+  glutes: Recovery | null;
+  triceps: Recovery | null;
+  forearms: Recovery | null;
+  lats: Recovery | null;
+  trapezius: Recovery | null;
 };
 
 export const MusclesBack: React.FunctionComponent<Props> = ({
@@ -39,7 +39,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={calves}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-calf"
@@ -49,7 +48,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={calves}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-hamstring"
@@ -59,7 +57,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={hamstrings}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-hamstring"
@@ -69,7 +66,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={hamstrings}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-glute"
@@ -79,7 +75,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={glutes}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-glute"
@@ -89,7 +84,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={glutes}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-tricep"
@@ -99,7 +93,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={triceps}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-tricep"
@@ -109,7 +102,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={triceps}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-forearm"
@@ -119,7 +111,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={forearms}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-forearm"
@@ -129,7 +120,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={forearms}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-lat"
@@ -139,7 +129,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={lats}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-lat"
@@ -149,7 +138,6 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
           }
           recovery={lats}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="trapezius"

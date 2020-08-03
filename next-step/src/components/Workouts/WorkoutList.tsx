@@ -5,7 +5,6 @@ import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
 import { WorkoutItem } from "./WorkoutItem";
-import { useHistory } from "react-router-dom";
 import * as types from "../../types/types";
 
 type Props = {
@@ -18,35 +17,29 @@ export const WorkoutList: React.FunctionComponent<Props> = ({
   setException,
 }) => {
   const [workouts, setWorkouts] = useState<Array<types.Workout>>([]);
-  const history = useHistory();
 
-  const handleDeleteWorkout = (id: number) => {
+  const handleDeleteWorkout = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
-      (async () => {
-        try {
-          const response = await workoutService.deleteWorkout(id);
-          const newState =
-            (await response) && workouts.filter((x) => x.workoutId !== id);
-          (await newState) && setWorkouts(newState);
-        } catch (error) {
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          );
-          history.push("/error");
-        }
-      })();
+      try {
+        await workoutService.deleteWorkout(id);
+        const newState = workouts.filter((x) => x.workoutId !== id);
+        setWorkouts(newState);
+      } catch {
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+      }
   };
 
   useEffect(() => {
     (async () => {
       try {
         const response = await workoutService.getAllWorkouts();
-        (await response) && setWorkouts(response);
-      } catch (error) {
+        setWorkouts(response);
+      } catch {
         setException(
           "We're having some technical difficulties. Please try again later."
         );
-        history.push("/error");
       }
     })();
   }, []);

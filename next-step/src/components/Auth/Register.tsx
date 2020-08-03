@@ -5,9 +5,9 @@ import { userService } from "../../services";
 import { useHistory } from "react-router-dom";
 import { useForm } from "../Other/useForm";
 
-interface Props {
+type Props = {
   setException: (value: string) => void;
-}
+};
 
 const initialFieldValues = {
   firstName: "",
@@ -24,7 +24,7 @@ export const Register: React.FC<Props> = ({ setException }) => {
   const history = useHistory();
 
   const validate = () => {
-    let temp = { ...errors };
+    let temp = { ...initialFieldValues };
     if (!values.firstName) {
       temp.firstName = "Field cannot be blank.";
     }
@@ -67,13 +67,12 @@ export const Register: React.FC<Props> = ({ setException }) => {
       };
 
       try {
-        const response = await userService.register(user);
-        (await response) && history.push(routes.LOG_IN);
+        await userService.register(user);
+        history.push(routes.LOG_IN);
       } catch {
         setException(
           "We're having some technical difficulties. Please try again later."
         );
-        history.push("/error");
       }
     }
   }

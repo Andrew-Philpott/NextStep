@@ -17,15 +17,8 @@ const initialFieldValues = {
 };
 
 export const Login: React.FC<Props> = ({ setException, setUser }) => {
-  const { values, errors, setErrors, handleInputChange } = useForm(
-    initialFieldValues
-  );
-  const history = useHistory();
-
   const validate = () => {
-    const temp = initialFieldValues;
-    temp.username = "";
-    temp.password = "";
+    const temp = { ...initialFieldValues };
     if (!values.username) {
       temp.username = "Field cannot be blank.";
     }
@@ -42,6 +35,11 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
     return false;
   };
 
+  const { values, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
+  const history = useHistory();
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
@@ -57,7 +55,6 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
         setException(
           "We're having some technical difficulties. Please try again later."
         );
-        history.push("/error");
       }
     }
   }

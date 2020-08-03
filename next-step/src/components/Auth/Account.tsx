@@ -2,9 +2,9 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
 
-interface Props {
+type Props = {
   setException: (value: string) => void;
-}
+};
 
 export const Account: React.FC<Props> = ({ setException }) => {
   return (

@@ -1,8 +1,10 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 
-export const useForm = (initialFieldValues: any) => {
-  const [values, setValues] = useState(initialFieldValues);
-  const [errors, setErrors] = useState(initialFieldValues);
+export const useForm = (fieldValues: any) => {
+  const [values, setValues] = useState(fieldValues);
+  const [errors, setErrors] = useState(fieldValues);
+  const [submitted, setSubmitted] = useState(false);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const fieldValue = { [name]: value };
@@ -16,6 +18,8 @@ export const useForm = (initialFieldValues: any) => {
     setValues,
     errors,
     setErrors,
+    submitted,
+    setSubmitted,
     handleInputChange,
   };
 };

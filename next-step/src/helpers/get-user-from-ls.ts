@@ -1,4 +1,4 @@
-import * as types from "../../src/types/types";
+import * as types from "../types/types";
 
 export const getUserFromLs = () => {
   let userString = localStorage.getItem("user");

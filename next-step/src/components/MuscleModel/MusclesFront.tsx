@@ -4,11 +4,11 @@ import { Recovery } from "../../types/types";
 
 type Props = {
   onCreateRecovery: (muscleId: number) => void;
-  quads: Recovery | null | undefined;
-  biceps: Recovery | null | undefined;
-  deltoids: Recovery | null | undefined;
-  pectorals: Recovery | null | undefined;
-  abdominals: Recovery | null | undefined;
+  quads: Recovery | null;
+  biceps: Recovery | null;
+  deltoids: Recovery | null;
+  pectorals: Recovery | null;
+  abdominals: Recovery | null;
 };
 
 export const MusclesFront: React.FunctionComponent<Props> = ({
@@ -35,7 +35,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={quads}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           muscleId={2}
@@ -45,7 +44,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={quads}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-bicep"
@@ -64,7 +62,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={biceps}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-deltoid"
@@ -74,7 +71,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={deltoids}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-deltoid"
@@ -84,7 +80,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={deltoids}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-pectoral"
@@ -94,7 +89,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={pectorals}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-pectoral"
@@ -104,7 +98,6 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
           }
           recovery={pectorals}
         />
-
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           muscleId={9}

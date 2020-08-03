@@ -13,7 +13,6 @@ import * as routes from "../../constants/route-constants";
 import { workoutService } from "../../services";
 import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
 import { Exercise, ExerciseType } from "../../types/types";
-import { type } from "os";
 
 type Props = {
   exerciseTypes: Array<ExerciseType>;
@@ -38,9 +37,15 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
   setException,
 }) => {
   const { id } = useParams();
-  const { values, setValues, errors, setErrors, handleInputChange } = useForm(
-    initialFieldValues
-  );
+  const {
+    values,
+    setValues,
+    errors,
+    setErrors,
+    submitted,
+    setSubmitted,
+    handleInputChange,
+  } = useForm(initialFieldValues);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [removedExercises, setRemovedExercises] = useState<Array<Exercise>>([]);
@@ -51,9 +56,8 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await workoutService.getWorkout(id);
-          (await response) && console.log(response);
-          (await response) && setValues(response);
-          (await response) && setEditing(true);
+          setValues(response);
+          setEditing(true);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -102,53 +106,39 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
     setValues({ ...newState });
   };
 
-  const validate = (fieldValues = values) => {
-    let temp = { ...errors };
+  const validate = () => {
+    setErrors(null);
+    let temp = initialFieldValues;
     temp.exercises = [];
     temp.name = "";
     let isValid = true;
-    if ("name" in fieldValues && !fieldValues.name) {
+    if ("name" in values && !values.name) {
       temp.name = "This field is required";
       isValid = false;
     }
 
-    if (fieldValues.exercises.length === 0) {
+    if (values.exercises.length === 0) {
       alert("A workout must include at least 1 exercise.");
       isValid = false;
     } else {
-      for (let i = 0; i < fieldValues.exercises.length; i++) {
+      for (let i = 0; i < values.exercises.length; i++) {
         temp.exercises.push({ ...blankExercise });
         if (
-          "exerciseTypeId" in fieldValues.exercises[i] &&
-          !fieldValues.exercises[i].exerciseTypeId
+          "exerciseTypeId" in values.exercises[i] &&
+          !values.exercises[i].exerciseTypeId
         ) {
           temp.exercises[i].exerciseTypeId = "This field is required";
           isValid = false;
         }
-
-        if (
-          "reps" in fieldValues.exercises[i] &&
-          !fieldValues.exercises[i].reps
-        ) {
+        if ("reps" in values.exercises[i] && !values.exercises[i].reps) {
           temp.exercises[i].reps = "This field is required";
           isValid = false;
         }
 
-        if (
-          "sets" in fieldValues.exercises[i] &&
-          !fieldValues.exercises[i].sets
-        ) {
+        if ("sets" in values.exercises[i] && !values.exercises[i].sets) {
           temp.exercises[i].sets = "This field is required";
           isValid = false;
         }
-
-        // if (
-        //   "intensity" in fieldValues.exercises[i] &&
-        //   !fieldValues.exercises[i].intensity
-        // ) {
-        //   temp.exercises[i].intensity = "This field is required";
-        //   isValid = false;
-        // }
       }
     }
 
@@ -161,8 +151,8 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
     if (validate()) {
-      console.log("validated");
       (async () => {
         try {
           let workout = {};
@@ -180,7 +170,7 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
             };
 
             const response = await workoutService.updateWorkout(id, workout);
-            (await response) && history.push(routes.WORKOUTS_LIST);
+            history.push(routes.WORKOUTS_LIST);
           } else {
             workout = {
               name: values.name,
@@ -188,15 +178,15 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
               exercises: values.exercises,
             };
             const response = await workoutService.createWorkout(workout);
-            (await response) && setValues(initialFieldValues);
-            (await response) && history.push(routes.WORKOUTS_LIST);
+            setValues(initialFieldValues);
+            history.push(routes.WORKOUTS_LIST);
           }
-        } catch (error) {
-          setException(error);
-          history.push("/error");
+        } catch {
+          setException("Something went wrong");
         }
       })();
     }
+    setSubmitted(false);
   };
 
   return (
@@ -217,7 +207,11 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
             value={values.name}
             onChange={handleInputChange}
             variant="outlined"
-            {...(errors.name && { error: true, helperText: errors.name })}
+            {...(submitted &&
+              "name" in errors && {
+                error: true,
+                helperText: "name" in errors,
+              })}
           />
 
           <InputLabel className="mrgn-t16" htmlFor="notes">
@@ -232,7 +226,8 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
             value={values.notes}
             onChange={handleInputChange}
             variant="outlined"
-            {...(errors.notes && { error: true, helperText: errors.notes })}
+            {...(submitted &&
+              errors.notes && { error: true, helperText: errors.notes })}
           />
 
           {exerciseTypes &&
@@ -259,7 +254,8 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
                             value={values.exercises[index].exerciseTypeId}
                             onChange={handleExerciseChange}
                             variant="outlined"
-                            {...(errors.exercises &&
+                            {...(submitted &&
+                              errors.exercises &&
                               errors.exercises[index] &&
                               errors.exercises[index].exerciseTypeId && {
                                 error: true,
@@ -306,7 +302,7 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
                             value={values.exercises[index].reps}
                             onChange={handleExerciseChange}
                             variant="outlined"
-                            {...(errors.exercises &&
+                            {...(submitted &&
                               errors.exercises[index] &&
                               errors.exercises[index].reps && {
                                 error: true,
@@ -325,7 +321,7 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
                             onChange={handleExerciseChange}
                             className="sets"
                             variant="outlined"
-                            {...(errors.exercises &&
+                            {...(submitted &&
                               errors.exercises[index] &&
                               errors.exercises[index].sets && {
                                 error: true,

@@ -9,7 +9,7 @@ import { WorkoutList } from "./components/Workouts/WorkoutList";
 import { Login } from "./components/Auth/Login";
 import { Register } from "./components/Auth/Register";
 import { NavigationBar } from "./components/Other/NavigationBar";
-// import { RecordHistory } from "./components/Records/RecordHistory";
+import { RecordHistory } from "./components/Records/RecordHistory";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { SessionList } from "./components/Sessions/SessionList";
 import { RecordForm } from "./components/Records/RecordForm";
@@ -19,7 +19,6 @@ import { userService, sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
 import "./App.css";
 import history from "./helpers/history";
-import { isNumber } from "util";
 import * as types from "./types/types";
 import { getUserFromLs } from "../src/helpers/get-user-from-ls";
 
@@ -45,7 +44,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (exerciseTypes.length === 0 && user) {
+    if (exerciseTypes.length === 0) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
@@ -60,48 +59,12 @@ const App = () => {
   }, [exerciseTypes]);
 
   useEffect(() => {}, [user]);
-
-  console.log(user);
+  useEffect(() => {}, [session]);
   useEffect(() => {
     if (!session && user && online) {
       (async () => {
         try {
           const response = await sessionService.getCurrentSession();
-          (await response) && setSession(response);
-        } catch {
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          );
-        }
-      })();
-    }
-  }, [session]);
-
-  const handleEndSession = async (id: number) => {
-    const answer = window.prompt("How would you rate that workout?");
-    let rating: number = 0;
-    if (isNumber(answer) && answer >= 1 && answer <= 5) {
-      rating = parseInt(answer);
-      try {
-        const response = await sessionService.updateSession(id, {
-          rating: rating,
-        });
-        (await response) && setSession(response);
-      } catch {
-        setException(
-          "We're having some technical difficulties. Please try again later."
-        );
-      }
-    }
-  };
-
-  const handleCreateSession = (id: number) => {
-    if (!session) {
-      (async () => {
-        try {
-          const response = await sessionService.createSession({
-            workoutId: id,
-          });
           setSession(response);
         } catch {
           setException(
@@ -109,19 +72,57 @@ const App = () => {
           );
         }
       })();
+    }
+  }, []);
+
+  const handleEndSession = async (id: number) => {
+    const answer: string | null = window.prompt(
+      "How would you rate that workout?"
+    );
+    let rating: number = 0;
+    if (answer) {
+      rating = parseInt(answer);
+    }
+    if (rating >= 1 && rating <= 5) {
+      try {
+        const response = await sessionService.updateSession(id, {
+          rating: rating,
+        });
+        setSession(null);
+      } catch (ex) {
+        console.log(ex);
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+      }
+    }
+  };
+
+  const handleCreateSession = async (id: number) => {
+    if (!session) {
+      try {
+        const response = await sessionService.createSession({
+          workoutId: id,
+        });
+        setSession(response);
+      } catch {
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+      }
     } else {
       alert(
         "You must complete your current session before starting a new one."
       );
     }
   };
-
+  console.log(user);
   return (
     <div id="App">
       <div>
         <Router history={history}>
           <NavigationBar onLogout={handleLogout} user={user} />
-          {session && (
+          {session ? (
             <div className="current-session">
               <Button
                 className="button green-background white-border float-right mrgn-r8"
@@ -133,8 +134,7 @@ const App = () => {
                 Start time: {session.workoutStart}
               </span>
             </div>
-          )}
-
+          ) : null}
           <Switch>
             {exception && <ErrorPage exception={exception} />}
             <Route
@@ -149,13 +149,13 @@ const App = () => {
             />
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
               path={routes.ACCOUNT}
               component={() => <Account setException={setException} />}
             />
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
               path={routes.RECORDS_NEW}
               component={() => (
                 <RecordForm
@@ -166,7 +166,7 @@ const App = () => {
             />
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
               path={routes.RECORDS_LIST}
               component={() => (
                 <RecordList
@@ -175,14 +175,15 @@ const App = () => {
                 />
               )}
             />
-            {/* <PrivateRoute
-              exact
-              path={routes.RECORD_HISTORY}
-              component={() => <RecordHistory setException={setException} />}
-            /> */}
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
+              path={routes.RECORD_HISTORY}
+              component={() => <RecordHistory setException={setException} />}
+            />
+            <PrivateRoute
+              exact
+              user={user}
               path={routes.WORKOUTS_LIST}
               component={() => (
                 <WorkoutList
@@ -193,7 +194,7 @@ const App = () => {
             />
             <PrivateRoute
               path={routes.WORKOUTS_NEW}
-              user={user ? user : undefined}
+              user={user}
               component={() => (
                 <WorkoutForm
                   exerciseTypes={exerciseTypes}
@@ -203,7 +204,7 @@ const App = () => {
             />
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
               path={routes.WORKOUTS_EDIT}
               component={() => (
                 <WorkoutForm
@@ -214,7 +215,7 @@ const App = () => {
             />
             <PrivateRoute
               exact
-              user={user ? user : undefined}
+              user={user}
               path={routes.SESSIONS_LIST}
               component={() => <SessionList setException={setException} />}
             />

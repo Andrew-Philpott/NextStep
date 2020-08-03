@@ -40,7 +40,6 @@ export const NavigationBar: React.FunctionComponent<Props> = ({
   onLogout,
 }) => {
   const classes = useStyles();
-  const history = useHistory();
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
   const [
     mobileMoreAnchorEl,

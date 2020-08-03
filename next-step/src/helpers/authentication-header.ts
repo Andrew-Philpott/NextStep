@@ -1,20 +1,11 @@
-export type User = {
-  userId: number;
-  userName: string;
-  firstName: string;
-  lastName: string;
-  token?: string;
-};
+import { getUserFromLs } from "./get-user-from-ls";
 
-export function authHeader() {
-  let userString = localStorage.getItem("user");
-  let user: User | null = null;
-  if (userString) {
-    user = JSON.parse(userString) as User;
-  }
-
+export function authHeader(): HeadersInit {
+  const user = getUserFromLs();
   if (user && user.token) {
-    return { Authorization: "Bearer " + user.token };
+    return {
+      Authorization: `Bearer ${user.token}`,
+    };
   } else {
     return { Authorization: "" };
   }

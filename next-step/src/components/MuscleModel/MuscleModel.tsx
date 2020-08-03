@@ -3,7 +3,6 @@ import { MusclesFront } from "./MusclesFront";
 import { MusclesBack } from "./MusclesBack";
 import { Grid } from "@material-ui/core";
 import { recoveryService } from "../../services";
-import { useHistory } from "react-router-dom";
 import { Recovery } from "../../types/types";
 
 type Props = {
@@ -15,7 +14,6 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   active,
   setException,
 }) => {
-  const [recoveries, setRecoveries] = useState(null);
   const [quads, setQuads] = useState<Recovery>(null);
   const [biceps, setBiceps] = useState<Recovery>(null);
   const [deltoids, setDeltoids] = useState<Recovery>(null);
@@ -28,8 +26,6 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   const [forearms, setForearms] = useState<Recovery>(null);
   const [lats, setLats] = useState<Recovery>(null);
   const [trapezius, setTrapezius] = useState<Recovery>(null);
-
-  const history = useHistory();
 
   const handleRecoveries = (response: Array<Recovery>) => {
     response.map((recovery) => {
@@ -45,10 +41,6 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
           break;
         case 4:
           setGlutes(recovery);
-          break;
-        case 5:
-          break;
-        case 6:
           break;
         case 7:
           setLats(recovery);
@@ -103,7 +95,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    if (!recoveries && active) {
+    if (active) {
       (async () => {
         try {
           const response = await recoveryService.getAllRecoveries();
@@ -113,11 +105,10 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
           setException(
             "We're having some technical difficulties. Please try again later."
           );
-          history.push("/error");
         }
       })();
     }
-  }, [recoveries]);
+  }, []);
 
   return (
     <Grid className="muscle-model" container>

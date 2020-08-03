@@ -2,7 +2,7 @@ import React from "react";
 import { Recovery } from "../../types/types";
 
 type Props = {
-  recovery: Recovery | null | undefined;
+  recovery: Recovery | null;
   draw: string | undefined;
   muscleId: number;
   onCreateRecovery: (value: number) => void;
