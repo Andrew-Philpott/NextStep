@@ -25,7 +25,7 @@ export const SessionList: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await sessionService.getAllSessions();
-          (await response) && setSessions(response);
+          setSessions(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."

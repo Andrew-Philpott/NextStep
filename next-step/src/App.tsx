@@ -14,7 +14,6 @@ import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { SessionList } from "./components/Sessions/SessionList";
 import { RecordForm } from "./components/Records/RecordForm";
 import * as routes from "./constants/route-constants";
-import { Account } from "./components/Auth/Account";
 import { userService, sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
 import "./App.css";
@@ -48,7 +47,7 @@ const App = () => {
       (async () => {
         try {
           const response = await exerciseService.getAll();
-          (await response) && setExerciseTypes(response);
+          setExerciseTypes(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -56,10 +55,8 @@ const App = () => {
         }
       })();
     }
-  }, [exerciseTypes]);
+  }, []);
 
-  useEffect(() => {}, [user]);
-  useEffect(() => {}, [session]);
   useEffect(() => {
     if (!session && user && online) {
       (async () => {
@@ -85,12 +82,11 @@ const App = () => {
     }
     if (rating >= 1 && rating <= 5) {
       try {
-        const response = await sessionService.updateSession(id, {
+        await sessionService.updateSession(id, {
           rating: rating,
         });
         setSession(null);
-      } catch (ex) {
-        console.log(ex);
+      } catch {
         setException(
           "We're having some technical difficulties. Please try again later."
         );
@@ -116,7 +112,6 @@ const App = () => {
       );
     }
   };
-  console.log(user);
   return (
     <div id="App">
       <div>
@@ -140,18 +135,12 @@ const App = () => {
             <Route
               exact
               path={routes.LANDING}
-              component={() => <Home setException={setException} />}
+              component={() => <Home user={user} setException={setException} />}
             />
             <Route
               exact
               path={routes.ERROR}
               component={() => <ErrorPage exception={exception} />}
-            />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.ACCOUNT}
-              component={() => <Account setException={setException} />}
             />
             <PrivateRoute
               exact

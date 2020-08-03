@@ -3,7 +3,6 @@ import { useState, ChangeEvent, useEffect } from "react";
 export const useForm = (fieldValues: any) => {
   const [values, setValues] = useState(fieldValues);
   const [errors, setErrors] = useState(fieldValues);
-  const [submitted, setSubmitted] = useState(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,8 +17,6 @@ export const useForm = (fieldValues: any) => {
     setValues,
     errors,
     setErrors,
-    submitted,
-    setSubmitted,
     handleInputChange,
   };
 };

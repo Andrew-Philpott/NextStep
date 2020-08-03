@@ -50,7 +50,7 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
         );
         localStorage.setItem("user", JSON.stringify(response));
         setUser(response);
-        history.push("/account");
+        history.push("/home");
       } catch {
         setException(
           "We're having some technical difficulties. Please try again later."

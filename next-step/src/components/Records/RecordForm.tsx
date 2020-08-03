@@ -29,13 +29,9 @@ export const RecordForm: React.FunctionComponent<Props> = ({
   setException,
 }) => {
   const { exerciseTypeId } = useParams();
-  const {
-    values,
-    errors,
-    setErrors,
-    setSubmitted,
-    handleInputChange,
-  } = useForm(initialFieldValues);
+  const { values, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
   const history = useHistory();
 
   const validate = (fieldValues = values) => {
@@ -73,9 +69,8 @@ export const RecordForm: React.FunctionComponent<Props> = ({
     }
   };
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
     if (validate()) {
       const record = {
         exerciseId: parseInt(values.exerciseId),
@@ -83,20 +78,16 @@ export const RecordForm: React.FunctionComponent<Props> = ({
         reps: parseInt(values.reps),
         sets: parseInt(values.sets),
       };
-
-      (async () => {
-        try {
-          const response = await recordService.createRecord(record);
-          (await response) && history.push("/records");
-        } catch {
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          );
-          history.push("/error");
-        }
-      })();
+      try {
+        await recordService.createRecord(record);
+        history.push("/records");
+      } catch {
+        setException(
+          "We're having some technical difficulties. Please try again later."
+        );
+        history.push("/error");
+      }
     }
-    setSubmitted(false);
   }
 
   return (

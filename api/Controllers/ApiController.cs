@@ -441,8 +441,9 @@ namespace BodyJournalAPI.Controllers
 
         return Ok(entities);
       }
-      catch
+      catch (Exception ex)
       {
+        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
@@ -611,7 +612,8 @@ namespace BodyJournalAPI.Controllers
       try
       {
         var currentUserId = int.Parse(User.Identity.Name);
-        var entities = await _db.Recovery.AsAsyncEnumerable().Where(x => x.UserId == currentUserId).ToArrayAsync();
+        var recoveries = await _db.Recovery.AsAsyncEnumerable().Where(x => x.UserId == currentUserId).ToListAsync();
+        var entities = recoveries.GroupBy(x => x.MuscleId, (key, g) => g.OrderByDescending(x => x.Time).FirstOrDefault()).ToArray();
 
         return Ok(entities);
       }
@@ -620,6 +622,8 @@ namespace BodyJournalAPI.Controllers
         return StatusCode(500, "Internal server error.");
       }
     }
+
+
 
     [HttpPost("users/recoveries")]
     public async Task<IActionResult> CreateRecovery([FromBody] Recovery model)
@@ -787,8 +791,9 @@ namespace BodyJournalAPI.Controllers
         _db.SaveChanges();
         return Ok();
       }
-      catch
+      catch (Exception ex)
       {
+        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }

@@ -80,14 +80,20 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
         if (answer) {
           fatigue = parseInt(answer);
           if (fatigue !== 0 && fatigue >= 1 && fatigue <= 5) {
-            const response: Recovery = await recoveryService.createRecovery({
-              recoveryId: 0,
-              fatigue: fatigue,
-              time: "",
-              userId: 0,
-              muscleId: muscleId,
-            });
-            handleRecoveries([response]);
+            try {
+              const response: Recovery = await recoveryService.createRecovery({
+                recoveryId: 0,
+                fatigue: fatigue,
+                time: "",
+                userId: 0,
+                muscleId: muscleId,
+              });
+              handleRecoveries([response]);
+            } catch {
+              setException(
+                "We're having some technical difficulties. Please try again later."
+              );
+            }
           }
         }
       }
@@ -99,8 +105,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await recoveryService.getAllRecoveries();
-          (await response) && handleRecoveries(response);
-          (await response) && console.log(response);
+          handleRecoveries(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
