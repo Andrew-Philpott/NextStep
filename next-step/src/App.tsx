@@ -11,7 +11,7 @@ import { Register } from "./components/Auth/Register";
 import { NavigationBar } from "./components/Other/NavigationBar";
 // import { RecordHistory } from "./components/Records/RecordHistory";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
-import { Sessions } from "./components/Sessions/Sessions";
+import { SessionList } from "./components/Sessions/SessionList";
 import { RecordForm } from "./components/Records/RecordForm";
 import * as routes from "./constants/route-constants";
 import { Account } from "./components/Auth/Account";
@@ -21,27 +21,28 @@ import "./App.css";
 import history from "./helpers/history";
 import { isNumber } from "util";
 import * as types from "./types/types";
-
-function setUserFromLocalStorage() {
-  const jsonParserUnknown = (jsonString: string): unknown =>
-    JSON.parse(jsonString);
-  let userString: string | null = localStorage.getItem("user");
-  return userString ? (jsonParserUnknown(userString) as types.User) : null;
-}
+import { getUserFromLs } from "../src/helpers/get-user-from-ls";
 
 const App = () => {
-  const [session, setSession] = useState<types.Session>(null);
+  const [session, setSession] = useState<types.Session | null>(null);
   const [exerciseTypes, setExerciseTypes] = useState<Array<types.ExerciseType>>(
     []
   );
   const [exception, setException] = useState("");
   const [user, setUser] = useState<types.User | null>(null);
   const online = useOnlineStatus();
-  console.log(localStorage.getItem("user"));
-  const handleLogin = () => {
-    setUser(setUserFromLocalStorage);
-    history.push("/account");
+
+  const handleLogout = () => {
+    history.push("login");
+    setUser(null);
+    userService.logout();
   };
+
+  useEffect(() => {
+    if (!user) {
+      setUser(getUserFromLs());
+    }
+  }, []);
 
   useEffect(() => {
     if (exerciseTypes.length === 0 && user) {
@@ -119,7 +120,7 @@ const App = () => {
     <div id="App">
       <div>
         <Router history={history}>
-          <NavigationBar user={user} />
+          <NavigationBar onLogout={handleLogout} user={user} />
           {session && (
             <div className="current-session">
               <Button
@@ -215,12 +216,12 @@ const App = () => {
               exact
               user={user ? user : undefined}
               path={routes.SESSIONS_LIST}
-              component={() => <Sessions setException={setException} />}
+              component={() => <SessionList setException={setException} />}
             />
             <Route
               path={routes.LOG_IN}
               component={() => (
-                <Login onLogin={handleLogin} setException={setException} />
+                <Login setUser={setUser} setException={setException} />
               )}
             />
             <Route

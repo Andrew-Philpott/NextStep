@@ -6,17 +6,16 @@ export type User = {
   token: string;
 };
 
-export type Session =
-  | {
-      sessionId: number;
-      workoutStart: string;
-      workoutEnd?: string;
-      rating: number;
-      workoutId: number;
-      userId: number;
-    }
-  | null
-  | undefined;
+export type Session = {
+  sessionId: number;
+  workoutStart: string;
+  workoutEnd?: string;
+  workout: Workout;
+  rating: number;
+  workoutId: number;
+  userId: number;
+};
+
 export type Recovery =
   | {
       recoveryId: number;

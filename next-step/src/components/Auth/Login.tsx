@@ -7,7 +7,7 @@ import { useForm } from "../Other/useForm";
 import { User } from "../../types/types";
 
 type Props = {
-  onLogin: () => void;
+  setUser: (value: User) => void;
   setException: (value: string) => void;
 };
 
@@ -16,15 +16,11 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Login: React.FC<Props> = ({ onLogin, setException }) => {
+export const Login: React.FC<Props> = ({ setException, setUser }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
   const history = useHistory();
-
-  useEffect(() => {
-    userService.logout();
-  }, []);
 
   const validate = () => {
     const temp = initialFieldValues;
@@ -50,15 +46,14 @@ export const Login: React.FC<Props> = ({ onLogin, setException }) => {
     e.preventDefault();
     if (validate()) {
       try {
-        const response: User = await userService.login(
+        const response = await userService.login(
           values.username,
           values.password
         );
         localStorage.setItem("user", JSON.stringify(response));
-        console.log(response);
-        onLogin();
-      } catch (error) {
-        console.log(error);
+        setUser(response);
+        history.push("/account");
+      } catch {
         setException(
           "We're having some technical difficulties. Please try again later."
         );

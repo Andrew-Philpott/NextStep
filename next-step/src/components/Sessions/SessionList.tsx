@@ -8,10 +8,16 @@ import TableRow from "@material-ui/core/TableRow";
 import { Grid } from "@material-ui/core";
 import { sessionService } from "../../services";
 import { useHistory } from "react-router-dom";
+import { Session } from "../../types/types";
 
-export const Sessions = (props) => {
-  const { setException } = props;
-  const [sessions, setSessions] = useState(null);
+type Props = {
+  setException: (value: string) => void;
+};
+
+export const SessionList: React.FunctionComponent<Props> = ({
+  setException,
+}) => {
+  const [sessions, setSessions] = useState<Array<Session>>([]);
   const history = useHistory();
 
   useEffect(() => {
@@ -53,7 +59,7 @@ export const Sessions = (props) => {
               <TableBody>
                 {sessions &&
                   sessions.map((session) => (
-                    <TableRow key={session.id}>
+                    <TableRow key={session.sessionId}>
                       <TableCell component="th" scope="row">
                         {session.workout.name}
                       </TableCell>

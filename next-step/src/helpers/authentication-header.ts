@@ -1,19 +1,21 @@
-import { User } from "../types/types";
+export type User = {
+  userId: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  token?: string;
+};
 
-const jsonParserUnknown = (jsonString: string): unknown =>
-  JSON.parse(jsonString);
-
-export const authHeader = () => {
-  let userAsString: string | null = localStorage.getItem("user");
-  console.log(userAsString);
-  let user = null;
-  if (userAsString) {
-    user = jsonParserUnknown(userAsString) as User;
+export function authHeader() {
+  let userString = localStorage.getItem("user");
+  let user: User | null = null;
+  if (userString) {
+    user = JSON.parse(userString) as User;
   }
-  console.log(user);
+
   if (user && user.token) {
     return { Authorization: "Bearer " + user.token };
   } else {
     return { Authorization: "" };
   }
-};
+}
