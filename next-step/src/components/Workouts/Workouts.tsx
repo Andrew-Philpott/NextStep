@@ -4,15 +4,23 @@ import { Link } from "react-router-dom";
 import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
-import { Workout } from "../Workouts/Workout";
+import { Workout } from "./Workout";
 import { useHistory } from "react-router-dom";
+import * as types from "../../types/types";
 
-export const Workouts = ({ ...props }) => {
-  const [workouts, setWorkouts] = useState(null);
-  const { onCreateSession, setException } = props;
+type Props = {
+  onCreateSession: (value: number) => void;
+  setException: (value: string) => void;
+};
+
+export const Workouts: React.FunctionComponent<Props> = ({
+  onCreateSession,
+  setException,
+}) => {
+  const [workouts, setWorkouts] = useState<Array<types.Workout>>([]);
   const history = useHistory();
 
-  const handleDeleteWorkout = (id) => {
+  const handleDeleteWorkout = (id: number) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
       (async () => {
         try {

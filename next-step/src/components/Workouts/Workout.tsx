@@ -4,10 +4,23 @@ import { Link } from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
 import DetailsIcon from "@material-ui/icons/Details";
+import { Exercise } from "../../types/types";
 
-export const Workout = (props) => {
-  const { onCreateSession, name, id, exercises, onDeleteWorkout } = props;
+type Props = {
+  onCreateSession: (value: number) => void;
+  name: string;
+  id: number;
+  exercises: Array<Exercise>;
+  onDeleteWorkout: (value: number) => void;
+};
 
+export const Workout: React.FunctionComponent<Props> = ({
+  onCreateSession,
+  name,
+  id,
+  exercises,
+  onDeleteWorkout,
+}) => {
   return (
     <Grid container direction="row" className="workout-container">
       <Grid item xs={5}>

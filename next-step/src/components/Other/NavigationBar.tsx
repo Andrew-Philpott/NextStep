@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -9,6 +9,12 @@ import MoreIcon from "@material-ui/icons/MoreVert";
 import { Link } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { makeStyles } from "@material-ui/core";
+import { User } from "../../types/types";
+
+type Props = {
+  user: User;
+  onLogout: () => void;
+};
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -28,29 +34,29 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavigationBar = (props) => {
+export const NavigationBar: React.FunctionComponent<Props> = (props) => {
   const classes = useStyles();
   const { user, onLogout } = props;
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState<Element>();
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<Element>();
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleProfileMenuOpen = (event: Event) => {
+    setAnchorEl(event.currentTarget as Element);
   };
 
   const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
+    setMobileMoreAnchorEl(undefined);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
+    setAnchorEl(undefined);
     handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
+  const handleMobileMenuOpen = (event: Event) => {
+    setMobileMoreAnchorEl(event.currentTarget as Element);
   };
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -99,7 +105,7 @@ export const NavigationBar = (props) => {
           Log in
         </MenuItem>
       ) : (
-        <MenuItem onClick={handleProfileMenuOpen}>Account</MenuItem>
+        <MenuItem onClick={() => handleProfileMenuOpen}>Account</MenuItem>
       )}
     </Menu>
   );
@@ -131,17 +137,17 @@ export const NavigationBar = (props) => {
                   Log in
                 </Link>
               ) : (
-                <span
+                <button
                   className="nav-link pointer"
-                  onClick={handleProfileMenuOpen}
+                  onClick={() => handleProfileMenuOpen}
                 >
                   Account
-                </span>
+                </button>
               )}
             </Typography>
           </div>
           <div className={classes.sectionMobile}>
-            <IconButton onClick={handleMobileMenuOpen}>
+            <IconButton onClick={() => handleMobileMenuOpen}>
               <MoreIcon />
             </IconButton>
           </div>

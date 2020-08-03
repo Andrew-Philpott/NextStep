@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -12,6 +12,13 @@ import { useHistory } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { workoutService } from "../../services";
 import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
+import { Exercise, ExerciseType } from "../../types/types";
+import { type } from "os";
+
+type Props = {
+  exerciseTypes: Array<ExerciseType>;
+  setException: (value: string) => void;
+};
 
 const blankExercise = {
   exerciseTypeId: "",
@@ -26,15 +33,17 @@ const initialFieldValues = {
   exercises: [{ ...blankExercise }],
 };
 
-export const WorkoutForm = (props) => {
-  const { exercises, setException } = props;
+export const WorkoutForm: React.FunctionComponent<Props> = ({
+  exerciseTypes,
+  setException,
+}) => {
   const { id } = useParams();
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [removedExercises, setRemovedExercises] = useState([]);
+  const [removedExercises, setRemovedExercises] = useState<Array<Exercise>>([]);
   const history = useHistory();
 
   useEffect(() => {
@@ -57,7 +66,7 @@ export const WorkoutForm = (props) => {
     }
   }, [id, loading]);
 
-  const handleExerciseChange = (e) => {
+  const handleExerciseChange = (e: ChangeEvent<HTMLInputElement>) => {
     let updatedExercises = { ...values };
     const beforeIndex = e.target.name.indexOf("-");
     const index = e.target.name.substring(beforeIndex + 1);
@@ -72,7 +81,7 @@ export const WorkoutForm = (props) => {
     setValues({ ...newState });
   };
 
-  const handleRemoveExercise = (eid, index) => {
+  const handleRemoveExercise = (eid: number, index: number) => {
     //remove the exercise but dont be invasive
     let newState = { ...values };
     //I could push it into removeExercises
@@ -150,7 +159,7 @@ export const WorkoutForm = (props) => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (validate()) {
       console.log("validated");
@@ -163,10 +172,10 @@ export const WorkoutForm = (props) => {
               notes: values.notes,
               exercises: values.exercises,
               updateExercises: values.exercises.filter(
-                (x) => x.exerciseId !== null
+                (x: Exercise) => x.exerciseId !== null
               ),
               createExercises: values.exercises.filter(
-                (x) => x.exerciseId === null
+                (x: Exercise) => x.exerciseId === null
               ),
             };
 
@@ -226,9 +235,9 @@ export const WorkoutForm = (props) => {
             {...(errors.notes && { error: true, helperText: errors.notes })}
           />
 
-          {exercises &&
+          {exerciseTypes &&
             values.exercises &&
-            values.exercises.map((exercise, index) => {
+            values.exercises.map((exercise: Exercise, index: number) => {
               const exerciseName = `exerciseTypeId-${index}`;
               const exerciseWeight = `weight-${index}`;
               const exerciseReps = `reps-${index}`;
@@ -258,7 +267,7 @@ export const WorkoutForm = (props) => {
                                   errors.exercises[index].exerciseTypeId,
                               })}
                           >
-                            {exercises
+                            {exerciseTypes
                               .sort((a, b) => (a.name > b.name ? 1 : -1))
                               .map((item) => {
                                 return (
@@ -351,7 +360,7 @@ export const WorkoutForm = (props) => {
             </Button>
             <Button
               className="button blue-background float-right"
-              onClick={() => handleSubmit()}
+              onClick={handleSubmit}
             >
               Submit
             </Button>

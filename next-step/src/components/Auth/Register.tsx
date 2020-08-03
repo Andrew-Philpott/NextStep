@@ -23,21 +23,21 @@ export const Register: React.FC<Props> = ({ setException }) => {
   );
   const history = useHistory();
 
-  const validate = (fieldValues = values) => {
+  const validate = () => {
     let temp = { ...errors };
-    if (!fieldValues.firstName) {
+    if (!values.firstName) {
       temp.firstName = "Field cannot be blank.";
     }
-    if (!fieldValues.lastName) {
+    if (!values.lastName) {
       temp.lastName = "Field cannot be blank.";
     }
-    if (!fieldValues.username) {
+    if (!values.username) {
       temp.username = "Field cannot be blank.";
     }
-    if (!fieldValues.email) {
+    if (!values.email) {
       temp.email = "Field cannot be blank.";
     }
-    if (!fieldValues.password) {
+    if (!values.password) {
       temp.password = "Field cannot be blank.";
     }
 

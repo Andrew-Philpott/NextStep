@@ -11,10 +11,7 @@ export const useLoggedInStatus = () => {
   });
 
   function handleEvent(e) {
-    console.log(e);
-    console.log(localStorage);
     const user = localStorage.getItem("user");
-    console.log(user);
     setLoggedIn(localStorage.getItem("user"));
     return loggedIn;
   }
