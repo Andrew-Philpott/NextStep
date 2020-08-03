@@ -1,14 +1,16 @@
-type User = { token: string | undefined } | null;
+import { User } from "../types/types";
 
 const jsonParserUnknown = (jsonString: string): unknown =>
   JSON.parse(jsonString);
 
 export const authHeader = () => {
   let userAsString: string | null = localStorage.getItem("user");
-  let user: User = { token: undefined };
+  console.log(userAsString);
+  let user = null;
   if (userAsString) {
     user = jsonParserUnknown(userAsString) as User;
   }
+  console.log(user);
   if (user && user.token) {
     return { Authorization: "Bearer " + user.token };
   } else {

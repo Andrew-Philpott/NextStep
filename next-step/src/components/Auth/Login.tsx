@@ -6,21 +6,25 @@ import * as routes from "../../constants/route-constants";
 import { useForm } from "../Other/useForm";
 import { User } from "../../types/types";
 
-interface Props {
-  setUser: (value: User) => void;
+type Props = {
+  onLogin: () => void;
   setException: (value: string) => void;
-}
+};
 
 const initialFieldValues = {
   username: "",
   password: "",
 };
 
-export const Login: React.FC<Props> = ({ setUser, setException }) => {
+export const Login: React.FC<Props> = ({ onLogin, setException }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
   const history = useHistory();
+
+  useEffect(() => {
+    userService.logout();
+  }, []);
 
   const validate = () => {
     const temp = initialFieldValues;
@@ -46,17 +50,13 @@ export const Login: React.FC<Props> = ({ setUser, setException }) => {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await userService.login(
+        const response: User = await userService.login(
           values.username,
           values.password
         );
-        const stringify = JSON.stringify(response);
-        localStorage.setItem("user", stringify);
-        JSON.parse(stringify);
-        setUser(response);
-        setTimeout(() => {
-          history.push("/account");
-        }, 20);
+        localStorage.setItem("user", JSON.stringify(response));
+        console.log(response);
+        onLogin();
       } catch (error) {
         console.log(error);
         setException(

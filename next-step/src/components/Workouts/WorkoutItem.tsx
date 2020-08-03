@@ -14,7 +14,7 @@ type Props = {
   onDeleteWorkout: (value: number) => void;
 };
 
-export const Workout: React.FunctionComponent<Props> = ({
+export const WorkoutItem: React.FunctionComponent<Props> = ({
   onCreateSession,
   name,
   id,

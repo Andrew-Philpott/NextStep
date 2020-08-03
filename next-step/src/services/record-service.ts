@@ -34,7 +34,7 @@ async function getAllRecordsForExercise(id: number) {
   return await handleResponse(response);
 }
 
-async function getPRsForExercises(id: number) {
+async function getPRsForExercises() {
   const response = await fetch(
     `http://localhost:5000${path}/exercises/pr`,
     getOptions

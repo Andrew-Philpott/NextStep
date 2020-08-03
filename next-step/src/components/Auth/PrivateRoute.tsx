@@ -3,11 +3,15 @@ import { Route, Redirect, RouteProps } from "react-router-dom";
 import { User } from "../../types/types";
 
 export interface PrivateRouteProps extends RouteProps {
-  user?: User;
+  user: User | undefined;
 }
 
-export const PrivateRoute: React.FC<PrivateRouteProps> = (props) => {
-  if (props.user && props.user.token !== "") {
+export const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  user,
+  ...props
+}) => {
+  console.log(user);
+  if (!user) {
     return (
       <Route
         {...props}

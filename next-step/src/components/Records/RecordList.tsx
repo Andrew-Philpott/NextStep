@@ -1,19 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
 import { recordService } from "../../services";
-import { Record } from "./Record";
+import { RecordItem } from "./RecordItem";
 import { useHistory } from "react-router-dom";
+import * as types from "../../types/types";
 
-export const Records = (props) => {
-  const { exercises, setException } = props;
-  const [records, setRecords] = useState(null);
+type Props = {
+  setException: (value: string) => void;
+  exerciseTypes: Array<types.ExerciseType>;
+};
+
+export const RecordList: React.FunctionComponent<Props> = ({
+  exerciseTypes,
+  setException,
+}) => {
+  const [records, setRecords] = useState<Array<types.Record>>([]);
   const history = useHistory();
 
   useEffect(() => {
-    if (!records) {
+    if (records.length === 0) {
+      console.log("no records");
       (async () => {
         try {
           const response = await recordService.getPRsForExercises();
+          (await response) && console.log(response);
           (await response) && setRecords(response);
         } catch {
           setException(
@@ -34,20 +44,20 @@ export const Records = (props) => {
           <Grid item xs={10} sm={8} md={6} lg={6} xl={6}>
             <h1>Records</h1>
             <Grid container direction="row" justify="center">
-              {exercises &&
-                records &&
-                exercises.map((exercise) => (
-                  <Record
-                    key={exercise.exerciseTypeId}
-                    exercise={exercise}
+              {records &&
+                exerciseTypes &&
+                exerciseTypes.map((exerciseType) => (
+                  <RecordItem
+                    key={exerciseType.exerciseTypeId}
+                    exerciseType={exerciseType}
                     record={
                       records
                         ? records.filter(
-                            (x) => x.exerciseTypeId === exercise.exerciseTypeId
+                            (x) =>
+                              x.exerciseTypeId === exerciseType.exerciseTypeId
                           )[0]
                         : null
                     }
-                    setException={setException}
                   />
                 ))}
             </Grid>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
-import { Workout } from "./Workout";
+import { WorkoutItem } from "./WorkoutItem";
 import { useHistory } from "react-router-dom";
 import * as types from "../../types/types";
 
@@ -13,7 +13,7 @@ type Props = {
   setException: (value: string) => void;
 };
 
-export const Workouts: React.FunctionComponent<Props> = ({
+export const WorkoutList: React.FunctionComponent<Props> = ({
   onCreateSession,
   setException,
 }) => {
@@ -79,7 +79,7 @@ export const Workouts: React.FunctionComponent<Props> = ({
           )}
           {workouts &&
             workouts.map((workout, index) => (
-              <Workout
+              <WorkoutItem
                 key={index}
                 id={workout.workoutId}
                 onDeleteWorkout={handleDeleteWorkout}

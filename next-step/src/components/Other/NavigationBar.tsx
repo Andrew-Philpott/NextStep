@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -10,10 +10,10 @@ import { Link } from "react-router-dom";
 import * as routes from "../../constants/route-constants";
 import { makeStyles } from "@material-ui/core";
 import { User } from "../../types/types";
+import { useHistory } from "react-router-dom";
 
 type Props = {
-  user: User;
-  onLogout: () => void;
+  user: User | null;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -34,29 +34,36 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavigationBar: React.FunctionComponent<Props> = (props) => {
+export const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
   const classes = useStyles();
-  const { user, onLogout } = props;
-  const [anchorEl, setAnchorEl] = useState<Element>();
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<Element>();
+  const history = useHistory();
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const [
+    mobileMoreAnchorEl,
+    setMobileMoreAnchorEl,
+  ] = React.useState<Element | null>(null);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleProfileMenuOpen = (event: Event) => {
-    setAnchorEl(event.currentTarget as Element);
+  const handleProfileMenuOpen = (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>
+  ) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(undefined);
+    setMobileMoreAnchorEl(null);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(undefined);
+    setAnchorEl(null);
     handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = (event: Event) => {
-    setMobileMoreAnchorEl(event.currentTarget as Element);
+  const handleMobileMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    setMobileMoreAnchorEl(event.currentTarget);
   };
   const menuId = "primary-search-account-menu";
   const renderMenu = (
@@ -75,7 +82,7 @@ export const NavigationBar: React.FunctionComponent<Props> = (props) => {
       <MenuItem
         onClick={function () {
           handleMenuClose();
-          onLogout();
+          history.push("/login");
         }}
       >
         Log out
@@ -100,12 +107,12 @@ export const NavigationBar: React.FunctionComponent<Props> = (props) => {
       <MenuItem component={Link} to={routes.RECORDS_LIST}>
         Records
       </MenuItem>
-      {user == null ? (
+      {user === null ? (
         <MenuItem component={Link} to={routes.LOG_IN}>
           Log in
         </MenuItem>
       ) : (
-        <MenuItem onClick={() => handleProfileMenuOpen}>Account</MenuItem>
+        <MenuItem onClick={handleProfileMenuOpen}>Account</MenuItem>
       )}
     </Menu>
   );
@@ -122,7 +129,7 @@ export const NavigationBar: React.FunctionComponent<Props> = (props) => {
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <Typography variant="h6">
-              {user == null ? null : (
+              {user === null ? null : (
                 <>
                   <Link className="nav-link" to={routes.WORKOUTS_LIST}>
                     Workouts
@@ -132,22 +139,22 @@ export const NavigationBar: React.FunctionComponent<Props> = (props) => {
                   </Link>
                 </>
               )}
-              {user == null ? (
+              {user === null ? (
                 <Link className="nav-link" to={routes.LOG_IN}>
                   Log in
                 </Link>
               ) : (
-                <button
+                <span
                   className="nav-link pointer"
-                  onClick={() => handleProfileMenuOpen}
+                  onClick={handleProfileMenuOpen}
                 >
                   Account
-                </button>
+                </span>
               )}
             </Typography>
           </div>
           <div className={classes.sectionMobile}>
-            <IconButton onClick={() => handleMobileMenuOpen}>
+            <IconButton onClick={handleMobileMenuOpen}>
               <MoreIcon />
             </IconButton>
           </div>

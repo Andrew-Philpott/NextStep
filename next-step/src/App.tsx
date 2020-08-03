@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  Redirect,
-} from "react-router-dom";
+import { Router, Route, Switch, Redirect } from "react-router-dom";
 import { Button } from "@material-ui/core";
 import { PrivateRoute } from "./components/Auth/PrivateRoute";
 import { useOnlineStatus } from "./components/Other/useOnlineStatus";
 import { Home } from "./components/Other/Home";
-import { Records } from "./components/Records/Records";
-import { Workouts } from "./components/Workouts/Workouts";
+import { RecordList } from "./components/Records/RecordList";
+import { WorkoutList } from "./components/Workouts/WorkoutList";
 import { Login } from "./components/Auth/Login";
 import { Register } from "./components/Auth/Register";
 import { NavigationBar } from "./components/Other/NavigationBar";
-import { RecordHistory } from "./components/Records/RecordHistory";
+// import { RecordHistory } from "./components/Records/RecordHistory";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { Sessions } from "./components/Sessions/Sessions";
 import { RecordForm } from "./components/Records/RecordForm";
@@ -23,50 +18,49 @@ import { Account } from "./components/Auth/Account";
 import { userService, sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
 import "./App.css";
+import history from "./helpers/history";
 import { isNumber } from "util";
 import * as types from "./types/types";
 
 function setUserFromLocalStorage() {
   const jsonParserUnknown = (jsonString: string): unknown =>
     JSON.parse(jsonString);
-  let userAsStringOrNull: string | null = localStorage.getItem("user");
-  let user: types.User = null;
-  if (userAsStringOrNull) {
-    user = jsonParserUnknown(userAsStringOrNull) as types.User;
-  }
-  return user;
+  let userString: string | null = localStorage.getItem("user");
+  return userString ? (jsonParserUnknown(userString) as types.User) : null;
 }
 
 const App = () => {
   const [session, setSession] = useState<types.Session>(null);
-  const [exercises, setExercises] = useState(null);
+  const [exerciseTypes, setExerciseTypes] = useState<Array<types.ExerciseType>>(
+    []
+  );
   const [exception, setException] = useState("");
-  const [user, setUser] = useState<types.User>(setUserFromLocalStorage);
+  const [user, setUser] = useState<types.User | null>(null);
   const online = useOnlineStatus();
-
-  useEffect(() => {}, [user]);
-
-  const handleLogout = () => {
-    userService.logout();
-    setUser(null);
+  console.log(localStorage.getItem("user"));
+  const handleLogin = () => {
+    setUser(setUserFromLocalStorage);
+    history.push("/account");
   };
 
   useEffect(() => {
-    if (!exercises) {
+    if (exerciseTypes.length === 0 && user) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
-          (await response) && setExercises(response);
+          (await response) && setExerciseTypes(response);
         } catch {
-          console.log("error");
-          // setException(
-          //   "We're having some technical difficulties. Please try again later."
-          // );
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          );
         }
       })();
     }
-  }, [exercises]);
+  }, [exerciseTypes]);
 
+  useEffect(() => {}, [user]);
+
+  console.log(user);
   useEffect(() => {
     if (!session && user && online) {
       (async () => {
@@ -124,8 +118,8 @@ const App = () => {
   return (
     <div id="App">
       <div>
-        <Router>
-          <NavigationBar onLogout={handleLogout} user={user} />
+        <Router history={history}>
+          <NavigationBar user={user} />
           {session && (
             <div className="current-session">
               <Button
@@ -154,33 +148,43 @@ const App = () => {
             />
             <PrivateRoute
               exact
-              user={user}
+              user={user ? user : undefined}
               path={routes.ACCOUNT}
               component={() => <Account setException={setException} />}
             />
             <PrivateRoute
               exact
+              user={user ? user : undefined}
               path={routes.RECORDS_NEW}
-              component={() => <RecordForm setException={setException} />}
-            />
-            <PrivateRoute
-              exact
-              path={routes.RECORDS_LIST}
               component={() => (
-                <Records exercises={exercises} setException={setException} />
+                <RecordForm
+                  exerciseTypes={exerciseTypes}
+                  setException={setException}
+                />
               )}
             />
             <PrivateRoute
               exact
+              user={user ? user : undefined}
+              path={routes.RECORDS_LIST}
+              component={() => (
+                <RecordList
+                  exerciseTypes={exerciseTypes}
+                  setException={setException}
+                />
+              )}
+            />
+            {/* <PrivateRoute
+              exact
               path={routes.RECORD_HISTORY}
               component={() => <RecordHistory setException={setException} />}
-            />
+            /> */}
             <PrivateRoute
               exact
+              user={user ? user : undefined}
               path={routes.WORKOUTS_LIST}
               component={() => (
-                <Workouts
-                  exercises={exercises}
+                <WorkoutList
                   onCreateSession={handleCreateSession}
                   setException={setException}
                 />
@@ -188,33 +192,35 @@ const App = () => {
             />
             <PrivateRoute
               path={routes.WORKOUTS_NEW}
+              user={user ? user : undefined}
               component={() => (
                 <WorkoutForm
-                  exercises={exercises}
+                  exerciseTypes={exerciseTypes}
                   setException={setException}
                 />
               )}
             />
             <PrivateRoute
               exact
-              user={user}
+              user={user ? user : undefined}
               path={routes.WORKOUTS_EDIT}
               component={() => (
                 <WorkoutForm
-                  exercises={exercises}
+                  exerciseTypes={exerciseTypes}
                   setException={setException}
                 />
               )}
             />
             <PrivateRoute
               exact
+              user={user ? user : undefined}
               path={routes.SESSIONS_LIST}
               component={() => <Sessions setException={setException} />}
             />
             <Route
               path={routes.LOG_IN}
               component={() => (
-                <Login setUser={setUser} setException={setException} />
+                <Login onLogin={handleLogin} setException={setException} />
               )}
             />
             <Route

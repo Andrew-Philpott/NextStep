@@ -17,12 +17,11 @@ async function login(username: string, password: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   };
-  console.log(username, password);
   const response = await fetch(
     `http://localhost:5000${path}/authenticate`,
     requestOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 function logout() {
@@ -34,7 +33,7 @@ async function register(model: object) {
     `http://localhost:5000/api/users/register`,
     postOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function updateUser(model: object) {
@@ -42,7 +41,7 @@ async function updateUser(model: object) {
     `http://localhost:5000/api/users`,
     putOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function deleteUser(id: number) {
@@ -50,5 +49,5 @@ async function deleteUser(id: number) {
     `http://localhost:5000/api/users/${id}`,
     deleteOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }

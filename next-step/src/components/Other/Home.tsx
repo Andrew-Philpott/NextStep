@@ -2,8 +2,11 @@ import React from "react";
 import { Grid } from "@material-ui/core";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
 
-export function Home(props) {
-  const { setException } = props;
+type Props = {
+  setException: (value: string) => void;
+};
+
+export const Home: React.FunctionComponent<Props> = ({ setException }) => {
   return (
     <Grid container>
       <h1>Welcome to NextStep Fitness</h1>
@@ -21,4 +24,4 @@ export function Home(props) {
       </Grid>
     </Grid>
   );
-}
+};

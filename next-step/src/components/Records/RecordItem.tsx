@@ -1,17 +1,24 @@
 import React from "react";
 import { Grid, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import { Record, ExerciseType } from "../../types/types";
 
-export const Record = (props) => {
-  const { record, exercise } = props;
+type Props = {
+  record: Record | null;
+  exerciseType: ExerciseType;
+};
 
+export const RecordItem: React.FunctionComponent<Props> = ({
+  record,
+  exerciseType,
+}) => {
   return (
     <Grid container>
       <Grid alignItems="flex-end" container>
         <Grid item xs={6}>
           <h1>
-            <Link to={`/exercises/${exercise.exerciseTypeId}`}>
-              {exercise.name}
+            <Link to={`/exercises/${exerciseType.exerciseTypeId}`}>
+              {exerciseType.name}
             </Link>
           </h1>
         </Grid>
@@ -22,7 +29,7 @@ export const Record = (props) => {
                 component={Link}
                 fullWidth
                 className="button blue-background float-left"
-                to={`/records/new/${exercise.exerciseTypeId}`}
+                to={`/records/new/${exerciseType.exerciseTypeId}`}
               >
                 New Record
               </Button>
@@ -33,7 +40,7 @@ export const Record = (props) => {
                 fullWidth
                 style={{ minWidth: "117px" }}
                 className="button green-background float-left"
-                to={`/records/${exercise.exerciseTypeId}`}
+                to={`/records/${exerciseType.exerciseTypeId}`}
               >
                 History
               </Button>
@@ -54,9 +61,9 @@ export const Record = (props) => {
         <Grid direction="row" container>
           <Grid item xs={6}>
             <h4>Primary</h4>
-            {exercise.muscles
+            {exerciseType.muscles
               .filter((x) => x.primary === true)
-              .sort((a, b) => (a.id < b.id ? 1 : -1))
+              .sort((a, b) => (a.muscleId < b.muscleId ? 1 : -1))
               .map((muscle, index) => (
                 <li
                   style={{
@@ -72,9 +79,9 @@ export const Record = (props) => {
           <Grid item xs={6}>
             <Grid container justify="center" direction="column">
               <h4>Secondary</h4>
-              {exercise.muscles
+              {exerciseType.muscles
                 .filter((x) => x.primary === false)
-                .sort((a, b) => (a.id < b.id ? 1 : -1))
+                .sort((a, b) => (a.muscleId < b.muscleId ? 1 : -1))
                 .map((muscle, index) => (
                   <li
                     style={{

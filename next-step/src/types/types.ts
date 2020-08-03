@@ -1,4 +1,11 @@
-export type User = { userId: number; token: string } | null | undefined;
+export type User = {
+  userId: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  token: string;
+};
+
 export type Session =
   | {
       sessionId: number;
@@ -10,13 +17,16 @@ export type Session =
     }
   | null
   | undefined;
-export type Recovery = {
-  recoveryId: number;
-  fatigue: number;
-  time: string;
-  userId: number;
-  muscleId: number;
-};
+export type Recovery =
+  | {
+      recoveryId: number;
+      fatigue: number;
+      time: string;
+      userId: number;
+      muscleId: number;
+    }
+  | null
+  | undefined;
 export type Exercise = {
   exerciseId: number;
   weight?: number;
@@ -51,4 +61,15 @@ export type Muscle = {
   muscleId: number;
   name: string;
   exerciseTypes: Array<ExerciseType>;
+};
+export type Record = {
+  recordId: number;
+  weight: number;
+  reps: number;
+  sets: number;
+  time: string;
+  userId: number;
+  user: User;
+  exerciseTypeId: number;
+  exerciseType: ExerciseType;
 };

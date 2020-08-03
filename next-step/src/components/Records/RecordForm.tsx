@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import {
   Button,
   InputLabel,
@@ -9,7 +9,13 @@ import {
 import { useForm } from "../Other/useForm";
 import { useHistory } from "react-router-dom";
 import { recordService } from "../../services";
+import { ExerciseType } from "../../types/types";
 import { useParams } from "react-router-dom";
+
+type Props = {
+  exerciseTypes: Array<ExerciseType>;
+  setException: (value: string) => void;
+};
 
 const initialFieldValues = {
   weight: "",
@@ -18,9 +24,11 @@ const initialFieldValues = {
   exerciseId: "",
 };
 
-export const RecordForm = (props) => {
+export const RecordForm: React.FunctionComponent<Props> = ({
+  exerciseTypes,
+  setException,
+}) => {
   const { exerciseTypeId } = useParams();
-  const { exercises, setException } = props;
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -61,7 +69,7 @@ export const RecordForm = (props) => {
     }
   };
 
-  function handleSubmit(e) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
       const record = {
