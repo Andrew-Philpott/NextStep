@@ -5,6 +5,7 @@ import {
   postOptions,
   deleteOptions,
 } from "./request-options";
+import * as types from "../types/types";
 
 const path = "/api/users/workouts";
 

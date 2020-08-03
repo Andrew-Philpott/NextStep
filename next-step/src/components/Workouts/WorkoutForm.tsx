@@ -56,7 +56,6 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
           setException(
             "We're having some technical difficulties. Please try again later."
           );
-          history.push("/error");
         } finally {
           setLoading(false);
         }
@@ -180,7 +179,7 @@ export const WorkoutForm: React.FunctionComponent<Props> = ({
 
   return (
     <Grid container>
-      <div className="spacer" />
+      <div className="spacer-32" />
       <Grid item xs={1} sm={2} md={2} lg={4} xl={4} />
       <Grid item xs={10} sm={8} md={8} lg={4} xl={4}>
         {editing === true ? <h2>Edit workout</h2> : <h2>Create workout</h2>}

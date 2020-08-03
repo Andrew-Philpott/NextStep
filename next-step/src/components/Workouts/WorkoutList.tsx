@@ -46,30 +46,16 @@ export const WorkoutList: React.FunctionComponent<Props> = ({
 
   return (
     <Grid container>
-      <div className="spacer" />
-      <Grid item xs={9}></Grid>
-      <Grid item xs={3}>
-        <Grid container justify="center">
-          <Button
-            component={Link}
-            className="button blue-background"
-            to={routes.WORKOUTS_NEW}
-          >
-            Create Workout
-          </Button>
-        </Grid>
-      </Grid>
-
+      <div className="spacer-32" />
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
       <Grid item xs={8} sm={6} md={6} lg={6} xl={6}>
+        {workouts && workouts.length !== 0 ? (
+          <h1>Workouts</h1>
+        ) : (
+          <h1 className="text-align-center">You dont have any workouts yet</h1>
+        )}
+        <div className="spacer-16" />
         <Grid container direction="column" justify="center">
-          {workouts && workouts.length !== 0 ? (
-            <h1>Workouts</h1>
-          ) : (
-            <h1 className="text-align-center">
-              You dont have any workouts yet
-            </h1>
-          )}
           {workouts &&
             workouts.map((workout, index) => (
               <WorkoutItem
@@ -84,7 +70,16 @@ export const WorkoutList: React.FunctionComponent<Props> = ({
         </Grid>
       </Grid>
       <Grid item xs={2} sm={4} md={4} lg={4} xl={4}>
-        <div className="spacer" />
+        <Grid container justify="flex-end">
+          <Button
+            component={Link}
+            className="button blue-background"
+            to={routes.WORKOUTS_NEW}
+          >
+            Create Workout
+          </Button>
+          <div className="spacer-16" />
+        </Grid>
         <MuscleModel setException={setException} active={true} />
       </Grid>
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />

@@ -5,6 +5,7 @@ import {
   postOptions,
   deleteOptions,
 } from "./request-options";
+import * as types from "../types/types";
 
 const path = "/api/users/records";
 
@@ -47,7 +48,7 @@ async function getAllRecords() {
   return await handleResponse(response);
 }
 
-async function createRecord(model: object) {
+async function createRecord(model: types.Record) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -55,7 +56,7 @@ async function createRecord(model: object) {
   return await handleResponse(response);
 }
 
-async function updateRecord(id: number, model: object) {
+async function updateRecord(id: number, model: types.Record) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)

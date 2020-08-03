@@ -17,6 +17,9 @@ const initialFieldValues = {
 };
 
 export const Login: React.FC<Props> = ({ setException, setUser }) => {
+  useEffect(() => {
+    userService.logout();
+  }, []);
   const validate = () => {
     const temp = { ...initialFieldValues };
     if (!values.username) {
@@ -50,7 +53,7 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
         );
         localStorage.setItem("user", JSON.stringify(response));
         setUser(response);
-        history.push("/home");
+        history.push(routes.LANDING);
       } catch {
         setException(
           "We're having some technical difficulties. Please try again later."

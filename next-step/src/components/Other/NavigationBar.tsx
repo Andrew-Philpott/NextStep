@@ -14,7 +14,6 @@ import { useHistory } from "react-router-dom";
 
 type Props = {
   user: User | null;
-  onLogout: () => void;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -35,11 +34,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavigationBar: React.FunctionComponent<Props> = ({
-  user,
-  onLogout,
-}) => {
+export const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
   const classes = useStyles();
+  const history = useHistory();
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
   const [
     mobileMoreAnchorEl,
@@ -85,7 +82,7 @@ export const NavigationBar: React.FunctionComponent<Props> = ({
       <MenuItem
         onClick={() => {
           handleMenuClose();
-          onLogout();
+          history.push(routes.LOG_OUT);
         }}
       >
         Log out

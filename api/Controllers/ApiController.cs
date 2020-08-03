@@ -371,6 +371,8 @@ namespace BodyJournalAPI.Controllers
       if (model == null)
         return BadRequest(new { message = "Model cannot be null." });
 
+      string time = DateTime.Now.ToString("MM/dd/yyyy H:mm");
+
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -378,10 +380,10 @@ namespace BodyJournalAPI.Controllers
         if (exercise == null)
           return NotFound(new { message = "Exercise does not exist." });
 
-        model.UserId = currentUserId;
-        await _db.Records.AddAsync(model);
+        Record entity = new Record() { Weight = model.Weight, Reps = model.Reps, Sets = model.Sets, ExerciseTypeId = exercise.ExerciseTypeId, Time = time, UserId = currentUserId };
+        await _db.Records.AddAsync(entity);
         await _db.SaveChangesAsync();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {

@@ -1,6 +1,6 @@
 import { handleResponse } from "../helpers/handle-response";
 import { putOptions, postOptions, deleteOptions } from "./request-options";
-
+import * as types from "../types/types";
 const path = "/api/users";
 
 export const userService = {

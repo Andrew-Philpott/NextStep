@@ -12,7 +12,6 @@ import { NavigationBar } from "./components/Other/NavigationBar";
 import { RecordHistory } from "./components/Records/RecordHistory";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { SessionList } from "./components/Sessions/SessionList";
-import { RecordForm } from "./components/Records/RecordForm";
 import * as routes from "./constants/route-constants";
 import { userService, sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
@@ -29,12 +28,6 @@ const App = () => {
   const [exception, setException] = useState("");
   const [user, setUser] = useState<types.User | null>(null);
   const online = useOnlineStatus();
-
-  const handleLogout = () => {
-    history.push("login");
-    setUser(null);
-    userService.logout();
-  };
 
   useEffect(() => {
     if (!user) {
@@ -116,7 +109,7 @@ const App = () => {
     <div id="App">
       <div>
         <Router history={history}>
-          <NavigationBar onLogout={handleLogout} user={user} />
+          <NavigationBar user={user} />
           {session ? (
             <div className="current-session">
               <Button
@@ -142,17 +135,7 @@ const App = () => {
               path={routes.ERROR}
               component={() => <ErrorPage exception={exception} />}
             />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.RECORDS_NEW}
-              component={() => (
-                <RecordForm
-                  exerciseTypes={exerciseTypes}
-                  setException={setException}
-                />
-              )}
-            />
+
             <PrivateRoute
               exact
               user={user}

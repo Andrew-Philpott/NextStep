@@ -25,12 +25,11 @@ export const RecordHistory: React.FunctionComponent<Props> = ({
           const response: Array<Record> = await recordService.getAllRecordsForExercise(
             id as number
           );
-          setRecords(response.sort((a, b) => (a.weight < b.weight ? 1 : -1)));
+          setRecords(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
           );
-          history.push("/error");
         }
       })();
     }
@@ -46,7 +45,6 @@ export const RecordHistory: React.FunctionComponent<Props> = ({
           setException(
             "We're having some technical difficulties. Please try again later."
           );
-          history.push("/error");
         }
       })();
   };
@@ -54,7 +52,7 @@ export const RecordHistory: React.FunctionComponent<Props> = ({
   return (
     <React.Fragment>
       <Grid container>
-        <div className="spacer" />
+        <div className="spacer-32" />
         <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
           <Grid justify="center" spacing={2} container>
             <div className="text-align-center">

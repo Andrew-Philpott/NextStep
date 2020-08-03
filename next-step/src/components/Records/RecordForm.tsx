@@ -7,14 +7,12 @@ import {
   Grid,
 } from "@material-ui/core";
 import { useForm } from "../Other/useForm";
-import { useHistory } from "react-router-dom";
 import { recordService } from "../../services";
-import { ExerciseType } from "../../types/types";
-import { useParams } from "react-router-dom";
+import * as types from "../../types/types";
 
 type Props = {
-  exerciseTypes: Array<ExerciseType>;
   setException: (value: string) => void;
+  onCreateRecord: (value: types.CreateRecord) => void;
 };
 
 const initialFieldValues = {
@@ -25,44 +23,30 @@ const initialFieldValues = {
 };
 
 export const RecordForm: React.FunctionComponent<Props> = ({
-  exerciseTypes,
   setException,
+  onCreateRecord,
 }) => {
-  const { exerciseTypeId } = useParams();
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
-  const history = useHistory();
 
-  const validate = (fieldValues = values) => {
-    let temp = { ...errors };
-    if ("name" in fieldValues && !fieldValues.name) {
-      temp.name = "This field is required";
-    } else {
-      temp.name = "";
-    }
+  const validate = () => {
+    let temp = { ...initialFieldValues };
 
-    if ("exerciseId" in fieldValues && !fieldValues.exerciseId) {
+    if (!values.weight) {
       temp.exerciseId = "This field is required";
-    } else {
-      temp.exerciseId = "";
     }
-
-    if ("reps" in fieldValues && !fieldValues.reps) {
+    if (!values.reps) {
       temp.reps = "This field is required";
-    } else {
-      temp.reps = "";
     }
-    if ("sets" in fieldValues && !fieldValues.sets) {
+    if (!values.sets) {
       temp.sets = "This field is required";
-    } else {
-      temp.sets = "";
     }
 
     setErrors({
       ...temp,
     });
-    if (!temp) {
+    if (!temp.weight && !temp.reps && !temp.sets) {
       return true;
     } else {
       return false;
@@ -72,75 +56,58 @@ export const RecordForm: React.FunctionComponent<Props> = ({
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
-      const record = {
-        exerciseId: parseInt(values.exerciseId),
-        weight: parseInt(values.weight),
-        reps: parseInt(values.reps),
-        sets: parseInt(values.sets),
-      };
-      try {
-        await recordService.createRecord(record);
-        history.push("/records");
-      } catch {
-        setException(
-          "We're having some technical difficulties. Please try again later."
-        );
-        history.push("/error");
-      }
+      onCreateRecord(values as types.CreateRecord);
     }
   }
 
   return (
     <Grid container>
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
-      <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
-        <h2>Create Record</h2>
-        <form autoComplete="off" onSubmit={handleSubmit}>
-          <Grid container spacing={1}>
-            <Grid item xs={2}>
-              <InputLabel className="mrgn-t16" htmlFor="weight">
-                Weight
-              </InputLabel>
-              <TextField
-                type="text"
-                name="weight"
-                value={values.weight}
-                onChange={handleInputChange}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <InputLabel className="mrgn-t16" htmlFor="reps">
-                Reps
-              </InputLabel>
-              <TextField
-                type="text"
-                name="reps"
-                value={values.reps}
-                onChange={handleInputChange}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <InputLabel className="mrgn-t16" htmlFor="sets">
-                Sets
-              </InputLabel>
-              <TextField
-                type="text"
-                name="sets"
-                variant="outlined"
-                value={values.sets}
-                onChange={handleInputChange}
-              />
-            </Grid>
+      <form autoComplete="off" onSubmit={handleSubmit}>
+        <Grid container spacing={1}>
+          <Grid item xs={4}>
+            <TextField
+              type="text"
+              placeholder="weight"
+              name="weight"
+              value={values.weight}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
           </Grid>
-
-          <Button type="submit" className="button blue-background float-right">
+          <Grid item xs={4}>
+            <TextField
+              type="text"
+              placeholder="reps"
+              name="reps"
+              value={values.reps}
+              onChange={handleInputChange}
+              variant="outlined"
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <TextField
+              type="text"
+              placeholder="sets"
+              name="sets"
+              variant="outlined"
+              value={values.sets}
+              onChange={handleInputChange}
+            />
+          </Grid>
+        </Grid>
+        <Grid container justify="flex-end">
+          <Button
+            style={{ marginRight: "10px" }}
+            type="submit"
+            className="button red-background mrgn-t8"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" className="button blue-background mrgn-t8">
             Submit
           </Button>
-        </form>
-      </Grid>
-      <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+        </Grid>
+      </form>
     </Grid>
   );
 };
