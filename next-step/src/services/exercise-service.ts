@@ -17,9 +17,6 @@ async function get(id: number) {
 }
 
 async function getAll() {
-  const response = await fetch(
-    `http://localhost:5000/api/exercises`,
-    getOptions
-  );
+  const response = await fetch(`http://localhost:5000${path}`, getOptions);
   return await handleResponse(response);
 }

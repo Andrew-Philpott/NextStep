@@ -1,6 +1,6 @@
 import { handleResponse } from "../helpers/handle-response";
 import { putOptions, postOptions, deleteOptions } from "./request-options";
-import * as types from "../types/types";
+
 const path = "/api/users";
 
 export const userService = {
@@ -12,10 +12,14 @@ export const userService = {
 };
 
 async function login(username: string, password: string) {
-  const model = { username, password };
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  };
   const response = await fetch(
     `http://localhost:5000${path}/authenticate`,
-    postOptions(model)
+    requestOptions
   );
   return handleResponse(response);
 }

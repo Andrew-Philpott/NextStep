@@ -13,12 +13,12 @@ import { RecordHistory } from "./components/Records/RecordHistory";
 import { WorkoutForm } from "./components/Workouts/WorkoutForm";
 import { SessionList } from "./components/Sessions/SessionList";
 import * as routes from "./constants/route-constants";
-import { userService, sessionService, exerciseService } from "./services";
+import { sessionService, exerciseService } from "./services";
 import { ErrorPage } from "./components/Other/ErrorPage";
 import "./App.css";
 import history from "./helpers/history";
 import * as types from "./types/types";
-import { getUserFromLs } from "../src/helpers/get-user-from-ls";
+import getUserFromLs from "../src/helpers/get-user-from-ls";
 
 const App = () => {
   const [session, setSession] = useState<types.Session | null>(null);
@@ -124,7 +124,7 @@ const App = () => {
             </div>
           ) : null}
           <Switch>
-            {exception && <ErrorPage exception={exception} />}
+            {/* {exception && <ErrorPage exception={exception} />} */}
             <Route
               exact
               path={routes.LANDING}

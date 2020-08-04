@@ -593,10 +593,9 @@ namespace BodyJournalAPI.Controllers
     {
       if (id == null)
         return BadRequest(new { message = "id cannot be null." });
-
+      var currentUserId = int.Parse(User.Identity.Name);
       try
       {
-        var currentUserId = int.Parse(User.Identity.Name);
         var entity = await _db.Recovery.AsAsyncEnumerable().SingleOrDefaultAsync(x => x.UserId == currentUserId && x.RecoveryId == id);
         if (entity == null)
           return NotFound(new { message = "Recovery does not exist in the database" });
@@ -611,16 +610,17 @@ namespace BodyJournalAPI.Controllers
     [HttpGet("users/recoveries")]
     public async Task<IActionResult> GetRecoveries()
     {
+      var currentUserId = int.Parse(User.Identity.Name);
       try
       {
-        var currentUserId = int.Parse(User.Identity.Name);
         var recoveries = await _db.Recovery.AsAsyncEnumerable().Where(x => x.UserId == currentUserId).ToListAsync();
         var entities = recoveries.GroupBy(x => x.MuscleId, (key, g) => g.OrderByDescending(x => x.Time).FirstOrDefault()).ToArray();
 
         return Ok(entities);
       }
-      catch
+      catch (Exception ex)
       {
+        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
