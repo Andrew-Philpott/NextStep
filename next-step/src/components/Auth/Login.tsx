@@ -28,9 +28,9 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
   }, []);
 
   const validate = () => {
-    const temp = { userName: true, password: true };
-    if (!values.username) temp.userName = false;
-    if (!values.password) temp.password = false;
+    const temp = { userName: false, password: false };
+    if (!values.username) temp.userName = true;
+    if (!values.password) temp.password = true;
     setErrors({ ...temp });
     if (!temp.userName && !temp.password) {
       return true;

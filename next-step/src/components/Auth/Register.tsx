@@ -25,20 +25,19 @@ const Register: React.FC<Props> = ({ setException }) => {
     initialFieldValues
   );
   const history = useHistory();
-
   const validate = () => {
     let temp = {
-      firstName: true,
-      lastName: true,
-      userName: true,
-      email: true,
-      password: true,
+      firstName: false,
+      lastName: false,
+      userName: false,
+      email: false,
+      password: false,
     };
-    if (!values.firstName) temp.firstName = false;
-    if (!values.lastName) temp.lastName = false;
-    if (!values.userName) temp.userName = false;
-    if (!values.email) temp.email = false;
-    if (!values.password) temp.password = false;
+    if (!values.firstName) temp.firstName = true;
+    if (!values.lastName) temp.lastName = true;
+    if (!values.userName) temp.userName = true;
+    if (!values.email) temp.email = true;
+    if (!values.password) temp.password = true;
     setErrors({ ...temp });
     if (
       !temp.firstName &&
@@ -152,7 +151,7 @@ const Register: React.FC<Props> = ({ setException }) => {
                 <p className="error">Fields in red are required.</p>
               )}
             </Grid>
-            <div className="mrgn-t8">
+            <Grid className="mrgn-t8">
               <Button className="button blue-background" href={routes.LANDING}>
                 Cancel
               </Button>
@@ -162,7 +161,7 @@ const Register: React.FC<Props> = ({ setException }) => {
               >
                 Register
               </Button>
-            </div>
+            </Grid>
           </form>
         </React.Fragment>
       </Grid>
