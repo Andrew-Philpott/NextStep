@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Suspense, lazy, FormEvent } from "react";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import RecordList from "./components/Records/RecordList";
 import WorkoutList from "./components/Workouts/WorkoutList";
@@ -10,24 +9,23 @@ import NavigationBar from "./components/Other/NavigationBar";
 import RecordHistory from "./components/Records/RecordHistory";
 import WorkoutForm from "./components/Workouts/WorkoutForm";
 import SessionList from "./components/Sessions/SessionList";
+import WorkoutDetails from "./components/Workouts/WorkoutDetails";
 import * as routes from "./constants/route-constants";
 import { sessionService, exerciseService } from "./services";
 import Error from "./components/Other/Error";
 import "./App.css";
 import history from "./helpers/history";
-import * as types from "./types/types";
+import { Session, ExerciseType, User } from "./types/types";
 import getUserFromLs from "../src/helpers/get-user-from-ls";
 import Home from "./components/Other/Home";
 import useOnlineStatus from "./components/Other/useOnlineStatus";
 import CurrentSession from "./components/Sessions/CurrentSession";
 
 const App = () => {
-  const [session, setSession] = useState<types.Session | null>(null);
-  const [exerciseTypes, setExerciseTypes] = useState<Array<types.ExerciseType>>(
-    []
-  );
+  const [session, setSession] = useState<Session | null>(null);
+  const [exerciseTypes, setExerciseTypes] = useState<Array<ExerciseType>>([]);
   const [exception, setException] = useState("");
-  const [user, setUser] = useState<types.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const online = useOnlineStatus();
   if (!online) {
@@ -131,7 +129,6 @@ const App = () => {
           <Route exact path={routes.LANDING}>
             <Home user={user} setException={setException} />
           </Route>
-
           <Route exact path={routes.ERROR}>
             <Error exception={exception} />
           </Route>
@@ -141,6 +138,9 @@ const App = () => {
           <Route path={routes.REGISTER}>
             <Register setException={setException} />
           </Route>
+          <PrivateRoute exact path={routes.ACCOUNT}>
+            <Home user={user} setException={setException} />
+          </PrivateRoute>
           <PrivateRoute exact path={routes.RECORDS_LIST}>
             <RecordList
               exerciseTypes={exerciseTypes}
@@ -168,6 +168,9 @@ const App = () => {
               exerciseTypes={exerciseTypes}
               setException={setException}
             />
+          </PrivateRoute>
+          <PrivateRoute path={routes.WORKOUTS_DETAILS}>
+            <WorkoutDetails setException={setException} />
           </PrivateRoute>
           <PrivateRoute exact path={routes.SESSIONS_LIST}>
             <SessionList setException={setException} />

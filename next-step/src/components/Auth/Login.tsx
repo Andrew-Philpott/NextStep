@@ -45,7 +45,7 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
   );
   const history = useHistory();
 
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
       userService

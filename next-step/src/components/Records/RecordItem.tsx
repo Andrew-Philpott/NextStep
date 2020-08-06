@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Grid, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Record, ExerciseType } from "../../types/types";
@@ -7,7 +7,6 @@ import * as types from "../../types/types";
 type Props = {
   record: Record | null;
   exerciseType: ExerciseType;
-  setException: (value: string) => void;
   selectedExerciseType: ExerciseType | null;
   setSelectedExerciseType: (value: ExerciseType | null) => void;
   onCreateRecord: (value: types.Record) => void;
@@ -16,7 +15,6 @@ type Props = {
 export const RecordItem: React.FunctionComponent<Props> = ({
   record,
   exerciseType,
-  setException,
   selectedExerciseType,
   setSelectedExerciseType,
   onCreateRecord,
@@ -86,7 +84,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
           {selectedExerciseType === exerciseType ? (
             <RecordForm
               onCreateRecord={onCreateRecord}
-              setException={setException}
+              setSelectedExerciseType={setSelectedExerciseType}
             />
           ) : (
             <Button

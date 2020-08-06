@@ -43,7 +43,7 @@ const WorkoutItem: React.FunctionComponent<Props> = ({
             exercises.map((exercise, index) => (
               <Grid key={index} container>
                 <p>
-                  {exercise.exerciseType.name} {exercise.sets}x{exercise.reps}{" "}
+                  {exercise.exerciseType?.name} {exercise.sets}x{exercise.reps}{" "}
                   {exercise.weight ? <span>{exercise.weight}lbs</span> : null}
                 </p>
               </Grid>

@@ -21,7 +21,7 @@ const SessionList: React.FunctionComponent<Props> = ({ setException }) => {
       (async () => {
         try {
           const response = await sessionService.getAllSessions();
-          (await response) && setSessions(response);
+          setSessions(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -38,7 +38,6 @@ const SessionList: React.FunctionComponent<Props> = ({ setException }) => {
       <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
         <React.Fragment>
           <h1>Sessions</h1>
-
           <TableContainer>
             <Table aria-label="simple table">
               <TableHead>

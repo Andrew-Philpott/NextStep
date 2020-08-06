@@ -1,48 +1,36 @@
-import React, { useEffect, useState, FormEvent } from "react";
-import {
-  Button,
-  InputLabel,
-  TextField,
-  MenuItem,
-  Grid,
-} from "@material-ui/core";
+import React, { FormEvent } from "react";
+import { Button, TextField, Grid } from "@material-ui/core";
 import { useForm } from "../Other/useForm";
-import { recordService } from "../../services";
-import * as types from "../../types/types";
+import { Record, ExerciseType } from "../../types/types";
 
 type Props = {
-  setException: (value: string) => void;
-  onCreateRecord: (value: types.CreateRecord) => void;
+  onCreateRecord: (value: Record) => void;
+  setSelectedExerciseType: (value: ExerciseType | null) => void;
 };
 
 const initialFieldValues = {
+  recordId: "",
   weight: "",
   reps: "",
   sets: "",
-  exerciseId: "",
+  time: "",
+  userId: 0,
+  exerciseTypeId: 0,
 };
 
 const RecordForm: React.FunctionComponent<Props> = ({
-  setException,
   onCreateRecord,
+  setSelectedExerciseType,
 }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
 
   const validate = () => {
-    let temp = { ...initialFieldValues };
-
-    if (!values.weight) {
-      temp.exerciseId = "This field is required";
-    }
-    if (!values.reps) {
-      temp.reps = "This field is required";
-    }
-    if (!values.sets) {
-      temp.sets = "This field is required";
-    }
-
+    let temp = { weight: false, reps: false, sets: false };
+    if (!values.weight) temp.weight = true;
+    if (!values.reps) temp.reps = true;
+    if (!values.sets) temp.sets = true;
     setErrors({
       ...temp,
     });
@@ -52,14 +40,10 @@ const RecordForm: React.FunctionComponent<Props> = ({
       return false;
     }
   };
-
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (validate()) {
-      onCreateRecord(values as types.CreateRecord);
-    }
+    if (validate()) onCreateRecord(values);
   }
-
   return (
     <Grid container>
       <form autoComplete="off" onSubmit={handleSubmit}>
@@ -72,6 +56,9 @@ const RecordForm: React.FunctionComponent<Props> = ({
               value={values.weight}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors.weight && {
+                error: true,
+              })}
             />
           </Grid>
           <Grid item xs={4}>
@@ -82,6 +69,9 @@ const RecordForm: React.FunctionComponent<Props> = ({
               value={values.reps}
               onChange={handleInputChange}
               variant="outlined"
+              {...(errors.reps && {
+                error: true,
+              })}
             />
           </Grid>
           <Grid item xs={4}>
@@ -92,7 +82,15 @@ const RecordForm: React.FunctionComponent<Props> = ({
               variant="outlined"
               value={values.sets}
               onChange={handleInputChange}
+              {...(errors.sets && {
+                error: true,
+              })}
             />
+          </Grid>
+          <Grid item xs={12}>
+            {(errors.weight || errors.reps || errors.sets) && (
+              <p style={{ color: "red" }}>Fields in red are required.</p>
+            )}
           </Grid>
         </Grid>
         <Grid container justify="flex-end">
@@ -100,6 +98,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
             style={{ marginRight: "10px" }}
             type="submit"
             className="button red-background mrgn-t8"
+            onClick={() => setSelectedExerciseType(null)}
           >
             Cancel
           </Button>

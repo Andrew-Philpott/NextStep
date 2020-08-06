@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { Button, Grid } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { recordService } from "../../services/record-service";
-import { exerciseService } from "../../services/exercise-service";
 import { Record } from "../../types/types";
 
 type Props = {
@@ -12,7 +11,6 @@ type Props = {
 
 const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
   const { id } = useParams();
-  const [exercise, setExercise] = useState(null);
   const [records, setRecords] = useState<Array<Record>>([]);
   const history = useHistory();
 
@@ -21,7 +19,7 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
       (async () => {
         try {
           const response: Array<Record> = await recordService.getAllRecordsForExercise(
-            id as number
+            parseInt(id)
           );
           setRecords(response);
         } catch {
@@ -37,8 +35,10 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
     if (window.confirm("Are you sure you want to delete this record?"))
       (async () => {
         try {
-          await recordService.deleteRecord(id);
-          history.push("/records");
+          const response = await recordService.deleteRecord(id);
+          if (response.recordId === id) {
+            history.push("/records");
+          }
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."

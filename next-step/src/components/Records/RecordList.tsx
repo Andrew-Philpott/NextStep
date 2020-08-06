@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Button } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { recordService } from "../../services";
 import { RecordItem } from "./RecordItem";
-import * as types from "../../types/types";
+import { ExerciseType, Record } from "../../types/types";
 
 type Props = {
   setException: (value: string) => void;
-  exerciseTypes: Array<types.ExerciseType>;
+  exerciseTypes: Array<ExerciseType>;
 };
 
 const RecordList: React.FunctionComponent<Props> = ({
   exerciseTypes,
   setException,
 }) => {
-  const [records, setRecords] = useState<Array<types.Record>>([]);
+  const [records, setRecords] = useState<Array<Record>>([]);
   const [
     selectedExerciseType,
     setSelectedExerciseType,
-  ] = useState<types.ExerciseType | null>(null);
+  ] = useState<ExerciseType | null>(null);
 
   useEffect(() => {
     if (records.length === 0) {
       (async () => {
         try {
           const response = await recordService.getPRsForExercises();
-          setRecords(await response);
+          setRecords(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -34,21 +34,12 @@ const RecordList: React.FunctionComponent<Props> = ({
     }
   }, []);
 
-  const handleCreateRecord = async (values: types.CreateRecord) => {
+  const handleCreateRecord = async (record: Record) => {
     try {
-      const record: types.Record = {
-        recordId: 0,
-        weight: values.weight,
-        reps: values.reps,
-        sets: values.sets,
-        time: "",
-        userId: 0,
-        exerciseTypeId: selectedExerciseType?.exerciseTypeId,
-      };
       const response = await recordService.createRecord(record);
-      let newState = records.filter(
-        (x) => x.exerciseTypeId !== selectedExerciseType?.exerciseTypeId
-      );
+      let newState =
+        (await response) &&
+        records.filter((x) => x.exerciseTypeId !== response.exerciseTypeId);
       newState.push(response);
       setSelectedExerciseType(null);
       setRecords([...newState]);
@@ -77,7 +68,6 @@ const RecordList: React.FunctionComponent<Props> = ({
                     exerciseType={exerciseType}
                     selectedExerciseType={selectedExerciseType}
                     setSelectedExerciseType={setSelectedExerciseType}
-                    setException={setException}
                     record={
                       records
                         ? records.filter(

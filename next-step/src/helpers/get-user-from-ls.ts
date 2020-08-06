@@ -1,10 +1,10 @@
-import * as types from "../types/types";
+import { User } from "../types/types";
 
 function getUserFromLs() {
   let userString = localStorage.getItem("user");
-  let user: types.User | null = null;
+  let user: User | null = null;
   if (userString) {
-    user = JSON.parse(userString) as types.User;
+    user = JSON.parse(userString);
     if (user && user.token) {
       return user;
     } else {

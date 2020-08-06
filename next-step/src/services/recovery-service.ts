@@ -5,7 +5,7 @@ import {
   postOptions,
   deleteOptions,
 } from "./request-options";
-import * as types from "../types/types";
+import { Recovery } from "../types/types";
 
 const path = "/api/users/recoveries";
 
@@ -30,7 +30,7 @@ async function getAllRecoveries() {
   return handleResponse(response);
 }
 
-async function createRecovery(model: types.Recovery) {
+async function createRecovery(model: Recovery) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -38,7 +38,7 @@ async function createRecovery(model: types.Recovery) {
   return handleResponse(response);
 }
 
-async function updateRecovery(id: number, model: types.Recovery) {
+async function updateRecovery(id: number, model: Recovery) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)

@@ -20,17 +20,22 @@ type Props = {
   setException: (value: string) => void;
 };
 
-const blankExercise = {
-  exerciseTypeId: "",
+const blankExercise: Exercise = {
+  exerciseId: 0,
+  exerciseTypeId: 0,
   reps: "",
   sets: "",
   weight: "",
+  workoutId: 0,
+  userId: 0,
 };
 
-const initialFieldValues = {
+const initialFieldValues: Workout = {
   name: "",
   notes: "",
   exercises: [{ ...blankExercise }],
+  workoutId: 0,
+  userId: 0,
 };
 
 const WorkoutForm: React.FunctionComponent<Props> = ({
@@ -41,12 +46,11 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
-  const [loading, setLoading] = useState(true);
   const [removedExercises, setRemovedExercises] = useState<Array<Exercise>>([]);
   const history = useHistory();
 
   useEffect(() => {
-    if (id && loading) {
+    if (id) {
       (async () => {
         try {
           const response = await workoutService.getWorkout(id);
@@ -55,12 +59,10 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
           setException(
             "We're having some technical difficulties. Please try again later."
           );
-        } finally {
-          setLoading(false);
         }
       })();
     }
-  }, [id, loading]);
+  }, [id]);
 
   const handleExerciseChange = (e: ChangeEvent<HTMLInputElement>) => {
     let updatedExercises = { ...values };

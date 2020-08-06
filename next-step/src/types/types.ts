@@ -23,11 +23,11 @@ export type Recovery = {
 };
 export type Exercise = {
   exerciseId: number;
-  weight?: number;
-  reps: number;
-  sets: number;
-  exerciseTypeId: number;
-  exerciseType: ExerciseType;
+  weight: number | string;
+  reps: number | string;
+  sets: number | string;
+  exerciseTypeId: number | string;
+  exerciseType?: ExerciseType;
   userId: number;
   workoutId: number;
 };

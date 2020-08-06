@@ -591,7 +591,7 @@ namespace BodyJournalAPI.Controllers
         }
         _db.Workouts.Remove(entity);
         _db.SaveChanges();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {
