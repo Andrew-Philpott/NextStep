@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -46,10 +46,12 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
-  const [removedExercises, setRemovedExercises] = useState<Array<Exercise>>([]);
+  const [removedExercises, setRemovedExercises] = React.useState<
+    Array<Exercise>
+  >([]);
   const history = useHistory();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (id) {
       (async () => {
         try {
@@ -64,7 +66,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
     }
   }, [id]);
 
-  const handleExerciseChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleExerciseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let updatedExercises = { ...values };
     const beforeIndex = e.target.name.indexOf("-");
     const index = e.target.name.substring(beforeIndex + 1);
@@ -131,24 +133,18 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
     return isValid;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      const workout: Workout = {
-        workoutId: 0,
-        name: values.name,
-        exercises: values.exercises,
-        notes: values.notes,
-        userId: 0,
-      };
       try {
+        let response: Promise<Response>;
         if (id) {
-          await workoutService.updateWorkout(id, workout);
+          response = await workoutService.updateWorkout(id, values);
         } else {
-          await workoutService.createWorkout(workout);
+          response = await workoutService.createWorkout(values);
         }
-        setValues(initialFieldValues);
-        history.push(routes.WORKOUTS_LIST);
+        (await response) && setValues(initialFieldValues);
+        (await response) && history.push(routes.WORKOUTS_LIST);
       } catch {
         setException("Something went wrong");
       }
@@ -177,7 +173,6 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
                 helperText: errors.name,
               })}
             />
-
             <InputLabel className="mrgn-t16" htmlFor="notes">
               Notes
             </InputLabel>
@@ -192,7 +187,6 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
               variant="outlined"
               {...(errors.notes && { error: true, helperText: errors.notes })}
             />
-
             {exerciseTypes &&
               values.exercises &&
               values.exercises.map((exercise: Exercise, index: number) => {

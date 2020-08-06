@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -14,9 +14,9 @@ type Props = {
 };
 
 const SessionList: React.FunctionComponent<Props> = ({ setException }) => {
-  const [sessions, setSessions] = useState<Array<Session>>([]);
+  const [sessions, setSessions] = React.useState<Array<Session>>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!sessions) {
       (async () => {
         try {

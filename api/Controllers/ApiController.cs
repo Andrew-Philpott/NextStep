@@ -386,6 +386,7 @@ namespace BodyJournalAPI.Controllers
     [HttpPost("users/records")]
     public async Task<IActionResult> CreateRecord([FromBody] Record model)
     {
+      System.Console.WriteLine(model);
       if (model == null)
         return BadRequest(new { message = "Model cannot be null." });
 
@@ -403,8 +404,9 @@ namespace BodyJournalAPI.Controllers
         await _db.SaveChangesAsync();
         return Ok(entity);
       }
-      catch
+      catch (Exception ex)
       {
+        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }

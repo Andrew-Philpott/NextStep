@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { workoutService } from "../../services";
@@ -18,7 +18,7 @@ const WorkoutList: React.FunctionComponent<Props> = ({
   setException,
   user,
 }) => {
-  const [workouts, setWorkouts] = useState<Array<Workout>>([]);
+  const [workouts, setWorkouts] = React.useState<Array<Workout>>([]);
 
   const handleDeleteWorkout = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
@@ -35,7 +35,7 @@ const WorkoutList: React.FunctionComponent<Props> = ({
       }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     (async () => {
       try {
         const response = await workoutService.getAllWorkouts();

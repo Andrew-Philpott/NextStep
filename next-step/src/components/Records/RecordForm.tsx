@@ -1,4 +1,4 @@
-import React, { FormEvent } from "react";
+import React from "react";
 import { Button, TextField, Grid } from "@material-ui/core";
 import { useForm } from "../Other/useForm";
 import { Record, ExerciseType } from "../../types/types";
@@ -6,22 +6,26 @@ import { Record, ExerciseType } from "../../types/types";
 type Props = {
   onCreateRecord: (value: Record) => void;
   setSelectedExerciseType: (value: ExerciseType | null) => void;
-};
-
-const initialFieldValues = {
-  recordId: "",
-  weight: "",
-  reps: "",
-  sets: "",
-  time: "",
-  userId: 0,
-  exerciseTypeId: 0,
+  selectedExerciseType: ExerciseType;
 };
 
 const RecordForm: React.FunctionComponent<Props> = ({
   onCreateRecord,
   setSelectedExerciseType,
+  selectedExerciseType,
 }) => {
+  const initialFieldValues: Record = {
+    recordId: 0,
+    weight: "",
+    reps: "",
+    sets: "",
+    time: "",
+    user: undefined,
+    userId: 0,
+    exerciseType: undefined,
+    exerciseTypeId: selectedExerciseType.exerciseTypeId,
+  };
+
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -40,7 +44,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
       return false;
     }
   };
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) onCreateRecord(values);
   }
@@ -89,7 +93,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
           </Grid>
           <Grid item xs={12}>
             {(errors.weight || errors.reps || errors.sets) && (
-              <p style={{ color: "red" }}>Fields in red are required.</p>
+              <p className="error">Fields in red are required.</p>
             )}
           </Grid>
         </Grid>

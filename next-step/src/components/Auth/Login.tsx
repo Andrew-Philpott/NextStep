@@ -1,4 +1,4 @@
-import React, { useEffect, FormEvent } from "react";
+import React from "react";
 import { userService } from "../../services";
 import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
@@ -12,7 +12,7 @@ type Props = {
 };
 
 const initialFieldValues = {
-  username: "",
+  userName: "",
   password: "",
 };
 
@@ -22,23 +22,23 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
   );
   const history = useHistory();
 
-  useEffect(() => {
+  React.useEffect(() => {
     userService.logout();
     setUser(null);
   }, []);
 
   const validate = () => {
-    const temp = { ...initialFieldValues };
-    if (!values.username) temp.username = "Field cannot be blank.";
-    if (!values.password) temp.password = "Field cannot be blank.";
+    const temp = { userName: true, password: true };
+    if (!values.username) temp.userName = false;
+    if (!values.password) temp.password = false;
     setErrors({ ...temp });
-    if (!temp.username && !temp.password) {
+    if (!temp.userName && !temp.password) {
       return true;
     }
     return false;
   };
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (validate()) {
       userService
@@ -60,26 +60,25 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
   }
 
   return (
-    <Grid container>
+    <Grid className="mrgn-t24" container>
       <Grid item xs={1} sm={2} md={2} lg={3} xl={3} />
       <Grid item xs={10} sm={8} md={8} lg={6} xl={6}>
         <React.Fragment>
           <h2 className="mrgn-t8">Log in</h2>
-          <form method="POST" name="form" onSubmit={handleSubmit}>
+          <form method="POST" onSubmit={handleSubmit}>
             <InputLabel className="mrgn-t8" htmlFor="username">
               User Name
             </InputLabel>
             <TextField
               type="text"
-              name="username"
+              name="userName"
               fullWidth
-              value={values.username}
+              value={values.userName}
               onChange={handleInputChange}
               variant="outlined"
               {...(errors &&
-                errors.username && {
+                errors.userName && {
                   error: true,
-                  helperText: errors.username,
                 })}
             />
             <InputLabel className="mrgn-t8" htmlFor="password">
@@ -95,12 +94,15 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
               {...(errors &&
                 errors.password && {
                   error: true,
-                  helperText: errors.password,
                 })}
             />
-
-            <div className="mrgn-t8">
-              <span style={{ fontSize: "large", marginRight: "10" }}>
+            <Grid item xs={12}>
+              {(errors.userName || errors.password) && (
+                <p className="error">Fields in red are required.</p>
+              )}
+            </Grid>
+            <Grid className="mrgn-t8">
+              <span style={{ fontSize: "large", marginRight: "10px" }}>
                 No Account?
               </span>
               <Button className="button blue-background" href={routes.REGISTER}>
@@ -112,7 +114,7 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
               >
                 Log in
               </Button>
-            </div>
+            </Grid>
           </form>
         </React.Fragment>
       </Grid>

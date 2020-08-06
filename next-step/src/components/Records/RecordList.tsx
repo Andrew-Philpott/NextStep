@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Grid } from "@material-ui/core";
 import { recordService } from "../../services";
 import { RecordItem } from "./RecordItem";
@@ -13,13 +13,13 @@ const RecordList: React.FunctionComponent<Props> = ({
   exerciseTypes,
   setException,
 }) => {
-  const [records, setRecords] = useState<Array<Record>>([]);
+  const [records, setRecords] = React.useState<Array<Record>>([]);
   const [
     selectedExerciseType,
     setSelectedExerciseType,
-  ] = useState<ExerciseType | null>(null);
+  ] = React.useState<ExerciseType | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (records.length === 0) {
       (async () => {
         try {
@@ -43,7 +43,8 @@ const RecordList: React.FunctionComponent<Props> = ({
       newState.push(response);
       setSelectedExerciseType(null);
       setRecords([...newState]);
-    } catch {
+    } catch (ex) {
+      console.log(ex.message);
       setException(
         "We're having some technical difficulties. Please try again later."
       );

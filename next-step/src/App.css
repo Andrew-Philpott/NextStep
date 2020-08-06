@@ -50,6 +50,10 @@ h6 {
   margin-right: 10px;
 }
 
+.error {
+  color: red !important;
+}
+
 .float-right {
   float: right !important;
 }

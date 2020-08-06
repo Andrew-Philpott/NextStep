@@ -62,9 +62,9 @@ export type Muscle = {
 };
 export type Record = {
   recordId: number;
-  weight?: number;
-  reps?: number;
-  sets?: number;
+  weight: number | string;
+  reps: number | string;
+  sets: number | string;
   time?: string;
   userId?: number;
   user?: User;

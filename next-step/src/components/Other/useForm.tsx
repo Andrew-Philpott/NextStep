@@ -1,10 +1,10 @@
-import { useState, ChangeEvent, useEffect } from "react";
+import React from "react";
 
 export const useForm = (fieldValues: any) => {
-  const [values, setValues] = useState(fieldValues);
-  const [errors, setErrors] = useState(fieldValues);
+  const [values, setValues] = React.useState(fieldValues);
+  const [errors, setErrors] = React.useState(fieldValues);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const fieldValue = { [name]: value };
     setValues({

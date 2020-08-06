@@ -83,6 +83,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
         <Grid style={{ position: "relative" }} item xs={6}>
           {selectedExerciseType === exerciseType ? (
             <RecordForm
+              selectedExerciseType={selectedExerciseType}
               onCreateRecord={onCreateRecord}
               setSelectedExerciseType={setSelectedExerciseType}
             />

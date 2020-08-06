@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { Grid } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
@@ -12,10 +12,10 @@ type Props = {
 
 const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
   const { id } = useParams();
-  const [records, setRecords] = useState<Array<Record>>([]);
+  const [records, setRecords] = React.useState<Array<Record>>([]);
   const history = useHistory();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (id && records.length === 0) {
       (async () => {
         try {

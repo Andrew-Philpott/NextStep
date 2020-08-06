@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Redirect, RouteProps } from "react-router-dom";
-import { User } from "../../types/types";
 import getUserFromLs from "../../helpers/get-user-from-ls";
 
 interface PrivateRouteProps extends RouteProps {}

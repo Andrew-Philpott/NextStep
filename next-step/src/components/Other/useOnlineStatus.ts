@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import React from "react";
 
 const useOnlineStatus = () => {
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = React.useState(true);
 
   const handleEvent = () => {
     setOnline(window.navigator.onLine);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     window.addEventListener("online", handleEvent);
     window.addEventListener("offline", handleEvent);
 

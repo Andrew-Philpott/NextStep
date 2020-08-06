@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense, lazy, FormEvent } from "react";
+import React, { useState, Suspense, lazy } from "react";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import RecordList from "./components/Records/RecordList";
@@ -32,20 +32,19 @@ const App = () => {
     history.push("/login");
   }
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!user) {
       setUser(getUserFromLs());
     }
   }, [user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (exerciseTypes.length === 0 && user) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
-          (await response) && setExerciseTypes(response);
-        } catch (ex) {
-          console.log(ex.message);
+          setExerciseTypes(response);
+        } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
           );
@@ -54,12 +53,12 @@ const App = () => {
     }
   }, [user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!session && user) {
       (async () => {
         try {
           const response = await sessionService.getCurrentSession();
-          (await response) && setSession(response);
+          setSession(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."

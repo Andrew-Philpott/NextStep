@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { MusclesFront } from "./MusclesFront";
 import { MusclesBack } from "./MusclesBack";
 import { Grid } from "@material-ui/core";
@@ -15,18 +15,18 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   user,
   setException,
 }) => {
-  const [quads, setQuads] = useState<Recovery | null>(null);
-  const [biceps, setBiceps] = useState<Recovery | null>(null);
-  const [deltoids, setDeltoids] = useState<Recovery | null>(null);
-  const [pectorals, setPectorals] = useState<Recovery | null>(null);
-  const [abdominals, setAbdominals] = useState<Recovery | null>(null);
-  const [calves, setCalves] = useState<Recovery | null>(null);
-  const [hamstrings, setHamstrings] = useState<Recovery | null>(null);
-  const [glutes, setGlutes] = useState<Recovery | null>(null);
-  const [tricpes, setTricpes] = useState<Recovery | null>(null);
-  const [forearms, setForearms] = useState<Recovery | null>(null);
-  const [lats, setLats] = useState<Recovery | null>(null);
-  const [trapezius, setTrapezius] = useState<Recovery | null>(null);
+  const [quads, setQuads] = React.useState<Recovery | null>(null);
+  const [biceps, setBiceps] = React.useState<Recovery | null>(null);
+  const [deltoids, setDeltoids] = React.useState<Recovery | null>(null);
+  const [pectorals, setPectorals] = React.useState<Recovery | null>(null);
+  const [abdominals, setAbdominals] = React.useState<Recovery | null>(null);
+  const [calves, setCalves] = React.useState<Recovery | null>(null);
+  const [hamstrings, setHamstrings] = React.useState<Recovery | null>(null);
+  const [glutes, setGlutes] = React.useState<Recovery | null>(null);
+  const [tricpes, setTricpes] = React.useState<Recovery | null>(null);
+  const [forearms, setForearms] = React.useState<Recovery | null>(null);
+  const [lats, setLats] = React.useState<Recovery | null>(null);
+  const [trapezius, setTrapezius] = React.useState<Recovery | null>(null);
 
   const handleRecoveries = (response: Array<Recovery>) => {
     response.map((recovery) => {
@@ -101,7 +101,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
     if (user) {
       recoveryService
