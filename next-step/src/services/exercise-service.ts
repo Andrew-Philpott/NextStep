@@ -13,10 +13,10 @@ async function get(id: number) {
     `http://localhost:5000${path}/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAll() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
-  return await handleResponse(response);
+  return handleResponse(response);
 }

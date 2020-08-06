@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using BodyJournalAPI.Entities;
-using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using System;
@@ -31,16 +30,13 @@ namespace BodyJournalAPI.Helpers
       using (var hmac = new HMACSHA512())
       {
         passwordSalt = hmac.Key;
-        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("password"));
+        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("test"));
       }
 
       base.OnModelCreating(builder);
 
       builder.Entity<User>().HasData(
-      new User() { UserId = 1, FirstName = "Andrew", LastName = "Philpott", UserName = "Nxtstp", Email = "a@gmail.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt },
-      new User() { UserId = 2, FirstName = "b", LastName = "b", UserName = "b", Email = "b@gmail.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt }
-      );
-
+      new User() { UserId = 1, FirstName = "test", LastName = "test", UserName = "test", Email = "test@gmail.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt });
 
       builder.Entity<ExerciseType>().HasData(
         new ExerciseType() { ExerciseTypeId = 1, Name = "Squat" },

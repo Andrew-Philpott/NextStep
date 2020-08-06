@@ -17,7 +17,7 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Register: React.FC<Props> = ({ setException }) => {
+const Register: React.FC<Props> = ({ setException }) => {
   const { values, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -187,3 +187,4 @@ export const Register: React.FC<Props> = ({ setException }) => {
     </Grid>
   );
 };
+export default Register;

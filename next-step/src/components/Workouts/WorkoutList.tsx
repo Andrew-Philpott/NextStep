@@ -4,25 +4,29 @@ import { Link } from "react-router-dom";
 import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
 import { MuscleModel } from "../MuscleModel/MuscleModel";
-import { WorkoutItem } from "./WorkoutItem";
-import * as types from "../../types/types";
+import WorkoutItem from "./WorkoutItem";
+import { User, Workout } from "../../types/types";
 
 type Props = {
   onCreateSession: (value: number) => void;
   setException: (value: string) => void;
+  user: User | null;
 };
 
-export const WorkoutList: React.FunctionComponent<Props> = ({
+const WorkoutList: React.FunctionComponent<Props> = ({
   onCreateSession,
   setException,
+  user,
 }) => {
-  const [workouts, setWorkouts] = useState<Array<types.Workout>>([]);
+  const [workouts, setWorkouts] = useState<Array<Workout>>([]);
 
   const handleDeleteWorkout = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this workout?"))
       try {
-        await workoutService.deleteWorkout(id);
-        const newState = workouts.filter((x) => x.workoutId !== id);
+        const response = await workoutService.deleteWorkout(id);
+        const newState = workouts.filter(
+          (x) => x.workoutId !== response.workoutId
+        );
         setWorkouts(newState);
       } catch {
         setException(
@@ -49,7 +53,7 @@ export const WorkoutList: React.FunctionComponent<Props> = ({
       <div className="spacer-32" />
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
       <Grid item xs={8} sm={6} md={6} lg={6} xl={6}>
-        {workouts && workouts.length !== 0 ? (
+        {workouts.length !== 0 ? (
           <h1>Workouts</h1>
         ) : (
           <h1 className="text-align-center">You dont have any workouts yet</h1>
@@ -80,9 +84,11 @@ export const WorkoutList: React.FunctionComponent<Props> = ({
           </Button>
           <div className="spacer-16" />
         </Grid>
-        <MuscleModel setException={setException} active={true} />
+        <MuscleModel setException={setException} user={user} />
       </Grid>
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
     </Grid>
   );
 };
+
+export default WorkoutList;

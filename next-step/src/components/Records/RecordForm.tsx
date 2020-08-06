@@ -22,7 +22,7 @@ const initialFieldValues = {
   exerciseId: "",
 };
 
-export const RecordForm: React.FunctionComponent<Props> = ({
+const RecordForm: React.FunctionComponent<Props> = ({
   setException,
   onCreateRecord,
 }) => {
@@ -111,3 +111,4 @@ export const RecordForm: React.FunctionComponent<Props> = ({
     </Grid>
   );
 };
+export default RecordForm;

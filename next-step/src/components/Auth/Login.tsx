@@ -7,7 +7,7 @@ import { useForm } from "../Other/useForm";
 import { User } from "../../types/types";
 
 type Props = {
-  setUser: (value: User) => void;
+  setUser: (value: User | null) => void;
   setException: (value: string) => void;
 };
 
@@ -16,10 +16,12 @@ const initialFieldValues = {
   password: "",
 };
 
-export const Login: React.FC<Props> = ({ setException, setUser }) => {
+const Login: React.FC<Props> = ({ setException, setUser }) => {
   useEffect(() => {
     userService.logout();
+    setUser(null);
   }, []);
+
   const validate = () => {
     const temp = { ...initialFieldValues };
     if (!values.username) {
@@ -46,19 +48,21 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
-      try {
-        const response = await userService.login(
-          values.username,
-          values.password
+      userService
+        .login(values.username, values.password)
+        .then((response) => {
+          localStorage.setItem("user", JSON.stringify(response));
+          return response;
+        })
+        .then(() => {
+          history.push("/");
+          window.location.reload();
+        })
+        .catch(() =>
+          setException(
+            "We're having some technical difficulties. Please try again later."
+          )
         );
-        localStorage.setItem("user", JSON.stringify(response));
-        setUser(response);
-        history.push(routes.LANDING);
-      } catch {
-        setException(
-          "We're having some technical difficulties. Please try again later."
-        );
-      }
     }
   }
 
@@ -123,3 +127,5 @@ export const Login: React.FC<Props> = ({ setException, setUser }) => {
     </Grid>
   );
 };
+
+export default Login;

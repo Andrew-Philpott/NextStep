@@ -23,12 +23,12 @@ async function getSession(id: number) {
     `http://localhost:5000${path}/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAllSessions() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getCurrentSession() {
@@ -36,7 +36,7 @@ async function getCurrentSession() {
     `http://localhost:5000${path}/current`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function createSession(model: object) {
@@ -44,7 +44,7 @@ async function createSession(model: object) {
     `http://localhost:5000${path}`,
     postOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function updateSession(id: number, model: object) {
@@ -52,7 +52,7 @@ async function updateSession(id: number, model: object) {
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function deleteSession(id: number) {
@@ -60,5 +60,5 @@ async function deleteSession(id: number) {
     `http://localhost:5000${path}/${id}`,
     deleteOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }

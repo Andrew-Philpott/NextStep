@@ -1,27 +1,18 @@
 import React from "react";
 import { Route, Redirect, RouteProps } from "react-router-dom";
 import { User } from "../../types/types";
+import getUserFromLs from "../../helpers/get-user-from-ls";
 
-export interface PrivateRouteProps extends RouteProps {
-  user: User | null;
-}
+interface PrivateRouteProps extends RouteProps {}
 
-export const PrivateRoute: React.FC<PrivateRouteProps> = ({
-  user,
-  ...props
-}) => {
-  if (user === null) {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ ...props }) => {
+  if (getUserFromLs() === null) {
     return (
-      <Route
-        {...props}
-        component={() => (
-          <Redirect
-            to={{ pathname: "/login", state: { from: props.location } }}
-          />
-        )}
-      />
+      <Redirect to={{ pathname: "/login", state: { from: props.location } }} />
     );
   } else {
     return <Route {...props} />;
   }
 };
+
+export default PrivateRoute;

@@ -1,6 +1,6 @@
 import * as types from "../types/types";
 
-export default function getUserFromLs() {
+function getUserFromLs() {
   let userString = localStorage.getItem("user");
   let user: types.User | null = null;
   if (userString) {
@@ -13,3 +13,4 @@ export default function getUserFromLs() {
   }
   return null;
 }
+export default getUserFromLs;

@@ -1,6 +1,6 @@
 import getUserFromLs from "./get-user-from-ls";
 
-export default function authHeader(): HeadersInit {
+function authHeader(): HeadersInit {
   const user = getUserFromLs();
   if (user && user.token) {
     return {
@@ -10,3 +10,4 @@ export default function authHeader(): HeadersInit {
     return { Authorization: "" };
   }
 }
+export default authHeader;

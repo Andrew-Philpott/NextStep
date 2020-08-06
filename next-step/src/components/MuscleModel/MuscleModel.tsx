@@ -4,14 +4,15 @@ import { MusclesBack } from "./MusclesBack";
 import { Grid } from "@material-ui/core";
 import { recoveryService } from "../../services";
 import { Recovery } from "../../types/types";
+import { User } from "../../types/types";
 
 type Props = {
-  active: boolean;
+  user: User | null;
   setException: (value: string) => void;
 };
 
 export const MuscleModel: React.FunctionComponent<Props> = ({
-  active,
+  user,
   setException,
 }) => {
   const [quads, setQuads] = useState<Recovery | null>(null);
@@ -73,7 +74,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   };
 
   const handleCreateRecovery = async (muscleId: number) => {
-    if (active) {
+    if (user) {
       if (muscleId > 0 && muscleId <= 14) {
         const answer = window.prompt("Level of fatigue");
         let fatigue = 0;
@@ -101,19 +102,25 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
   };
 
   useEffect(() => {
-    if (active) {
-      (async () => {
-        try {
-          const response = await recoveryService.getAllRecoveries();
-          handleRecoveries(response);
-        } catch {
+    let mounted = true;
+    if (user) {
+      recoveryService
+        .getAllRecoveries()
+        .then((response) => {
+          if (mounted) {
+            handleRecoveries(response);
+          }
+        })
+        .catch(() =>
           setException(
             "We're having some technical difficulties. Please try again later."
-          );
-        }
-      })();
+          )
+        );
+      return () => {
+        mounted = false;
+      };
     }
-  }, []);
+  }, [user]);
 
   return (
     <Grid className="muscle-model" container>

@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
+const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
   const classes = useStyles();
   const history = useHistory();
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
@@ -118,7 +118,7 @@ export const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
   );
 
   return (
-    <div>
+    <React.Fragment>
       <AppBar className="blue-background" position="static">
         <Toolbar>
           <Typography variant="h6" noWrap>
@@ -162,6 +162,7 @@ export const NavigationBar: React.FunctionComponent<Props> = ({ user }) => {
       </AppBar>
       {renderMobileMenu}
       {renderMenu}
-    </div>
+    </React.Fragment>
   );
 };
+export default NavigationBar;

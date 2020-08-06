@@ -1,5 +1,6 @@
 import { handleResponse } from "../helpers/handle-response";
 import { putOptions, postOptions, deleteOptions } from "./request-options";
+import history from "../helpers/history";
 
 const path = "/api/users";
 

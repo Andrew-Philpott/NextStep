@@ -24,7 +24,7 @@ async function getRecord(id: number) {
     `http://localhost:5000${path}/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAllRecordsForExercise(id: number) {
@@ -32,7 +32,7 @@ async function getAllRecordsForExercise(id: number) {
     `http://localhost:5000${path}/exercises/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getPRsForExercises() {
@@ -40,12 +40,12 @@ async function getPRsForExercises() {
     `http://localhost:5000${path}/exercises/pr`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAllRecords() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function createRecord(model: types.Record) {
@@ -53,7 +53,7 @@ async function createRecord(model: types.Record) {
     `http://localhost:5000${path}`,
     postOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function updateRecord(id: number, model: types.Record) {
@@ -61,7 +61,7 @@ async function updateRecord(id: number, model: types.Record) {
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function deleteRecord(id: number) {
@@ -69,5 +69,5 @@ async function deleteRecord(id: number) {
     `http://localhost:5000${path}/${id}`,
     deleteOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }

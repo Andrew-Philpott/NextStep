@@ -22,12 +22,12 @@ async function getRecovery(id: number) {
     `http://localhost:5000${path}/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAllRecoveries() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function createRecovery(model: types.Recovery) {
@@ -35,7 +35,7 @@ async function createRecovery(model: types.Recovery) {
     `http://localhost:5000${path}`,
     postOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function updateRecovery(id: number, model: types.Recovery) {
@@ -43,7 +43,7 @@ async function updateRecovery(id: number, model: types.Recovery) {
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function deleteRecovery(id: number) {
@@ -51,5 +51,5 @@ async function deleteRecovery(id: number) {
     `http://localhost:5000${path}/${id}`,
     deleteOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }

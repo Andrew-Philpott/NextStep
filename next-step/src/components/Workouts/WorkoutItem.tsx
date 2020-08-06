@@ -14,7 +14,7 @@ type Props = {
   onDeleteWorkout: (value: number) => void;
 };
 
-export const WorkoutItem: React.FunctionComponent<Props> = ({
+const WorkoutItem: React.FunctionComponent<Props> = ({
   onCreateSession,
   name,
   id,
@@ -33,7 +33,6 @@ export const WorkoutItem: React.FunctionComponent<Props> = ({
             <Link to={`/workouts/edit/${id}`}>
               <EditIcon className="pointer green-color" />
             </Link>
-
             <DeleteOutlinedIcon
               className="pointer red-color"
               onClick={() => onDeleteWorkout(id)}
@@ -75,3 +74,4 @@ export const WorkoutItem: React.FunctionComponent<Props> = ({
     </Grid>
   );
 };
+export default WorkoutItem;

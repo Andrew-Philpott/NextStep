@@ -5,7 +5,7 @@ import {
   postOptions,
   deleteOptions,
 } from "./request-options";
-import * as types from "../types/types";
+import { Workout } from "../types/types";
 
 const path = "/api/users/workouts";
 
@@ -22,28 +22,28 @@ async function getWorkout(id: number) {
     `http://localhost:5000${path}/${id}`,
     getOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function getAllWorkouts() {
   const response = await fetch(`http://localhost:5000${path}`, getOptions);
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
-async function createWorkout(model: object) {
+async function createWorkout(model: Workout) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
-async function updateWorkout(id: number, model: object) {
+async function updateWorkout(id: number, model: Workout) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }
 
 async function deleteWorkout(id: number) {
@@ -51,5 +51,5 @@ async function deleteWorkout(id: number) {
     `http://localhost:5000${path}/${id}`,
     deleteOptions
   );
-  return await handleResponse(response);
+  return handleResponse(response);
 }

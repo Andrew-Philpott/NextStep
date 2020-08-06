@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy, FormEvent } from "react";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
-import { Button } from "@material-ui/core";
-import { PrivateRoute } from "./components/Auth/PrivateRoute";
-import { useOnlineStatus } from "./components/Other/useOnlineStatus";
-import { Home } from "./components/Other/Home";
-import { RecordList } from "./components/Records/RecordList";
-import { WorkoutList } from "./components/Workouts/WorkoutList";
-import { Login } from "./components/Auth/Login";
-import { Register } from "./components/Auth/Register";
-import { NavigationBar } from "./components/Other/NavigationBar";
-import { RecordHistory } from "./components/Records/RecordHistory";
-import { WorkoutForm } from "./components/Workouts/WorkoutForm";
-import { SessionList } from "./components/Sessions/SessionList";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import PrivateRoute from "./components/Auth/PrivateRoute";
+import RecordList from "./components/Records/RecordList";
+import WorkoutList from "./components/Workouts/WorkoutList";
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import NavigationBar from "./components/Other/NavigationBar";
+import RecordHistory from "./components/Records/RecordHistory";
+import WorkoutForm from "./components/Workouts/WorkoutForm";
+import SessionList from "./components/Sessions/SessionList";
 import * as routes from "./constants/route-constants";
 import { sessionService, exerciseService } from "./services";
-import { ErrorPage } from "./components/Other/ErrorPage";
+import Error from "./components/Other/Error";
 import "./App.css";
 import history from "./helpers/history";
 import * as types from "./types/types";
 import getUserFromLs from "../src/helpers/get-user-from-ls";
+import Home from "./components/Other/Home";
+import useOnlineStatus from "./components/Other/useOnlineStatus";
+import CurrentSession from "./components/Sessions/CurrentSession";
 
 const App = () => {
   const [session, setSession] = useState<types.Session | null>(null);
@@ -27,35 +28,40 @@ const App = () => {
   );
   const [exception, setException] = useState("");
   const [user, setUser] = useState<types.User | null>(null);
+
   const online = useOnlineStatus();
+  if (!online) {
+    history.push("/login");
+  }
 
   useEffect(() => {
     if (!user) {
       setUser(getUserFromLs());
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (exerciseTypes.length === 0) {
+    if (exerciseTypes.length === 0 && user) {
       (async () => {
         try {
           const response = await exerciseService.getAll();
-          setExerciseTypes(response);
-        } catch {
+          (await response) && setExerciseTypes(response);
+        } catch (ex) {
+          console.log(ex.message);
           setException(
             "We're having some technical difficulties. Please try again later."
           );
         }
       })();
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (!session && user && online) {
+    if (!session && user) {
       (async () => {
         try {
           const response = await sessionService.getCurrentSession();
-          setSession(response);
+          (await response) && setSession(response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -63,7 +69,7 @@ const App = () => {
         }
       })();
     }
-  }, []);
+  }, [user]);
 
   const handleEndSession = async (id: number) => {
     const answer: string | null = window.prompt(
@@ -76,7 +82,12 @@ const App = () => {
     if (rating >= 1 && rating <= 5) {
       try {
         await sessionService.updateSession(id, {
+          sessionId: 0,
+          workoutStart: "",
+          workoutEnd: "",
           rating: rating,
+          workoutId: id,
+          userId: 0,
         });
         setSession(null);
       } catch {
@@ -91,7 +102,12 @@ const App = () => {
     if (!session) {
       try {
         const response = await sessionService.createSession({
+          sessionId: 0,
+          workoutStart: "",
+          workoutEnd: "",
+          rating: 0,
           workoutId: id,
+          userId: 0,
         });
         setSession(response);
       } catch {
@@ -105,106 +121,60 @@ const App = () => {
       );
     }
   };
-  return (
-    <div id="App">
-      <div>
-        <Router history={history}>
-          <NavigationBar user={user} />
-          {session ? (
-            <div className="current-session">
-              <Button
-                className="button green-background white-border float-right mrgn-r8"
-                onClick={() => handleEndSession(session.sessionId)}
-              >
-                End session
-              </Button>
-              <span className="float-right">
-                Start time: {session.workoutStart}
-              </span>
-            </div>
-          ) : null}
-          <Switch>
-            {/* {exception && <ErrorPage exception={exception} />} */}
-            <Route
-              exact
-              path={routes.LANDING}
-              component={() => <Home user={user} setException={setException} />}
-            />
-            <Route
-              exact
-              path={routes.ERROR}
-              component={() => <ErrorPage exception={exception} />}
-            />
 
-            <PrivateRoute
-              exact
+  return (
+    <div className="App">
+      <Router history={history}>
+        <NavigationBar user={user} />
+        <CurrentSession session={session} onEndSession={handleEndSession} />
+        <Switch>
+          <Route exact path={routes.LANDING}>
+            <Home user={user} setException={setException} />
+          </Route>
+
+          <Route exact path={routes.ERROR}>
+            <Error exception={exception} />
+          </Route>
+          <Route path={routes.LOG_IN}>
+            <Login setUser={setUser} setException={setException} />
+          </Route>
+          <Route path={routes.REGISTER}>
+            <Register setException={setException} />
+          </Route>
+          <PrivateRoute exact path={routes.RECORDS_LIST}>
+            <RecordList
+              exerciseTypes={exerciseTypes}
+              setException={setException}
+            />
+          </PrivateRoute>
+          <PrivateRoute exact path={routes.RECORD_HISTORY}>
+            <RecordHistory setException={setException} />
+          </PrivateRoute>
+          <PrivateRoute exact path={routes.WORKOUTS_LIST}>
+            <WorkoutList
               user={user}
-              path={routes.RECORDS_LIST}
-              component={() => (
-                <RecordList
-                  exerciseTypes={exerciseTypes}
-                  setException={setException}
-                />
-              )}
+              onCreateSession={handleCreateSession}
+              setException={setException}
             />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.RECORD_HISTORY}
-              component={() => <RecordHistory setException={setException} />}
+          </PrivateRoute>
+          <PrivateRoute path={routes.WORKOUTS_NEW}>
+            <WorkoutForm
+              exerciseTypes={exerciseTypes}
+              setException={setException}
             />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.WORKOUTS_LIST}
-              component={() => (
-                <WorkoutList
-                  onCreateSession={handleCreateSession}
-                  setException={setException}
-                />
-              )}
+          </PrivateRoute>
+          <PrivateRoute path={routes.WORKOUTS_EDIT}>
+            <WorkoutForm
+              exerciseTypes={exerciseTypes}
+              setException={setException}
             />
-            <PrivateRoute
-              path={routes.WORKOUTS_NEW}
-              user={user}
-              component={() => (
-                <WorkoutForm
-                  exerciseTypes={exerciseTypes}
-                  setException={setException}
-                />
-              )}
-            />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.WORKOUTS_EDIT}
-              component={() => (
-                <WorkoutForm
-                  exerciseTypes={exerciseTypes}
-                  setException={setException}
-                />
-              )}
-            />
-            <PrivateRoute
-              exact
-              user={user}
-              path={routes.SESSIONS_LIST}
-              component={() => <SessionList setException={setException} />}
-            />
-            <Route
-              path={routes.LOG_IN}
-              component={() => (
-                <Login setUser={setUser} setException={setException} />
-              )}
-            />
-            <Route
-              path={routes.REGISTER}
-              component={() => <Register setException={setException} />}
-            />
-            <Redirect from="*" to={routes.LANDING} />
-          </Switch>
-        </Router>
-      </div>
+          </PrivateRoute>
+          <PrivateRoute exact path={routes.SESSIONS_LIST}>
+            <SessionList setException={setException} />
+          </PrivateRoute>
+          <Redirect from="*" to={routes.LANDING} />
+        </Switch>
+      </Router>
     </div>
   );
 };

@@ -9,7 +9,7 @@ type Props = {
   exerciseTypes: Array<types.ExerciseType>;
 };
 
-export const RecordList: React.FunctionComponent<Props> = ({
+const RecordList: React.FunctionComponent<Props> = ({
   exerciseTypes,
   setException,
 }) => {
@@ -24,7 +24,7 @@ export const RecordList: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await recordService.getPRsForExercises();
-          setRecords(response);
+          setRecords(await response);
         } catch {
           setException(
             "We're having some technical difficulties. Please try again later."
@@ -91,7 +91,7 @@ export const RecordList: React.FunctionComponent<Props> = ({
             </Grid>
           </Grid>
           <Grid item xs={1} sm={2} md={3} lg={3} xl={3}>
-            <Grid container>
+            {/* <Grid container>
               <Grid item xs={1} />
               <Grid item xs={10}>
                 <Grid direction="row" container>
@@ -108,7 +108,7 @@ export const RecordList: React.FunctionComponent<Props> = ({
                 </Grid>
               </Grid>
               <Grid item xs={1}></Grid>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Grid>
       ) : (
@@ -119,3 +119,4 @@ export const RecordList: React.FunctionComponent<Props> = ({
     </React.Fragment>
   );
 };
+export default RecordList;

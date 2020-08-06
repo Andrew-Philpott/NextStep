@@ -4,6 +4,7 @@ using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 using BodyJournalAPI.Entities;
 using BodyJournalAPI.Models;
 using BodyJournalAPI.Helpers;
@@ -200,7 +201,7 @@ namespace BodyJournalAPI.Controllers
         _db.Users.Remove(entity);
         _db.SaveChanges();
 
-        return Ok();
+        return Ok(entity);
       }
       catch
       {
@@ -303,7 +304,7 @@ namespace BodyJournalAPI.Controllers
 
         _db.Exercises.Remove(entity);
         _db.SaveChanges();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {
@@ -400,13 +401,13 @@ namespace BodyJournalAPI.Controllers
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
-        var model = await _db.Records.AsAsyncEnumerable().SingleOrDefaultAsync(x => x.UserId == currentUserId && x.RecordId == id);
-        if (model == null)
+        var entity = await _db.Records.AsAsyncEnumerable().SingleOrDefaultAsync(x => x.UserId == currentUserId && x.RecordId == id);
+        if (entity == null)
           return NotFound(new { message = "Record not in database" });
 
-        _db.Records.Remove(model);
+        _db.Records.Remove(entity);
         _db.SaveChanges();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {
@@ -443,15 +444,14 @@ namespace BodyJournalAPI.Controllers
 
         return Ok(entities);
       }
-      catch (Exception ex)
+      catch
       {
-        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
 
     [HttpPost("users/workouts")]
-    public async Task<IActionResult> CreateWorkout([FromBody] CreateWorkout model)
+    public async Task<IActionResult> CreateWorkout([FromBody] Workout model)
     {
       if (model == null)
         return BadRequest(new { message = "Model cannot be null." });
@@ -460,11 +460,10 @@ namespace BodyJournalAPI.Controllers
       try
       {
         Workout workoutEntity = new Workout() { UserId = currentUserId, Notes = model.Notes, Name = model.Name };
-        await _db.Workouts.AddAsync(workoutEntity);
-        await _db.SaveChangesAsync();
-        foreach (CreateExercise item in model.Exercises)
+        List<Exercise> exerciseList = new List<Exercise>();
+        foreach (Exercise item in model.Exercises)
         {
-          Exercise exerciseEntity = new Exercise()
+          exerciseList.Add(new Exercise()
           {
             UserId = currentUserId,
             WorkoutId = workoutEntity.WorkoutId,
@@ -472,11 +471,12 @@ namespace BodyJournalAPI.Controllers
             Reps = item.Reps,
             Sets = item.Sets,
             ExerciseTypeId = item.ExerciseTypeId
-          };
-          await _db.Exercises.AddAsync(exerciseEntity);
+          });
         }
+        workoutEntity.Exercises = exerciseList;
+        await _db.Workouts.AddAsync(workoutEntity);
         await _db.SaveChangesAsync();
-        return Ok();
+        return Ok(workoutEntity);
       }
       catch
       {
@@ -485,7 +485,7 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("users/workouts/{id}")]
-    public async Task<IActionResult> UpdateWorkout(long? id, [FromBody] UpdateWorkout model)
+    public async Task<IActionResult> UpdateWorkout(long? id, [FromBody] Workout model)
     {
       if (id == null)
         return BadRequest(new { message = "Id cannot be null." });
@@ -493,14 +493,16 @@ namespace BodyJournalAPI.Controllers
       if (model == null)
         return BadRequest(new { message = "Workout cannot be null." });
 
-      if ((model.CreateExercises == null) && (model.UpdateExercises == null))
+      if (model.Exercises == null)
         return BadRequest(new { message = "Exercises cannot be null." });
 
-      if (model.CreateExercises.Count() + model.UpdateExercises.Count() < 1)
+      if (model.Exercises.Count() < 1)
         return BadRequest(new { message = "Workout must include at least 1 exercise." });
 
+      StringBuilder response = new StringBuilder();
+
       if (string.IsNullOrWhiteSpace(model.Name))
-        return BadRequest(new { mesage = "Workout name cannot be null." });
+        response.Append("Workout: Name cannot be null or empty.");
 
       var currentUserId = int.Parse(User.Identity.Name);
 
@@ -513,41 +515,53 @@ namespace BodyJournalAPI.Controllers
         workoutEntity.Name = model.Name;
         workoutEntity.Notes = model.Notes;
 
-        _db.Workouts.Update(workoutEntity);
-
+        List<Exercise> remove = new List<Exercise>();
         foreach (Exercise exerciseEntity in workoutEntity.Exercises)
         {
-          var exerciseMatch = model.UpdateExercises.SingleOrDefault(x => x.ExerciseId == exerciseEntity.ExerciseId);
-
-          if (exerciseMatch != null)
-          {
-            exerciseEntity.ExerciseTypeId = exerciseMatch.ExerciseTypeId;
-            exerciseEntity.Reps = exerciseMatch.Reps;
-            exerciseEntity.Sets = exerciseMatch.Sets;
-            exerciseEntity.Weight = exerciseMatch.Weight;
-            _db.Exercises.Update(exerciseEntity);
-          }
-          else
+          var exerciseMatch = model.Exercises.SingleOrDefault(x => x.ExerciseId == exerciseEntity.ExerciseId);
+          if (exerciseMatch == null)
           {
             _db.Exercises.Remove(exerciseEntity);
           }
+          else
+          {
+            exerciseEntity.Reps = exerciseMatch.Reps;
+            exerciseEntity.Sets = exerciseMatch.Sets;
+            exerciseEntity.UserId = exerciseMatch.UserId;
+            exerciseEntity.ExerciseId = exerciseMatch.ExerciseId;
+            exerciseEntity.Weight = exerciseMatch.Weight;
+            _db.Exercises.Update(exerciseEntity);
+          }
         }
 
-        foreach (CreateExercise createExercise in model.CreateExercises)
+        for (int i = 0; i < model.Exercises.Count(); i++)
         {
-          if (createExercise == null)
-            return BadRequest(new { message = "Exercise cannot be null." });
+          Exercise exercise = model.Exercises[i];
+          StringBuilder exerciseSb = new StringBuilder();
+          string exerciseString = $"Exercise {i}: ";
 
-          Exercise exerciseEntity = new Exercise()
+          if (exercise.Reps < 0 || exercise.Reps > 255)
           {
-            UserId = currentUserId,
-            WorkoutId = workoutEntity.WorkoutId,
-            Weight = createExercise.Weight,
-            Reps = createExercise.Reps,
-            Sets = createExercise.Sets,
-            ExerciseTypeId = createExercise.ExerciseTypeId
-          };
-          await _db.Exercises.AddAsync(exerciseEntity);
+            exerciseSb.Append($"Reps must be between 0 and 255. ");
+          }
+          if (exercise.Sets < 0 || exercise.Sets > 255)
+          {
+            exerciseSb.Append("Sets must be between 0 and 255. ");
+          }
+          if (exercise.Weight < 0 || exercise.Weight > 32767)
+          {
+            exerciseSb.Append("Weight must be between 0 and 32767. ");
+          }
+          if (exerciseSb.Length > 0)
+          {
+            return BadRequest(new { message = exerciseSb.Insert(0, exerciseString).ToString() });
+          }
+          exercise.WorkoutId = workoutEntity.WorkoutId;
+          exercise.UserId = currentUserId;
+          if (exercise.ExerciseId == 0)
+          {
+            await _db.Exercises.AddAsync(exercise);
+          }
         }
         await _db.SaveChangesAsync();
         return Ok();
@@ -570,7 +584,6 @@ namespace BodyJournalAPI.Controllers
         var entity = await _db.Workouts.Include(x => x.Exercises).SingleOrDefaultAsync(x => x.UserId == currentUserId && x.WorkoutId == id);
         if (entity == null)
           return NotFound(new { message = "Workout does not exist in the database" });
-
 
         foreach (Exercise exercise in entity.Exercises)
         {
@@ -618,14 +631,11 @@ namespace BodyJournalAPI.Controllers
 
         return Ok(entities);
       }
-      catch (Exception ex)
+      catch
       {
-        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
-
-
 
     [HttpPost("users/recoveries")]
     public async Task<IActionResult> CreateRecovery([FromBody] Recovery model)
@@ -687,7 +697,7 @@ namespace BodyJournalAPI.Controllers
 
         _db.Recovery.Remove(entity);
         _db.SaveChanges();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {
@@ -748,7 +758,7 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPost("users/sessions")]
-    public async Task<IActionResult> CreateSession([FromBody] CreateSession model)
+    public async Task<IActionResult> CreateSession([FromBody] Session model)
     {
       if (model == null)
         return BadRequest(new { message = "Model cannot be null." });
@@ -757,7 +767,6 @@ namespace BodyJournalAPI.Controllers
       try
       {
         Session entity = new Session() { UserId = currentUserId, WorkoutId = model.WorkoutId };
-
 
         await _db.Sessions.AddAsync(entity);
         await _db.SaveChangesAsync();
@@ -770,7 +779,7 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("users/sessions/{id}")]
-    public async Task<IActionResult> UpdateSession(long? id, [FromBody] UpdateSession model)
+    public async Task<IActionResult> UpdateSession(long? id, [FromBody] Session model)
     {
       if (id == null)
         return BadRequest(new { message = "id cannot be null." });
@@ -793,9 +802,8 @@ namespace BodyJournalAPI.Controllers
         _db.SaveChanges();
         return Ok();
       }
-      catch (Exception ex)
+      catch
       {
-        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
@@ -814,7 +822,7 @@ namespace BodyJournalAPI.Controllers
 
         _db.Sessions.Remove(entity);
         _db.SaveChanges();
-        return Ok();
+        return Ok(entity);
       }
       catch
       {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Grid, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Record, ExerciseType } from "../../types/types";
-import { RecordForm } from "./RecordForm";
+import RecordForm from "./RecordForm";
 import * as types from "../../types/types";
 type Props = {
   record: Record | null;
@@ -35,7 +35,8 @@ export const RecordItem: React.FunctionComponent<Props> = ({
           <Grid container direction="row">
             {record && (
               <h3>
-                {record.weight}lbs on {record.time}
+                {record.reps}x{record.sets} at {record.weight}lbs on{" "}
+                {record.time}
               </h3>
             )}
           </Grid>

@@ -10,9 +10,7 @@ type Props = {
   setException: (value: string) => void;
 };
 
-export const RecordHistory: React.FunctionComponent<Props> = ({
-  setException,
-}) => {
+const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
   const { id } = useParams();
   const [exercise, setExercise] = useState(null);
   const [records, setRecords] = useState<Array<Record>>([]);
@@ -94,3 +92,4 @@ export const RecordHistory: React.FunctionComponent<Props> = ({
     </React.Fragment>
   );
 };
+export default RecordHistory;

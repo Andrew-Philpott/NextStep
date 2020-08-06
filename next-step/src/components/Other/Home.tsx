@@ -8,10 +8,7 @@ type Props = {
   user: User | null;
 };
 
-export const Home: React.FunctionComponent<Props> = ({
-  user,
-  setException,
-}) => {
+const Home: React.FunctionComponent<Props> = ({ user, setException }) => {
   return (
     <Grid container>
       {user === null && (
@@ -29,13 +26,12 @@ export const Home: React.FunctionComponent<Props> = ({
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3} />
         <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
           {user && <h1>Current Recovery</h1>}
-          <MuscleModel
-            setException={setException}
-            active={user ? true : false}
-          />
+          <MuscleModel setException={setException} user={user} />
         </Grid>
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3} />
       </Grid>
     </Grid>
   );
 };
+
+export default Home;

@@ -68,9 +68,8 @@ namespace BodyJournalAPI
       context.Database.Migrate();
 
       app.UseRouting();
-
       app.UseCors(options =>
-      options.AllowAnyOrigin()
+      options.WithOrigins("http://localhost:3000")
       .AllowAnyHeader()
       .AllowAnyMethod());
 
