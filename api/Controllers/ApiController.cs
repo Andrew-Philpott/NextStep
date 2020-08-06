@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using BodyJournalAPI.Entities;
-using BodyJournalAPI.Models;
 using BodyJournalAPI.Helpers;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
@@ -33,7 +32,7 @@ namespace BodyJournalAPI.Controllers
     #region Users
     [AllowAnonymous]
     [HttpPost("users/authenticate")]
-    public async Task<IActionResult> Authenticate([FromBody] AuthenticateUser model)
+    public async Task<IActionResult> Authenticate([FromBody] User model)
     {
       try
       {
@@ -78,10 +77,7 @@ namespace BodyJournalAPI.Controllers
 
     [AllowAnonymous]
     [HttpPost("users/register")]
-    [Consumes(MediaTypeNames.Application.Json)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RegisterUser model)
+    public async Task<IActionResult> Register([FromBody] User model)
     {
       try
       {
@@ -109,7 +105,7 @@ namespace BodyJournalAPI.Controllers
 
         await _db.Users.AddAsync(entity);
         await _db.SaveChangesAsync();
-        return NoContent();
+        return Ok(model);
       }
       catch
       {
@@ -138,7 +134,7 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(long? id, [FromBody] UpdateUser model)
+    public async Task<IActionResult> UpdateUser(long? id, [FromBody] User model)
     {
       if (id == null)
         return BadRequest(new { message = "Id cannot be null." });
@@ -349,6 +345,27 @@ namespace BodyJournalAPI.Controllers
         return StatusCode(500, "Internal server error.");
       }
     }
+
+    [HttpGet("users/records/exercises/{id}")]
+    public async Task<IActionResult> GetAllRecordsForExercise(short? id)
+    {
+      if (id == null)
+        return BadRequest(new { message = "Id cannot be null." });
+
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+
+        var entities = await _db.Records.AsAsyncEnumerable().Where(x => x.ExerciseTypeId == id).OrderByDescending(x => x.Weight).ToListAsync();
+        System.Console.WriteLine(entities);
+        return Ok(entities);
+      }
+      catch
+      {
+        return StatusCode(500, "Internal server error.");
+      }
+    }
+
 
     [HttpGet("users/records/exercises/pr")]
     public async Task<IActionResult> GetPRsForExercises()

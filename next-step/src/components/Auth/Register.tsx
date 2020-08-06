@@ -4,17 +4,20 @@ import * as routes from "../../constants/route-constants";
 import { userService } from "../../services";
 import { useHistory } from "react-router-dom";
 import { useForm } from "../Other/useForm";
+import { User } from "../../types/types";
 
 type Props = {
   setException: (value: string) => void;
 };
 
-const initialFieldValues = {
+const initialFieldValues: User = {
   firstName: "",
   lastName: "",
-  username: "",
+  userName: "",
   email: "",
   password: "",
+  token: "",
+  userId: 0,
 };
 
 const Register: React.FC<Props> = ({ setException }) => {
@@ -25,28 +28,16 @@ const Register: React.FC<Props> = ({ setException }) => {
 
   const validate = () => {
     let temp = { ...initialFieldValues };
-    if (!values.firstName) {
-      temp.firstName = "Field cannot be blank.";
-    }
-    if (!values.lastName) {
-      temp.lastName = "Field cannot be blank.";
-    }
-    if (!values.username) {
-      temp.username = "Field cannot be blank.";
-    }
-    if (!values.email) {
-      temp.email = "Field cannot be blank.";
-    }
-    if (!values.password) {
-      temp.password = "Field cannot be blank.";
-    }
-
+    if (!values.firstName) temp.firstName = "Field cannot be blank.";
+    if (!values.lastName) temp.lastName = "Field cannot be blank.";
+    if (!values.userName) temp.userName = "Field cannot be blank.";
+    if (!values.email) temp.email = "Field cannot be blank.";
+    if (!values.password) temp.password = "Field cannot be blank.";
     setErrors({ ...temp });
-
     if (
       !temp.firstName &&
       !temp.lastName &&
-      !temp.username &&
+      !temp.userName &&
       !temp.email &&
       !temp.password
     ) {
@@ -58,17 +49,10 @@ const Register: React.FC<Props> = ({ setException }) => {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (validate()) {
-      const user = {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        username: values.username,
-        email: values.email,
-        password: values.password,
-      };
-
       try {
-        await userService.register(user);
-        history.push(routes.LOG_IN);
+        const response = await userService.register(values);
+        (await response) && console.log(response);
+        (await response) && history.push(routes.LOG_IN);
       } catch {
         setException(
           "We're having some technical difficulties. Please try again later."
@@ -100,7 +84,6 @@ const Register: React.FC<Props> = ({ setException }) => {
                   helperText: errors.firstName,
                 })}
             />
-
             <InputLabel className="mrgn-t8" htmlFor="lastName">
               Last Name
             </InputLabel>
@@ -117,24 +100,22 @@ const Register: React.FC<Props> = ({ setException }) => {
                   helperText: errors.lastName,
                 })}
             />
-
             <InputLabel className="mrgn-t8" htmlFor="username">
               Username
             </InputLabel>
             <TextField
               type="text"
-              name="username"
+              name="userName"
               fullWidth
-              value={values.username}
+              value={values.userName}
               onChange={handleInputChange}
               variant="outlined"
               {...(errors &&
-                errors.username && {
+                errors.userName && {
                   error: true,
-                  helperText: errors.username,
+                  helperText: errors.userName,
                 })}
             />
-
             <InputLabel className="mrgn-t8" htmlFor="email">
               Email
             </InputLabel>
@@ -151,7 +132,6 @@ const Register: React.FC<Props> = ({ setException }) => {
                   helperText: errors.email,
                 })}
             />
-
             <InputLabel className="mrgn-t8" htmlFor="password">
               Password
             </InputLabel>
@@ -168,7 +148,6 @@ const Register: React.FC<Props> = ({ setException }) => {
                   helperText: errors.password,
                 })}
             />
-
             <div className="mrgn-t8">
               <Button className="button blue-background" href={routes.LANDING}>
                 Cancel

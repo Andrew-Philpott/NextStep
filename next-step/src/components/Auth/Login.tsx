@@ -1,4 +1,4 @@
-import React, { useEffect, FormEvent, useState } from "react";
+import React, { useEffect, FormEvent } from "react";
 import { userService } from "../../services";
 import { Button, TextField, Grid, InputLabel } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
@@ -17,6 +17,11 @@ const initialFieldValues = {
 };
 
 const Login: React.FC<Props> = ({ setException, setUser }) => {
+  const { values, errors, setErrors, handleInputChange } = useForm(
+    initialFieldValues
+  );
+  const history = useHistory();
+
   useEffect(() => {
     userService.logout();
     setUser(null);
@@ -24,26 +29,14 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
 
   const validate = () => {
     const temp = { ...initialFieldValues };
-    if (!values.username) {
-      temp.username = "Field cannot be blank.";
-    }
-    if (!values.password) {
-      temp.password = "Field cannot be blank.";
-    }
-
+    if (!values.username) temp.username = "Field cannot be blank.";
+    if (!values.password) temp.password = "Field cannot be blank.";
     setErrors({ ...temp });
-
     if (!temp.username && !temp.password) {
       return true;
     }
-
     return false;
   };
-
-  const { values, errors, setErrors, handleInputChange } = useForm(
-    initialFieldValues
-  );
-  const history = useHistory();
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();

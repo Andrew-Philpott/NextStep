@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { recordService } from "../../services/record-service";
 import { Record } from "../../types/types";
+import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
 
 type Props = {
   setException: (value: string) => void;
@@ -15,12 +16,13 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (id && !records) {
+    if (id && records.length === 0) {
       (async () => {
         try {
           const response: Array<Record> = await recordService.getAllRecordsForExercise(
             parseInt(id)
           );
+          console.log(response);
           setRecords(response);
         } catch {
           setException(
@@ -29,9 +31,9 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
         }
       })();
     }
-  }, [id, records]);
+  }, []);
 
-  const handleDelete = (id: number) => {
+  const handleDeleteRecord = (id: number) => {
     if (window.confirm("Are you sure you want to delete this record?"))
       (async () => {
         try {
@@ -49,45 +51,29 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
 
   return (
     <React.Fragment>
-      <Grid container>
-        <div className="spacer-32" />
-        <Grid item xs={1} sm={2} md={2} lg={2} xl={2}>
-          <Grid justify="center" spacing={2} container>
-            <div className="text-align-center">
-              <h2>Filter by</h2>
-              <Button
-                style={{ minWidth: "130px", marginTop: "8px", color: "white" }}
-                className="red-background"
-              >
-                Strength
-              </Button>
-              <Button
-                style={{ minWidth: "130px", marginTop: "8px", color: "white" }}
-                className="blue-background"
-              >
-                Hypertrophy
-              </Button>
-              <Button
-                style={{ minWidth: "130px", marginTop: "8px", color: "white" }}
-                className="green-background"
-              >
-                Endurance
-              </Button>
-            </div>
-          </Grid>
+      <Grid className="mrgn-t24" container>
+        <h1>Records</h1>
+        <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
+        <Grid justify="center" spacing={2} container>
+          {records &&
+            records.map((record, index) => {
+              return (
+                <React.Fragment key={index}>
+                  <p>
+                    {record.reps}x{record.sets} at {record.weight}lbs on{" "}
+                    {record.time}
+                  </p>
+                  <DeleteOutlinedIcon
+                    className="pointer"
+                    onClick={() => handleDeleteRecord(record.recordId)}
+                  >
+                    X
+                  </DeleteOutlinedIcon>
+                </React.Fragment>
+              );
+            })}
         </Grid>
-        {/* <Grid item xs={10} sm={8} md={8} lg={8} xl={8}>
-          {exercise && <h1>{exercise.name}</h1>}
-          {record ? (
-            <>
-              <p>Weight: {record.weight}</p>
-              <p>{record.time}</p>
-            </>
-          ) : (
-            <h1>You dont have any records for this exercise yet</h1>
-          )}
-        </Grid> */}
-        <Grid item xs={1} sm={2} md={2} lg={2} xl={2}></Grid>
+        <Grid item xs={1} sm={2} md={2} lg={2} xl={2} />
       </Grid>
     </React.Fragment>
   );

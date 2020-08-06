@@ -24,7 +24,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
       <Grid alignItems="flex-end" container>
         <Grid item xs={6}>
           <h1>
-            <Link to={`/exercises/${exerciseType.exerciseTypeId}`}>
+            <Link to={`/records/${exerciseType.exerciseTypeId}`}>
               {exerciseType.name}
             </Link>
           </h1>

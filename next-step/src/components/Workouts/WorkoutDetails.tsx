@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
-import { Grid, Button } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import { Record, ExerciseType } from "../../types/types";
-import * as types from "../../types/types";
+import { Grid } from "@material-ui/core";
 
 type Props = {
   setException: (value: string) => void;
@@ -12,9 +9,10 @@ type Props = {
 const WorkoutDetails: React.FunctionComponent<Props> = ({ setException }) => {
   const { id } = useParams();
   return (
-    <React.Fragment>
+    <Grid container>
       <h1>Workout Details Page</h1>
-    </React.Fragment>
+      <h2>Work in progress</h2>
+    </Grid>
   );
 };
 

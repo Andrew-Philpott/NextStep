@@ -1,9 +1,13 @@
+import { type } from "os";
+
 export type User = {
-  userId: number;
-  userName: string;
-  firstName: string;
-  lastName: string;
-  token: string;
+  userId?: number;
+  userName?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  token?: string;
 };
 export type Session = {
   sessionId: number;
@@ -57,7 +61,7 @@ export type Muscle = {
   exerciseTypes: Array<ExerciseType>;
 };
 export type Record = {
-  recordId?: number;
+  recordId: number;
   weight?: number;
   reps?: number;
   sets?: number;
