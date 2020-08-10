@@ -10,6 +10,6 @@ namespace BodyJournalAPI.Entities
     }
     public short ExerciseTypeId { get; set; }
     public string Name { get; set; }
-    public ICollection<ExerciseTypeMuscle> Muscles { get; set; }
+    public virtual ICollection<ExerciseTypeMuscle> Muscles { get; set; }
   }
 }

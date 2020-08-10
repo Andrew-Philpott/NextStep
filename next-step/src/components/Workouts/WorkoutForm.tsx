@@ -98,6 +98,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
     if (!values.name) temp.name = "Required.";
     if (values.exercises.length === 0) {
       alert("A workout must include at least 1 exercise.");
+      return false;
     } else {
       for (let i = 0; i < values.exercises.length; i++) {
         temp.exercises.push({ ...blankExercise });

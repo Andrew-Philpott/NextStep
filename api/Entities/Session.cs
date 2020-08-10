@@ -8,7 +8,6 @@ namespace BodyJournalAPI.Entities
   {
     [Required]
     public long SessionId { get; set; }
-    [Required]
     public string WorkoutStart { get; set; } = DateTime.Now.ToString("MM/dd/yyyy H:mm");
     public string WorkoutEnd { get; set; } = null;
     [Required]

@@ -52,9 +52,8 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
           return response;
         })
         .then((res) => {
-          console.log(res);
-          // history.push("/");
-          // window.location.reload();
+          history.push("/");
+          window.location.reload();
         })
         .catch(() =>
           setException(

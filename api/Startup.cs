@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using BodyJournalAPI.Services;
 
 namespace BodyJournalAPI
 {
@@ -40,16 +41,15 @@ namespace BodyJournalAPI
       {
         x.Events = new JwtBearerEvents
         {
-          OnTokenValidated = context =>
+          OnTokenValidated = async context =>
                 {
-                  var dataContext = context.HttpContext.RequestServices.GetRequiredService<DataContext>();
+                  var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                   var userId = int.Parse(context.Principal.Identity.Name);
-                  var user = dataContext.Users.Find(userId);
+                  var user = await userService.FindAsync(userId);
                   if (user == null)
                   {
                     context.Fail("Unauthorized");
                   }
-                  return Task.CompletedTask;
                 }
         };
         x.RequireHttpsMetadata = false;
@@ -62,6 +62,13 @@ namespace BodyJournalAPI
           ValidateAudience = false
         };
       });
+
+      services.AddScoped<IUserService, UserService>();
+      services.AddScoped<IWorkoutService, WorkoutService>();
+      services.AddScoped<IRecoveryService, RecoveryService>();
+      services.AddScoped<IRecordService, RecordService>();
+      services.AddScoped<IExerciseTypeService, ExerciseTypeService>();
+      services.AddScoped<ISessionService, SessionService>();
     }
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext context)
     {
