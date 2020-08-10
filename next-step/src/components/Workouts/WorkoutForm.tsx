@@ -22,7 +22,7 @@ type Props = {
 
 const blankExercise: Exercise = {
   exerciseId: 0,
-  exerciseTypeId: 0,
+  exerciseTypeId: "",
   reps: "",
   sets: "",
   weight: "",
@@ -56,6 +56,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await workoutService.getWorkout(id);
+          console.log(response);
           setValues(response);
         } catch {
           setException(
@@ -94,43 +95,31 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
   const validate = () => {
     let temp = { ...initialFieldValues };
     temp.exercises = [];
-    temp.name = "";
-    let isValid = true;
-    if ("name" in values && !values.name) {
-      temp.name = "This field is required";
-      isValid = false;
-    }
-
+    if (!values.name) temp.name = "Required.";
     if (values.exercises.length === 0) {
       alert("A workout must include at least 1 exercise.");
-      isValid = false;
     } else {
       for (let i = 0; i < values.exercises.length; i++) {
         temp.exercises.push({ ...blankExercise });
-        if (
-          "exerciseTypeId" in values.exercises[i] &&
-          !values.exercises[i].exerciseTypeId
-        ) {
-          temp.exercises[i].exerciseTypeId = "This field is required";
-          isValid = false;
-        }
-        if ("reps" in values.exercises[i] && !values.exercises[i].reps) {
-          temp.exercises[i].reps = "This field is required";
-          isValid = false;
-        }
-
-        if ("sets" in values.exercises[i] && !values.exercises[i].sets) {
-          temp.exercises[i].sets = "This field is required";
-          isValid = false;
-        }
+        if (!values.exercises[i].exerciseTypeId)
+          temp.exercises[i].exerciseTypeId = "Required.";
+        if (!values.exercises[i].reps) temp.exercises[i].reps = "Required.";
+        if (!values.exercises[i].sets) temp.exercises[i].sets = "Required.";
       }
     }
-
     setErrors({
       ...temp,
     });
 
-    return isValid;
+    if (
+      !temp.name &&
+      temp.exercises.filter(
+        (x) => x.reps === "" && x.sets === "" && x.exerciseTypeId === ""
+      ).length === temp.exercises.length
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,9 +157,8 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
               value={values.name}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.name && {
+              {...(errors.name === "Required." && {
                 error: true,
-                helperText: errors.name,
               })}
             />
             <InputLabel className="mrgn-t16" htmlFor="notes">
@@ -185,38 +173,35 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
               value={values.notes}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.notes && { error: true, helperText: errors.notes })}
+              {...(errors.notes === "Required." && {
+                error: true,
+              })}
             />
             {exerciseTypes &&
               values.exercises &&
               values.exercises.map((exercise: Exercise, index: number) => {
-                const exerciseName = `exerciseTypeId-${index}`;
-                const exerciseWeight = `weight-${index}`;
-                const exerciseReps = `reps-${index}`;
-                const exerciseSets = `sets-${index}`;
                 return (
                   <div key={index} className="mrgn-t16">
                     <Grid container spacing={1}>
                       <Grid item xs={11}>
                         <Grid spacing={1} container>
                           <Grid item xs={3}>
-                            <InputLabel htmlFor={exerciseName}>
+                            <InputLabel htmlFor={`exerciseTypeId-${index}`}>
                               Exercise
                             </InputLabel>
                             <TextField
                               select
-                              name={exerciseName}
+                              name={`exerciseTypeId-${index}`}
                               fullWidth
-                              id={exerciseName}
+                              id={`exerciseTypeId-${index}`}
                               value={values.exercises[index].exerciseTypeId}
                               onChange={handleExerciseChange}
                               variant="outlined"
                               {...(errors.exercises &&
                                 errors.exercises[index] &&
-                                errors.exercises[index].exerciseTypeId && {
+                                errors.exercises[index].exerciseTypeId ===
+                                  "Required." && {
                                   error: true,
-                                  helperText:
-                                    errors.exercises[index].exerciseTypeId,
                                 })}
                             >
                               {exerciseTypes
@@ -234,14 +219,14 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
                             </TextField>
                           </Grid>
                           <Grid item xs={3}>
-                            <InputLabel htmlFor={exerciseWeight}>
+                            <InputLabel htmlFor={`weight-${index}`}>
                               Weight
                             </InputLabel>
                             <TextField
-                              type="text"
-                              name={exerciseWeight}
+                              type="number"
+                              name={`weight-${index}`}
                               fullWidth
-                              id={exerciseWeight}
+                              id={`weight-${index}`}
                               value={values.exercises[index].weight}
                               onChange={handleExerciseChange}
                               className="weight"
@@ -249,37 +234,41 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
                             />
                           </Grid>
                           <Grid item xs={3}>
-                            <InputLabel htmlFor={exerciseReps}>Reps</InputLabel>
+                            <InputLabel htmlFor={`reps-${index}`}>
+                              Reps
+                            </InputLabel>
                             <TextField
-                              type="text"
-                              name={exerciseReps}
+                              type="number"
+                              name={`reps-${index}`}
                               fullWidth
-                              id={exerciseReps}
+                              id={`reps-${index}`}
                               value={values.exercises[index].reps}
                               onChange={handleExerciseChange}
                               variant="outlined"
                               {...(errors.exercises[index] &&
-                                errors.exercises[index].reps && {
+                                errors.exercises[index].reps ===
+                                  "Required." && {
                                   error: true,
-                                  helperText: errors.exercises[index].reps,
                                 })}
                             />
                           </Grid>
                           <Grid item xs={3}>
-                            <InputLabel htmlFor={exerciseSets}>Sets</InputLabel>
+                            <InputLabel htmlFor={`sets-${index}`}>
+                              Sets
+                            </InputLabel>
                             <TextField
-                              type="text"
-                              name={exerciseSets}
+                              type="number"
+                              name={`sets-${index}`}
                               fullWidth
-                              id={exerciseSets}
+                              id={`sets-${index}`}
                               value={values.exercises[index].sets}
                               onChange={handleExerciseChange}
                               className="sets"
                               variant="outlined"
                               {...(errors.exercises[index] &&
-                                errors.exercises[index].sets && {
+                                errors.exercises[index].sets ===
+                                  "Required." && {
                                   error: true,
-                                  helperText: errors.exercises[index].sets,
                                 })}
                             />
                           </Grid>

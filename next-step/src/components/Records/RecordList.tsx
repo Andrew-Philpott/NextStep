@@ -24,6 +24,7 @@ const RecordList: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await recordService.getPRsForExercises();
+          console.log(response);
           setRecords(response);
         } catch {
           setException(

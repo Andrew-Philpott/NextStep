@@ -16,7 +16,6 @@ const initialFieldValues: User = {
   userName: "",
   email: "",
   password: "",
-  token: "",
   userId: 0,
 };
 
@@ -27,17 +26,13 @@ const Register: React.FC<Props> = ({ setException }) => {
   const history = useHistory();
   const validate = () => {
     let temp = {
-      firstName: false,
-      lastName: false,
-      userName: false,
-      email: false,
-      password: false,
+      ...initialFieldValues,
     };
-    if (!values.firstName) temp.firstName = true;
-    if (!values.lastName) temp.lastName = true;
-    if (!values.userName) temp.userName = true;
-    if (!values.email) temp.email = true;
-    if (!values.password) temp.password = true;
+    if (!values.firstName) temp.firstName = "Required.";
+    if (!values.lastName) temp.lastName = "Required.";
+    if (!values.userName) temp.userName = "Required.";
+    if (!values.email) temp.email = "Required.";
+    if (!values.password) temp.password = "Required.";
     setErrors({ ...temp });
     if (
       !temp.firstName &&
@@ -82,7 +77,7 @@ const Register: React.FC<Props> = ({ setException }) => {
               value={values.firstName}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.firstName && {
+              {...(errors.firstName === "Required." && {
                 error: true,
               })}
             />
@@ -96,11 +91,11 @@ const Register: React.FC<Props> = ({ setException }) => {
               value={values.lastName}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.lastName && {
+              {...(errors.lastName === "Required." && {
                 error: true,
               })}
             />
-            <InputLabel className="mrgn-t8" htmlFor="username">
+            <InputLabel className="mrgn-t8" htmlFor="userName">
               Username
             </InputLabel>
             <TextField
@@ -110,7 +105,7 @@ const Register: React.FC<Props> = ({ setException }) => {
               value={values.userName}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.userName && {
+              {...(errors.userName === "Required." && {
                 error: true,
               })}
             />
@@ -138,7 +133,7 @@ const Register: React.FC<Props> = ({ setException }) => {
               value={values.password}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.password && {
+              {...(errors.password === "Required." && {
                 error: true,
               })}
             />

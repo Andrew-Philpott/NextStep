@@ -13,12 +13,13 @@ namespace BodyJournalAPI.Entities
     public byte Reps { get; set; }
     [Required]
     public byte Sets { get; set; }
-    [Required]
+    [ForeignKey(nameof(ExerciseType))]
     public short ExerciseTypeId { get; set; }
-    public virtual ExerciseType ExerciseType { get; set; }
+    public ExerciseType ExerciseType { get; set; }
     [ForeignKey(nameof(User))]
     public int UserId { get; set; }
+    [ForeignKey(nameof(Workout))]
     public long WorkoutId { get; set; }
-    public virtual Workout Workout { get; set; }
+    public Workout Workout { get; set; }
   }
 }

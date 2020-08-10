@@ -39,6 +39,7 @@ const WorkoutList: React.FunctionComponent<Props> = ({
     (async () => {
       try {
         const response = await workoutService.getAllWorkouts();
+        console.log(response);
         setWorkouts(response);
       } catch {
         setException(

@@ -31,10 +31,10 @@ const RecordForm: React.FunctionComponent<Props> = ({
   );
 
   const validate = () => {
-    let temp = { weight: false, reps: false, sets: false };
-    if (!values.weight) temp.weight = true;
-    if (!values.reps) temp.reps = true;
-    if (!values.sets) temp.sets = true;
+    let temp = { ...initialFieldValues };
+    if (!values.weight) temp.weight = "Required.";
+    if (!values.reps) temp.reps = "Required.";
+    if (!values.sets) temp.sets = "Required.";
     setErrors({
       ...temp,
     });
@@ -46,7 +46,9 @@ const RecordForm: React.FunctionComponent<Props> = ({
   };
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (validate()) onCreateRecord(values);
+    if (validate()) {
+      onCreateRecord(values);
+    }
   }
   return (
     <Grid container>
@@ -60,7 +62,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
               value={values.weight}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.weight && {
+              {...(errors.weight === "Required." && {
                 error: true,
               })}
             />
@@ -73,7 +75,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
               value={values.reps}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors.reps && {
+              {...(errors.reps === "Required." && {
                 error: true,
               })}
             />
@@ -86,7 +88,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
               variant="outlined"
               value={values.sets}
               onChange={handleInputChange}
-              {...(errors.sets && {
+              {...(errors.sets === "Required." && {
                 error: true,
               })}
             />

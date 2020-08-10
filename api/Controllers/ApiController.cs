@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Text;
-using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using BodyJournalAPI.Entities;
@@ -41,10 +39,10 @@ namespace BodyJournalAPI.Controllers
 
         var entity = await _db.Users.AsAsyncEnumerable().SingleOrDefaultAsync(x => x.UserName == model.UserName);
         if (entity == null)
-          return BadRequest("User not found in the database.");
+          return BadRequest(new { message = "User not found in the database." });
 
         if (!VerifyPasswordHash(model.Password, entity.PasswordHash, entity.PasswordSalt))
-          return BadRequest("Email or password was incorrect.");
+          return BadRequest(new { message = "Email or password was incorrect." });
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -82,22 +80,22 @@ namespace BodyJournalAPI.Controllers
       try
       {
         if (string.IsNullOrWhiteSpace(model.FirstName))
-          return BadRequest("FirstName is required.");
+          return BadRequest(new { message = "First name is required." });
 
         if (string.IsNullOrWhiteSpace(model.LastName))
-          return BadRequest("LastName is required.");
+          return BadRequest(new { message = "Last name is required." });
 
         if (string.IsNullOrWhiteSpace(model.UserName))
-          return BadRequest("UserName is required.");
+          return BadRequest(new { message = "Username is required." });
 
         if (string.IsNullOrWhiteSpace(model.Password))
-          return BadRequest("Password is required.");
+          return BadRequest(new { message = "Password is required." });
 
         if (string.IsNullOrWhiteSpace(model.Email))
-          return BadRequest("Email is required.");
+          return BadRequest(new { message = "Email is required." });
 
         if (await _db.Users.AsAsyncEnumerable().AnyAsync(x => x.UserName == model.UserName))
-          return BadRequest($"Username {model.UserName} is already taken.");
+          return BadRequest(new { message = $"Username {model.UserName} is already taken." });
         byte[] passwordHash, passwordSalt;
         CreatePasswordHash(model.Password, out passwordHash, out passwordSalt);
 
@@ -107,18 +105,16 @@ namespace BodyJournalAPI.Controllers
         await _db.SaveChangesAsync();
         return Ok(model);
       }
-      catch
+      catch (Exception ex)
       {
+        System.Console.WriteLine(ex);
         return StatusCode(500, "Internal server error.");
       }
     }
 
     [HttpGet("users/{id}")]
-    public async Task<IActionResult> GetById(long? id)
+    public async Task<IActionResult> GetById(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       try
       {
         var entity = await _db.Users.FindAsync(id);
@@ -134,11 +130,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(long? id, [FromBody] User model)
+    public async Task<IActionResult> UpdateUser(long id, [FromBody] User model)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       if (model == null)
         return BadRequest("User cannot be null.");
 
@@ -183,11 +176,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/{id}")]
-    public async Task<IActionResult> Delete(long? id)
+    public async Task<IActionResult> Delete(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       try
       {
         var entity = await _db.Users.FindAsync(id);
@@ -208,14 +198,10 @@ namespace BodyJournalAPI.Controllers
 
 
     #region exercises
-
     [AllowAnonymous]
     [HttpGet("exercises/{id}")]
-    public async Task<IActionResult> Exercise(short? id)
+    public async Task<IActionResult> Exercise(short id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       try
       {
         var entity = await _db.ExerciseTypes.AsQueryable().AsNoTracking().Include(x => x.Muscles).ThenInclude(muscle => muscle.Muscle).ThenInclude(x => x.ExerciseTypes).SingleOrDefaultAsync(x => x.ExerciseTypeId == id);
@@ -248,11 +234,8 @@ namespace BodyJournalAPI.Controllers
 
     #region exerciseTypes
     [HttpGet("users/exercises/{id}")]
-    public async Task<IActionResult> GetExercise(long? id)
+    public async Task<IActionResult> GetExercise(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -286,11 +269,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/exercises/{id}")]
-    public async Task<IActionResult> DeleteExercise(long? id)
+    public async Task<IActionResult> DeleteExercise(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -326,11 +306,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpGet("users/records/{id}")]
-    public async Task<IActionResult> GetRecord(short? id)
+    public async Task<IActionResult> GetRecord(short id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -347,17 +324,12 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpGet("users/records/exercises/{id}")]
-    public async Task<IActionResult> GetAllRecordsForExercise(short? id)
+    public async Task<IActionResult> GetAllRecordsForExercise(short id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
-
         var entities = await _db.Records.AsAsyncEnumerable().Where(x => x.ExerciseTypeId == id).OrderByDescending(x => x.Weight).ToListAsync();
-        System.Console.WriteLine(entities);
         return Ok(entities);
       }
       catch
@@ -412,11 +384,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/records/{id}")]
-    public async Task<IActionResult> DeleteRecord(short? id)
+    public async Task<IActionResult> DeleteRecord(short id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -436,11 +405,8 @@ namespace BodyJournalAPI.Controllers
 
     #region Workouts
     [HttpGet("users/workouts/{id}")]
-    public async Task<IActionResult> GetWorkout(long? id)
+    public async Task<IActionResult> GetWorkout(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -460,7 +426,6 @@ namespace BodyJournalAPI.Controllers
       try
       {
         var entities = await _db.Workouts.Include(x => x.Exercises).ThenInclude(x => x.ExerciseType).ThenInclude(x => x.Muscles).ThenInclude(x => x.Muscle).Where(x => x.UserId == currentUserId).ToArrayAsync();
-
         return Ok(entities);
       }
       catch
@@ -504,11 +469,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("users/workouts/{id}")]
-    public async Task<IActionResult> UpdateWorkout(long? id, [FromBody] Workout model)
+    public async Task<IActionResult> UpdateWorkout(long id, [FromBody] Workout model)
     {
-      if (id == null)
-        return BadRequest(new { message = "Id cannot be null." });
-
       if (model == null)
         return BadRequest(new { message = "Workout cannot be null." });
 
@@ -592,11 +554,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/workouts/{id}")]
-    public async Task<IActionResult> DeleteWorkout(long? id)
+    public async Task<IActionResult> DeleteWorkout(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -621,10 +580,8 @@ namespace BodyJournalAPI.Controllers
 
     #region Recovery
     [HttpGet("users/recoveries/{id}")]
-    public async Task<IActionResult> GetRecovery(long? id)
+    public async Task<IActionResult> GetRecovery(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -677,11 +634,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("users/recoveries/{id}")]
-    public async Task<IActionResult> UpdateRecovery(long? id, [FromBody] Recovery model)
+    public async Task<IActionResult> UpdateRecovery(long id, [FromBody] Recovery model)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -702,11 +656,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/recoveries/{id}")]
-    public async Task<IActionResult> DeleteRecovery(long? id)
+    public async Task<IActionResult> DeleteRecovery(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -727,11 +678,8 @@ namespace BodyJournalAPI.Controllers
 
     #region Session
     [HttpGet("users/sessions/{id}")]
-    public async Task<IActionResult> GetSession(long? id)
+    public async Task<IActionResult> GetSession(long id)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
@@ -798,11 +746,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpPut("users/sessions/{id}")]
-    public async Task<IActionResult> UpdateSession(long? id, [FromBody] Session model)
+    public async Task<IActionResult> UpdateSession(long id, [FromBody] Session model)
     {
-      if (id == null)
-        return BadRequest(new { message = "id cannot be null." });
-
       if (model == null)
         return BadRequest(new { message = "Model cannot be null." });
 
@@ -828,10 +773,8 @@ namespace BodyJournalAPI.Controllers
     }
 
     [HttpDelete("users/sessions/{id}")]
-    public async Task<IActionResult> DeleteSession(long? id)
+    public async Task<IActionResult> DeleteSession(long id)
     {
-
-
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {

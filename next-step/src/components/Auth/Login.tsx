@@ -11,9 +11,13 @@ type Props = {
   setException: (value: string) => void;
 };
 
-const initialFieldValues = {
+const initialFieldValues: User = {
+  firstName: "",
+  lastName: "",
   userName: "",
+  email: "",
   password: "",
+  userId: 0,
 };
 
 const Login: React.FC<Props> = ({ setException, setUser }) => {
@@ -28,10 +32,10 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
   }, []);
 
   const validate = () => {
-    const temp = { userName: false, password: false };
-    if (!values.username) temp.userName = true;
-    if (!values.password) temp.password = true;
-    setErrors({ ...temp });
+    const temp = { ...initialFieldValues };
+    if (!values.userName) temp.userName = "Required.";
+    if (!values.password) temp.password = "Required.";
+    setErrors(temp);
     if (!temp.userName && !temp.password) {
       return true;
     }
@@ -42,14 +46,15 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
     e.preventDefault();
     if (validate()) {
       userService
-        .login(values.username, values.password)
+        .login(values.userName, values.password)
         .then((response) => {
           localStorage.setItem("user", JSON.stringify(response));
           return response;
         })
-        .then(() => {
-          history.push("/");
-          window.location.reload();
+        .then((res) => {
+          console.log(res);
+          // history.push("/");
+          // window.location.reload();
         })
         .catch(() =>
           setException(
@@ -66,7 +71,7 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
         <React.Fragment>
           <h2 className="mrgn-t8">Log in</h2>
           <form method="POST" onSubmit={handleSubmit}>
-            <InputLabel className="mrgn-t8" htmlFor="username">
+            <InputLabel className="mrgn-t8" htmlFor="userName">
               User Name
             </InputLabel>
             <TextField
@@ -76,10 +81,9 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
               value={values.userName}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors &&
-                errors.userName && {
-                  error: true,
-                })}
+              {...(errors.userName === "Required." && {
+                error: true,
+              })}
             />
             <InputLabel className="mrgn-t8" htmlFor="password">
               Password
@@ -91,10 +95,9 @@ const Login: React.FC<Props> = ({ setException, setUser }) => {
               value={values.password}
               onChange={handleInputChange}
               variant="outlined"
-              {...(errors &&
-                errors.password && {
-                  error: true,
-                })}
+              {...(errors.password === "Required." && {
+                error: true,
+              })}
             />
             <Grid item xs={12}>
               {(errors.userName || errors.password) && (

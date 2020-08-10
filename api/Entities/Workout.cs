@@ -10,12 +10,16 @@ namespace BodyJournalAPI.Entities
     {
       this.Exercises = new List<Exercise>();
     }
+    [Required]
     public long WorkoutId { get; set; }
+    [Required]
     public string Name { get; set; }
+    [Required]
     public string Notes { get; set; }
+    [Required]
     [ForeignKey(nameof(User))]
     public int UserId { get; set; }
-    public virtual IList<Exercise> Exercises { get; set; }
+    public IList<Exercise> Exercises { get; set; }
   }
 }
 

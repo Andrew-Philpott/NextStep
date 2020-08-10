@@ -10,9 +10,7 @@ namespace BodyJournalAPI.Entities
     public byte Sets { get; set; }
     public string Time { get; set; } = DateTime.Now.ToString("MM/dd/yyyy H:mm");
     public int UserId { get; set; }
-    public virtual User User { get; set; }
     public short ExerciseTypeId { get; set; }
-    public virtual ExerciseType ExerciseType { get; set; }
   }
 }
 
