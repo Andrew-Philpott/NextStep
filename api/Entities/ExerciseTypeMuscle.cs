@@ -1,4 +1,4 @@
-namespace BodyJournalAPI.Entities
+namespace NxtstpApi.Entities
 {
   public class ExerciseTypeMuscle
   {

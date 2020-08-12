@@ -19,7 +19,7 @@ const RecordForm: React.FunctionComponent<Props> = ({
     weight: "",
     reps: "",
     sets: "",
-    time: "",
+    dateCreated: new Date(),
     user: undefined,
     userId: 0,
     exerciseType: undefined,

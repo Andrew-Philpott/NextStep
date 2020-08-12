@@ -56,7 +56,6 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
       (async () => {
         try {
           const response = await workoutService.getWorkout(id);
-          console.log(response);
           setValues(response);
         } catch {
           setException(

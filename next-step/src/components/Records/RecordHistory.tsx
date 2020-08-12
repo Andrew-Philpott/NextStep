@@ -22,7 +22,6 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
           const response: Array<Record> = await recordService.getAllRecordsForExercise(
             parseInt(id)
           );
-          console.log(response);
           setRecords(response);
         } catch {
           setException(
@@ -61,7 +60,7 @@ const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
                 <React.Fragment key={index}>
                   <p>
                     {record.reps}x{record.sets} at {record.weight}lbs on{" "}
-                    {record.time}
+                    {record.dateCreated}
                   </p>
                   <DeleteOutlinedIcon
                     className="pointer"

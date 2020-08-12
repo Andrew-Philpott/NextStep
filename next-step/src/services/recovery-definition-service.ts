@@ -5,19 +5,19 @@ import {
   postOptions,
   deleteOptions,
 } from "./request-options";
-import { Recovery } from "../types/types";
+import { RecoveryDefinition } from "../types/types";
 
-const path = "/api/users/recoveries";
+const path = "/api/users/recovery/definitions";
 
-export const recoveryService = {
-  getRecovery,
-  getCurrentRecoveries,
-  createRecovery,
-  updateRecovery,
-  deleteRecovery,
+export const recoveryDefinitionService = {
+  getRecoveryDefinition,
+  getCurrentRecoveryDefinitions,
+  createRecoveryDefinition,
+  updateRecoveryDefinition,
+  deleteRecoveryDefinition,
 };
 
-async function getRecovery(id: number) {
+async function getRecoveryDefinition(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     getOptions
@@ -25,7 +25,7 @@ async function getRecovery(id: number) {
   return handleResponse(response);
 }
 
-async function getCurrentRecoveries() {
+async function getCurrentRecoveryDefinitions() {
   const response = await fetch(
     `http://localhost:5000${path}/current`,
     getOptions
@@ -33,7 +33,7 @@ async function getCurrentRecoveries() {
   return handleResponse(response);
 }
 
-async function createRecovery(model: Recovery) {
+async function createRecoveryDefinition(model: RecoveryDefinition) {
   const response = await fetch(
     `http://localhost:5000${path}`,
     postOptions(model)
@@ -41,7 +41,7 @@ async function createRecovery(model: Recovery) {
   return handleResponse(response);
 }
 
-async function updateRecovery(id: number, model: Recovery) {
+async function updateRecoveryDefinition(id: number, model: RecoveryDefinition) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     putOptions(model)
@@ -49,7 +49,7 @@ async function updateRecovery(id: number, model: Recovery) {
   return handleResponse(response);
 }
 
-async function deleteRecovery(id: number) {
+async function deleteRecoveryDefinition(id: number) {
   const response = await fetch(
     `http://localhost:5000${path}/${id}`,
     deleteOptions

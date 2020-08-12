@@ -2,125 +2,177 @@ import React from "react";
 import { MusclesFront } from "./MusclesFront";
 import { MusclesBack } from "./MusclesBack";
 import { Grid } from "@material-ui/core";
-import { recoveryService } from "../../services";
-import { Recovery } from "../../types/types";
+import { recoveryService, recoveryDefinitionService } from "../../services";
+import { Recovery, RecoveryDefinition } from "../../types/types";
 import { User } from "../../types/types";
 
 type Props = {
   user: User | null;
+  defineRecoveries: boolean;
   setException: (value: string) => void;
 };
 
 export const MuscleModel: React.FunctionComponent<Props> = ({
   user,
+  defineRecoveries,
   setException,
 }) => {
-  const [quads, setQuads] = React.useState<Recovery | null>(null);
-  const [biceps, setBiceps] = React.useState<Recovery | null>(null);
-  const [deltoids, setDeltoids] = React.useState<Recovery | null>(null);
-  const [pectorals, setPectorals] = React.useState<Recovery | null>(null);
-  const [abdominals, setAbdominals] = React.useState<Recovery | null>(null);
-  const [calves, setCalves] = React.useState<Recovery | null>(null);
-  const [hamstrings, setHamstrings] = React.useState<Recovery | null>(null);
-  const [glutes, setGlutes] = React.useState<Recovery | null>(null);
-  const [tricpes, setTricpes] = React.useState<Recovery | null>(null);
-  const [forearms, setForearms] = React.useState<Recovery | null>(null);
-  const [lats, setLats] = React.useState<Recovery | null>(null);
-  const [trapezius, setTrapezius] = React.useState<Recovery | null>(null);
+  const [quads, setQuads] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [biceps, setBiceps] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [deltoids, setDeltoids] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
 
-  const handleRecoveries = (response: Array<Recovery>) => {
-    response.map((recovery) => {
-      switch (recovery?.muscleId) {
-        case 1:
-          setCalves(recovery);
-          break;
-        case 2:
-          setQuads(recovery);
-          break;
-        case 3:
-          setHamstrings(recovery);
-          break;
-        case 4:
-          setGlutes(recovery);
-          break;
-        case 7:
-          setLats(recovery);
-          break;
-        case 8:
-          setTrapezius(recovery);
-          break;
-        case 9:
-          setAbdominals(recovery);
-          break;
-        case 10:
-          setPectorals(recovery);
-          break;
-        case 11:
-          setDeltoids(recovery);
-          break;
-        case 12:
-          setTricpes(recovery);
-          break;
-        case 13:
-          setBiceps(recovery);
-          break;
-        case 14:
-          setForearms(recovery);
-          break;
-        default:
-          break;
-      }
-    });
+  const [pectorals, setPectorals] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [abdominals, setAbdominals] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [calves, setCalves] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [hamstrings, setHamstrings] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [glutes, setGlutes] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [tricpes, setTricpes] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [forearms, setForearms] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+  const [lats, setLats] = React.useState<Recovery | RecoveryDefinition | null>(
+    null
+  );
+  const [trapezius, setTrapezius] = React.useState<
+    Recovery | RecoveryDefinition | null
+  >(null);
+
+  const handleRecoveries = (
+    response: Array<Recovery | RecoveryDefinition> | null
+  ) => {
+    if (response === null) {
+      setCalves(null);
+      setQuads(null);
+      setHamstrings(null);
+      setGlutes(null);
+      setBiceps(null);
+      setForearms(null);
+      setLats(null);
+      setTrapezius(null);
+      setAbdominals(null);
+      setPectorals(null);
+      setDeltoids(null);
+      setTricpes(null);
+    } else {
+      response.map((recovery) => {
+        switch (recovery?.muscleId) {
+          case 1:
+            setCalves(recovery);
+            break;
+          case 2:
+            setQuads(recovery);
+            break;
+          case 3:
+            setHamstrings(recovery);
+            break;
+          case 4:
+            setGlutes(recovery);
+            break;
+          case 5:
+            setBiceps(recovery);
+            break;
+          case 6:
+            setForearms(recovery);
+            break;
+          case 7:
+            setLats(recovery);
+            break;
+          case 8:
+            setTrapezius(recovery);
+            break;
+          case 9:
+            setAbdominals(recovery);
+            break;
+          case 10:
+            setPectorals(recovery);
+            break;
+          case 11:
+            setDeltoids(recovery);
+            break;
+          case 12:
+            setTricpes(recovery);
+            break;
+          default:
+            break;
+        }
+      });
+    }
   };
 
-  const handleCreateRecovery = async (muscleId: number) => {
-    if (user) {
-      if (muscleId > 0 && muscleId <= 14) {
-        const answer = window.prompt("Level of fatigue");
-        let fatigue = 0;
-        if (answer) {
-          fatigue = parseInt(answer);
-          if (fatigue !== 0 && fatigue >= 1 && fatigue <= 5) {
-            try {
-              const response: Recovery = await recoveryService.createRecovery({
-                recoveryId: 0,
-                fatigue: fatigue,
-                time: "",
-                userId: 0,
+  const handleCreateRecoveryOrRecoveryDefinitionDefinition = async (
+    muscleId: number
+  ) => {
+    try {
+      if (user && muscleId > 0 && muscleId <= 12) {
+        let answer: string | null;
+        if (defineRecoveries) {
+          answer = window.prompt("Number of days to recover");
+        } else {
+          answer = window.prompt("Level of fatigue");
+        }
+        let parsedAnswer = answer && parseInt(answer);
+        if (typeof parsedAnswer === "number") {
+          let response: Recovery | RecoveryDefinition | null = null;
+          if (defineRecoveries && parsedAnswer >= 1 && parsedAnswer <= 7) {
+            response = await recoveryDefinitionService.createRecoveryDefinition(
+              {
+                recoveryDefinitionId: 0,
                 muscleId: muscleId,
-              });
-              handleRecoveries([response]);
-            } catch {
-              setException(
-                "We're having some technical difficulties. Please try again later."
-              );
-            }
+                recoveryTimeInDays: parsedAnswer,
+                dateCreated: undefined,
+              }
+            );
+          } else if (parsedAnswer >= 1 && parsedAnswer <= 5) {
+            response = await recoveryService.createRecovery({
+              recoveryId: 0,
+              fatigue: parsedAnswer,
+              dateCreated: undefined,
+              userId: 0,
+              muscleId: muscleId,
+            });
           }
+          response !== null && handleRecoveries([response]);
         }
       }
+    } catch {
+      setException(
+        "We're having some technical difficulties. Please try again later."
+      );
     }
   };
 
   React.useEffect(() => {
-    let mounted = true;
     if (user) {
-      recoveryService
-        .getAllRecoveries()
-        .then((response) => {
-          if (mounted) {
-            handleRecoveries(response);
-          }
-        })
-        .catch(() =>
-          setException(
-            "We're having some technical difficulties. Please try again later."
-          )
-        );
-      return () => {
-        mounted = false;
-      };
+      handleRecoveries(null);
+      let response: Array<Recovery | RecoveryDefinition> | null = null;
+      (async () => {
+        if (defineRecoveries) {
+          response = await recoveryDefinitionService.getCurrentRecoveryDefinitions();
+        } else {
+          response = await recoveryService.getCurrentRecoveries();
+        }
+        handleRecoveries(response);
+      })();
     }
-  }, [user]);
+  }, [user, defineRecoveries]);
 
   return (
     <Grid className="muscle-model" container>
@@ -131,7 +183,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
           deltoids={deltoids}
           pectorals={pectorals}
           abdominals={abdominals}
-          onCreateRecovery={handleCreateRecovery}
+          onCreateRecovery={handleCreateRecoveryOrRecoveryDefinitionDefinition}
         />
       </Grid>
       <Grid item xs={6}>
@@ -143,7 +195,7 @@ export const MuscleModel: React.FunctionComponent<Props> = ({
           forearms={forearms}
           lats={lats}
           trapezius={trapezius}
-          onCreateRecovery={handleCreateRecovery}
+          onCreateRecovery={handleCreateRecoveryOrRecoveryDefinitionDefinition}
         />
       </Grid>
     </Grid>

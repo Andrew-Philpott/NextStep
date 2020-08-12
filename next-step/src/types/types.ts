@@ -1,5 +1,3 @@
-import { type } from "os";
-
 export type User = {
   userId?: number;
   userName?: string;
@@ -21,10 +19,17 @@ export type Session = {
 export type Recovery = {
   recoveryId: number;
   fatigue: number;
-  time: string;
+  dateCreated: undefined;
   userId: number;
   muscleId: number;
 };
+export type RecoveryDefinition = {
+  recoveryDefinitionId: number;
+  muscleId: number;
+  recoveryTimeInDays: number;
+  dateCreated?: Date;
+};
+
 export type Exercise = {
   exerciseId: number;
   weight: number | string;
@@ -65,14 +70,9 @@ export type Record = {
   weight: number | string;
   reps: number | string;
   sets: number | string;
-  time?: string;
+  dateCreated: Date;
   userId?: number;
   user?: User;
   exerciseTypeId?: number;
   exerciseType?: ExerciseType;
-};
-export type CreateRecord = {
-  weight?: number;
-  reps?: number;
-  sets?: number;
 };

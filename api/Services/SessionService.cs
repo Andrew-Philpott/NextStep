@@ -1,13 +1,13 @@
 using System;
 using System.Text;
-using BodyJournalAPI.Entities;
+using NxtstpApi.Entities;
 using System.Threading.Tasks;
-using BodyJournalAPI.Helpers;
+using NxtstpApi.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BodyJournalAPI.Services
+namespace NxtstpApi.Services
 {
   public interface ISessionService
   {

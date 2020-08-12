@@ -27,9 +27,9 @@ const WorkoutItem: React.FunctionComponent<Props> = ({
         <Grid className="left" container>
           <Grid item xs={12}>
             <h2>{name}</h2>
-            <Link to={`/workouts/${id}`}>
+            {/* <Link to={`/workouts/${id}`}>
               <DetailsIcon className="pointer blue-color" />
-            </Link>
+            </Link> */}
             <Link to={`/workouts/edit/${id}`}>
               <EditIcon className="pointer green-color" />
             </Link>

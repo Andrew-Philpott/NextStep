@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Grid } from "@material-ui/core";
+import { Button, Grid, Paper } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { workoutService } from "../../services";
 import * as routes from "../../constants/route-constants";
@@ -39,7 +39,6 @@ const WorkoutList: React.FunctionComponent<Props> = ({
     (async () => {
       try {
         const response = await workoutService.getAllWorkouts();
-        console.log(response);
         setWorkouts(response);
       } catch {
         setException(
@@ -53,7 +52,16 @@ const WorkoutList: React.FunctionComponent<Props> = ({
     <Grid container>
       <div className="spacer-32" />
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
-      <Grid item xs={8} sm={6} md={6} lg={6} xl={6}>
+      <Grid
+        style={{ padding: "20px" }}
+        component={Paper}
+        item
+        xs={8}
+        sm={6}
+        md={6}
+        lg={6}
+        xl={6}
+      >
         {workouts.length !== 0 ? (
           <h1>Workouts</h1>
         ) : (
@@ -85,7 +93,11 @@ const WorkoutList: React.FunctionComponent<Props> = ({
           </Button>
           <div className="spacer-16" />
         </Grid>
-        <MuscleModel setException={setException} user={user} />
+        <MuscleModel
+          setException={setException}
+          user={user}
+          defineRecoveries={false}
+        />
       </Grid>
       <Grid item xs={1} sm={1} md={1} lg={1} xl={1} />
     </Grid>

@@ -1,4 +1,4 @@
-namespace BodyJournalAPI.Helpers
+namespace NxtstpApi.Helpers
 {
   public class AppSettings
   {

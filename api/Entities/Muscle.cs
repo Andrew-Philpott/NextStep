@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BodyJournalAPI.Entities
+namespace NxtstpApi.Entities
 {
   public class Muscle
   {

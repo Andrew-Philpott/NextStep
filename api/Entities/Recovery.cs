@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System;
 
-namespace BodyJournalAPI.Entities
+namespace NxtstpApi.Entities
 {
   public class Recovery
   {
@@ -10,7 +10,7 @@ namespace BodyJournalAPI.Entities
     public long RecoveryId { get; set; }
     [Required]
     public byte Fatigue { get; set; }
-    public string Time { get; set; } = DateTime.Now.ToString("MM/dd/yyyy H:mm");
+    public DateTime DateCreated { get; set; }
     [Required]
     [ForeignKey(nameof(User))]
     public int UserId { get; set; }

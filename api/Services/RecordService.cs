@@ -1,13 +1,13 @@
 using System;
 using System.Text;
-using BodyJournalAPI.Entities;
+using NxtstpApi.Entities;
 using System.Threading.Tasks;
-using BodyJournalAPI.Helpers;
+using NxtstpApi.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BodyJournalAPI.Services
+namespace NxtstpApi.Services
 {
   public interface IRecordService
   {
@@ -51,20 +51,20 @@ namespace BodyJournalAPI.Services
     }
     public async Task<Record> Create(Record model, ExerciseType exerciseType, int uId)
     {
-      string time = DateTime.Now.ToString("MM/dd/yyyy H:mm");
-      Record entity = new Record() { Weight = model.Weight, Reps = model.Reps, Sets = model.Sets, ExerciseTypeId = exerciseType.ExerciseTypeId, Time = time, UserId = uId };
+      DateTime time = DateTime.Now;
+      Record entity = new Record() { Weight = model.Weight, Reps = model.Reps, Sets = model.Sets, ExerciseTypeId = exerciseType.ExerciseTypeId, DateCreated = time, UserId = uId };
       await _context.Records.AddAsync(entity);
       await _context.SaveChangesAsync();
       return entity;
     }
     public async Task<Record> Update(short id, int uId, Record model, ExerciseType exerciseType)
     {
-      string time = DateTime.Now.ToString("MM/dd/yyyy H:mm");
+      DateTime time = DateTime.Now;
       var entity = await _context.Records.AsAsyncEnumerable().SingleOrDefaultAsync(x => x.UserId == uId && x.RecordId == id);
       if (entity == null)
         throw new Exception("Record does not exist.");
 
-      entity = new Record() { Weight = model.Weight, Reps = model.Reps, Sets = model.Sets, ExerciseTypeId = exerciseType.ExerciseTypeId, Time = time, UserId = uId };
+      entity = new Record() { Weight = model.Weight, Reps = model.Reps, Sets = model.Sets, ExerciseTypeId = exerciseType.ExerciseTypeId, DateCreated = time, UserId = uId };
       _context.Records.Update(entity);
       _context.SaveChanges();
       return entity;

@@ -133,6 +133,11 @@ h6 {
   color: #ef5350 !important;
 }
 
+.record-list-item {
+  list-style: none;
+  text-align: left;
+}
+
 .gray-background {
   background-color: gray !important;
 }

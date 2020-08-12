@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace BodyJournalAPI.Entities
+namespace NxtstpApi.Entities
 {
   public class User
   {

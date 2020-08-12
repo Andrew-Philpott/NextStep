@@ -1,6 +1,6 @@
 using System;
 
-namespace BodyJournalAPI.Entities
+namespace NxtstpApi.Entities
 {
   public class Record
   {
@@ -8,7 +8,7 @@ namespace BodyJournalAPI.Entities
     public short? Weight { get; set; }
     public byte Reps { get; set; }
     public byte Sets { get; set; }
-    public string Time { get; set; } = DateTime.Now.ToString("MM/dd/yyyy H:mm");
+    public DateTime DateCreated { get; set; }
     public int UserId { get; set; }
     public short ExerciseTypeId { get; set; }
   }

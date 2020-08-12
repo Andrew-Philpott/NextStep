@@ -1,14 +1,14 @@
 import React from "react";
 import { MuscleItem } from "./MuscleItem";
-import { Recovery } from "../../types/types";
+import { Recovery, RecoveryDefinition } from "../../types/types";
 
 type Props = {
   onCreateRecovery: (muscleId: number) => void;
-  quads: Recovery | null;
-  biceps: Recovery | null;
-  deltoids: Recovery | null;
-  pectorals: Recovery | null;
-  abdominals: Recovery | null;
+  quads: Recovery | RecoveryDefinition | null;
+  biceps: Recovery | RecoveryDefinition | null;
+  deltoids: Recovery | RecoveryDefinition | null;
+  pectorals: Recovery | RecoveryDefinition | null;
+  abdominals: Recovery | RecoveryDefinition | null;
 };
 
 export const MusclesFront: React.FunctionComponent<Props> = ({
@@ -47,7 +47,7 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-bicep"
-          muscleId={13}
+          muscleId={5}
           draw={
             "M15.232,28.934c0,0 1.105,16.785 -0.186,17.535c-1.481,0.86 -2.239,9.14 -2.239,9.14c0,0 -0.746,-2.099 -1.585,-2.005c-0.84,0.093 -2.425,1.679 -2.752,2.238c-0.326,0.56 -5.223,-17.301 6.762,-26.908Z"
           }
@@ -56,7 +56,7 @@ export const MusclesFront: React.FunctionComponent<Props> = ({
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-bicep"
-          muscleId={13}
+          muscleId={5}
           draw={
             "M53.528,31.098c0,0 -1.105,16.784 0.187,17.534c1.481,0.861 2.238,9.141 2.238,9.141c0,0 0.746,-2.099 1.586,-2.005c0.839,0.093 2.425,1.678 2.751,2.238c0.327,0.56 5.223,-17.302 -6.762,-26.908Z"
           }

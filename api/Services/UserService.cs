@@ -1,8 +1,8 @@
 using System;
 using System.Text;
-using BodyJournalAPI.Entities;
+using NxtstpApi.Entities;
 using System.Threading.Tasks;
-using BodyJournalAPI.Helpers;
+using NxtstpApi.Helpers;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +10,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace BodyJournalAPI.Services
+namespace NxtstpApi.Services
 {
   public class AuthenticatedUser
   {

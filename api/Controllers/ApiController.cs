@@ -2,13 +2,13 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using BodyJournalAPI.Entities;
-using BodyJournalAPI.Helpers;
+using NxtstpApi.Entities;
+using NxtstpApi.Helpers;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
-using BodyJournalAPI.Services;
+using NxtstpApi.Services;
 
-namespace BodyJournalAPI.Controllers
+namespace NxtstpApi.Controllers
 {
   [ApiController]
   [Route("[controller]")]
@@ -20,8 +20,9 @@ namespace BodyJournalAPI.Controllers
     private IRecordService _recordService;
     private IExerciseTypeService _exerciseTypeService;
     private IRecoveryService _recoveryService;
+    private IRecoveryDefinitionService _recoveryDefinitionService;
     private readonly AppSettings _appSettings;
-    public ApiController(DataContext db, IUserService userService, IWorkoutService workoutService, ISessionService sessionService, IRecordService recordService, IExerciseTypeService exerciseTypeService, IRecoveryService recoveryService, IOptions<AppSettings> appSettings)
+    public ApiController(DataContext db, IUserService userService, IWorkoutService workoutService, ISessionService sessionService, IRecordService recordService, IExerciseTypeService exerciseTypeService, IRecoveryService recoveryService, IRecoveryDefinitionService recoveryDefinitionService, IOptions<AppSettings> appSettings)
     {
       _userService = userService;
       _workoutService = workoutService;
@@ -29,6 +30,7 @@ namespace BodyJournalAPI.Controllers
       _recordService = recordService;
       _exerciseTypeService = exerciseTypeService;
       _recoveryService = recoveryService;
+      _recoveryDefinitionService = recoveryDefinitionService;
       _appSettings = appSettings.Value;
     }
     #region Users
@@ -44,7 +46,6 @@ namespace BodyJournalAPI.Controllers
       }
       catch (Exception ex)
       {
-        System.Console.WriteLine(ex);
         return BadRequest(new { message = ex.Message });
       }
     }
@@ -323,13 +324,13 @@ namespace BodyJournalAPI.Controllers
         return BadRequest(new { message = ex.Message });
       }
     }
-    [HttpGet("users/recoveries")]
-    public async Task<IActionResult> GetRecoveries()
+    [HttpGet("users/recoveries/current")]
+    public async Task<IActionResult> GetCurrentRecoveries()
     {
       var currentUserId = int.Parse(User.Identity.Name);
       try
       {
-        var entities = await _recoveryService.FindAllAsync(currentUserId);
+        var entities = await _recoveryService.FindCurrentAsync(currentUserId);
         return Ok(entities);
       }
       catch (Exception ex)
@@ -375,6 +376,83 @@ namespace BodyJournalAPI.Controllers
       try
       {
         var entity = await _recoveryService.Delete(id, currentUserId);
+        return Ok(entity);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
+    }
+    #endregion
+
+
+    #region RecoveryDefinition
+    [HttpGet("users/recovery/definitions/{id}")]
+    public async Task<IActionResult> GetRecoveryDefinition(long id)
+    {
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+        var entity = await _recoveryDefinitionService.FindAsync(id, currentUserId);
+        return Ok(entity);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
+    }
+    [HttpGet("users/recovery/definitions/current")]
+    public async Task<IActionResult> GetCurrentRecoveryDefinitions()
+    {
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+        var entities = await _recoveryDefinitionService.FindCurrentAsync(currentUserId);
+        return Ok(entities);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
+    }
+
+    [HttpPost("users/recovery/definitions")]
+    public async Task<IActionResult> CreateRecoveryDefintion([FromBody] RecoveryDefinition model)
+    {
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+        var entity = await _recoveryDefinitionService.Create(model, currentUserId);
+        return Ok(entity);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
+    }
+
+    [HttpPut("users/recovery/definitions/{id}")]
+    public async Task<IActionResult> UpdateRecoveryDefintion(long id, [FromBody] RecoveryDefinition model)
+    {
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+        var entity = await _recoveryDefinitionService.Update(id, currentUserId, model);
+        return Ok(entity);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
+    }
+
+    [HttpDelete("users/recovery/definitions/{id}")]
+    public async Task<IActionResult> DeleteRecoveryDefintion(long id)
+    {
+      var currentUserId = int.Parse(User.Identity.Name);
+      try
+      {
+        var entity = await _recoveryDefinitionService.Delete(id, currentUserId);
         return Ok(entity);
       }
       catch (Exception ex)
@@ -441,7 +519,6 @@ namespace BodyJournalAPI.Controllers
       }
       catch (Exception ex)
       {
-        System.Console.WriteLine(ex);
         return BadRequest(new { message = ex.Message });
       }
     }

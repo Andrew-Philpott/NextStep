@@ -3,13 +3,13 @@ import { Grid, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Record, ExerciseType } from "../../types/types";
 import RecordForm from "./RecordForm";
-import * as types from "../../types/types";
+
 type Props = {
   record: Record | null;
   exerciseType: ExerciseType;
   selectedExerciseType: ExerciseType | null;
   setSelectedExerciseType: (value: ExerciseType | null) => void;
-  onCreateRecord: (value: types.Record) => void;
+  onCreateRecord: (value: Record) => void;
 };
 
 export const RecordItem: React.FunctionComponent<Props> = ({
@@ -19,6 +19,16 @@ export const RecordItem: React.FunctionComponent<Props> = ({
   setSelectedExerciseType,
   onCreateRecord,
 }) => {
+  let dateTime: string | null = null;
+  if (record !== null) {
+    dateTime = `${record.dateCreated
+      .toString()
+      .substring(11, 16)} on ${record.dateCreated
+      .toString()
+      .substring(0, 10)
+      .replace(/-/g, "/")}`;
+  }
+
   return (
     <Grid item xs={12}>
       <Grid alignItems="flex-end" container>
@@ -33,8 +43,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
           <Grid container direction="row">
             {record && (
               <h3>
-                {record.reps}x{record.sets} at {record.weight}lbs on{" "}
-                {record.time}
+                {record.reps}x{record.sets} at {record.weight}lbs at {dateTime}
               </h3>
             )}
           </Grid>
@@ -50,13 +59,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
                 .filter((x) => x.primary === true)
                 .sort((a, b) => (a.muscleId < b.muscleId ? 1 : -1))
                 .map((muscle, index) => (
-                  <li
-                    style={{
-                      listStyle: "none",
-                      textAlign: "left",
-                    }}
-                    key={index}
-                  >
+                  <li className="record-list-item" key={index}>
                     {muscle.muscle.name}
                   </li>
                 ))}
@@ -67,13 +70,7 @@ export const RecordItem: React.FunctionComponent<Props> = ({
                 .filter((x) => x.primary === false)
                 .sort((a, b) => (a.muscleId < b.muscleId ? 1 : -1))
                 .map((muscle, index) => (
-                  <li
-                    style={{
-                      listStyle: "none",
-                      textAlign: "left",
-                    }}
-                    key={index}
-                  >
+                  <li className="record-list-item" key={index}>
                     {muscle.muscle.name}
                   </li>
                 ))}

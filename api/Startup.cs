@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using BodyJournalAPI.Helpers;
+using NxtstpApi.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using BodyJournalAPI.Services;
+using NxtstpApi.Services;
 
-namespace BodyJournalAPI
+namespace NxtstpApi
 {
   public class Startup
   {
@@ -66,6 +65,7 @@ namespace BodyJournalAPI
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IWorkoutService, WorkoutService>();
       services.AddScoped<IRecoveryService, RecoveryService>();
+      services.AddScoped<IRecoveryDefinitionService, RecoveryDefinitionService>();
       services.AddScoped<IRecordService, RecordService>();
       services.AddScoped<IExerciseTypeService, ExerciseTypeService>();
       services.AddScoped<ISessionService, SessionService>();

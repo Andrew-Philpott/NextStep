@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using BodyJournalAPI.Entities;
+using NxtstpApi.Entities;
 using System.Security.Cryptography;
 using System.Text;
 using System;
 
-namespace BodyJournalAPI.Helpers
+namespace NxtstpApi.Helpers
 {
   public class DataContext : DbContext
   {
@@ -16,7 +16,8 @@ namespace BodyJournalAPI.Helpers
     public virtual DbSet<Workout> Workouts { get; set; }
     public DbSet<Session> Sessions { get; set; }
     public DbSet<Record> Records { get; set; }
-    public DbSet<Recovery> Recovery { get; set; }
+    public DbSet<Recovery> Recoveries { get; set; }
+    public DbSet<RecoveryDefinition> RecoveryDefinitions { get; set; }
     public DbSet<ExerciseTypeMuscle> ExerciseTypeMuscles { get; set; }
     public virtual DbSet<ExerciseType> ExerciseTypes { get; set; }
     public DbSet<User> Users { get; set; }
@@ -34,7 +35,6 @@ namespace BodyJournalAPI.Helpers
       }
 
       base.OnModelCreating(builder);
-
       builder.Entity<User>().HasData(
       new User() { UserId = 1, FirstName = "test", LastName = "test", UserName = "test", Email = "test@gmail.com", PasswordHash = passwordHash, PasswordSalt = passwordSalt });
 
@@ -72,22 +72,20 @@ namespace BodyJournalAPI.Helpers
         new Muscle() { MuscleId = 2, Name = "Quadriceps" },
         new Muscle() { MuscleId = 3, Name = "Hamstrings" },
         new Muscle() { MuscleId = 4, Name = "Gluteus" },
-        new Muscle() { MuscleId = 5, Name = "Hips" },
-        new Muscle() { MuscleId = 6, Name = "Lower back" },
+        new Muscle() { MuscleId = 5, Name = "Biceps" },
+        new Muscle() { MuscleId = 6, Name = "Forearms" },
         new Muscle() { MuscleId = 7, Name = "Lats" },
         new Muscle() { MuscleId = 8, Name = "Trapezius" },
         new Muscle() { MuscleId = 9, Name = "Abdominals" },
         new Muscle() { MuscleId = 10, Name = "Pectorals" },
         new Muscle() { MuscleId = 11, Name = "Deltoids" },
-        new Muscle() { MuscleId = 12, Name = "Triceps" },
-        new Muscle() { MuscleId = 13, Name = "Biceps" },
-        new Muscle() { MuscleId = 14, Name = "Forearms" });
+        new Muscle() { MuscleId = 12, Name = "Triceps" });
 
       builder.Entity<Record>().HasData(
-        new Record() { RecordId = 1, ExerciseTypeId = 10, Weight = 200, Reps = 8, Sets = 3, UserId = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm") },
-        new Record() { RecordId = 2, ExerciseTypeId = 1, Weight = 300, Reps = 5, Sets = 3, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Record() { RecordId = 3, ExerciseTypeId = 14, Weight = 0, Reps = 20, Sets = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Record() { RecordId = 4, ExerciseTypeId = 17, Weight = 150, Reps = 8, Sets = 3, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 });
+        new Record() { RecordId = 1, ExerciseTypeId = 10, Weight = 200, Reps = 8, Sets = 3, UserId = 1, DateCreated = DateTime.Now },
+        new Record() { RecordId = 2, ExerciseTypeId = 1, Weight = 300, Reps = 5, Sets = 3, DateCreated = DateTime.Now, UserId = 1 },
+        new Record() { RecordId = 3, ExerciseTypeId = 14, Weight = 0, Reps = 20, Sets = 1, DateCreated = DateTime.Now, UserId = 1 },
+        new Record() { RecordId = 4, ExerciseTypeId = 17, Weight = 150, Reps = 8, Sets = 3, DateCreated = DateTime.Now, UserId = 1 });
 
       builder.Entity<ExerciseTypeMuscle>().HasData(
           //calves
@@ -126,7 +124,6 @@ namespace BodyJournalAPI.Helpers
           new ExerciseTypeMuscle { ExerciseTypeMuscleId = 25, ExerciseTypeId = 4, MuscleId = 5, Primary = true },
           new ExerciseTypeMuscle { ExerciseTypeMuscleId = 26, ExerciseTypeId = 9, MuscleId = 5, Primary = true },
           new ExerciseTypeMuscle { ExerciseTypeMuscleId = 27, ExerciseTypeId = 26, MuscleId = 5, Primary = true },
-
 
           //lower back
           new ExerciseTypeMuscle { ExerciseTypeMuscleId = 28, ExerciseTypeId = 1, MuscleId = 6, Primary = false },
@@ -183,22 +180,22 @@ namespace BodyJournalAPI.Helpers
           new ExerciseTypeMuscle { ExerciseTypeMuscleId = 68, ExerciseTypeId = 22, MuscleId = 12, Primary = true },
 
           //biceps
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 69, ExerciseTypeId = 13, MuscleId = 13, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 70, ExerciseTypeId = 14, MuscleId = 13, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 71, ExerciseTypeId = 15, MuscleId = 13, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 72, ExerciseTypeId = 16, MuscleId = 13, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 73, ExerciseTypeId = 23, MuscleId = 13, Primary = true },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 69, ExerciseTypeId = 13, MuscleId = 5, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 70, ExerciseTypeId = 14, MuscleId = 5, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 71, ExerciseTypeId = 15, MuscleId = 5, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 72, ExerciseTypeId = 16, MuscleId = 5, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 73, ExerciseTypeId = 23, MuscleId = 5, Primary = true },
 
           //forearms
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 74, ExerciseTypeId = 4, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 75, ExerciseTypeId = 13, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 76, ExerciseTypeId = 14, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 77, ExerciseTypeId = 15, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 78, ExerciseTypeId = 16, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 79, ExerciseTypeId = 18, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 80, ExerciseTypeId = 20, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 81, ExerciseTypeId = 22, MuscleId = 14, Primary = false },
-          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 82, ExerciseTypeId = 23, MuscleId = 14, Primary = false }
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 74, ExerciseTypeId = 4, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 75, ExerciseTypeId = 13, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 76, ExerciseTypeId = 14, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 77, ExerciseTypeId = 15, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 78, ExerciseTypeId = 16, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 79, ExerciseTypeId = 18, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 80, ExerciseTypeId = 20, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 81, ExerciseTypeId = 22, MuscleId = 6, Primary = false },
+          new ExerciseTypeMuscle { ExerciseTypeMuscleId = 82, ExerciseTypeId = 23, MuscleId = 6, Primary = false }
        );
 
       builder.Entity<Workout>().HasData(
@@ -211,28 +208,6 @@ namespace BodyJournalAPI.Helpers
              new Exercise() { ExerciseId = 1, ExerciseTypeId = 10, Weight = 180, Reps = 8, Sets = 3, UserId = 1, WorkoutId = 1 },
              //calves, quads, hamstrings, gluteus, hips, abdominals, lower back
              new Exercise() { ExerciseId = 2, ExerciseTypeId = 1, Weight = 250, Reps = 15, Sets = 3, UserId = 1, WorkoutId = 1 });
-
-      builder.Entity<Session>().HasData(
-        new Session() { SessionId = 1, WorkoutId = 1, WorkoutStart = DateTime.Now.ToString("MM/dd/yyyy H:mm"), WorkoutEnd = DateTime.Now.AddHours(1).ToString("MM/dd/yyyy H:mm"), Rating = 5, UserId = 1 }
-      );
-
-
-      builder.Entity<Recovery>().HasData(
-        new Recovery() { RecoveryId = 1, MuscleId = 1, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 2, MuscleId = 2, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 3, MuscleId = 3, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 4, MuscleId = 4, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 5, MuscleId = 5, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 6, MuscleId = 6, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 7, MuscleId = 7, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1, Fatigue = 1 },
-        new Recovery() { RecoveryId = 8, MuscleId = 8, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1, Fatigue = 1 },
-        new Recovery() { RecoveryId = 9, MuscleId = 9, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 10, MuscleId = 10, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 11, MuscleId = 11, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 12, MuscleId = 12, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 13, MuscleId = 13, Fatigue = 1, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1 },
-        new Recovery() { RecoveryId = 14, MuscleId = 14, Time = DateTime.Now.ToString("MM/dd/yyyy H:mm"), UserId = 1, Fatigue = 1 });
     }
-
   }
 }

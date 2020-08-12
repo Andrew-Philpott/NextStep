@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 
-namespace BodyJournalAPI.Helpers
+namespace NxtstpApi.Helpers
 {
   public static class ServiceExtensions
   {

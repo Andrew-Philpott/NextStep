@@ -1,8 +1,8 @@
 import React from "react";
-import { Recovery } from "../../types/types";
+import { Recovery, RecoveryDefinition } from "../../types/types";
 
 type Props = {
-  recovery: Recovery | null;
+  recovery: Recovery | RecoveryDefinition | null;
   draw: string | undefined;
   muscleId: number;
   onCreateRecovery: (value: number) => void;
@@ -14,27 +14,31 @@ export const MuscleItem: React.FunctionComponent<Props> = ({
   muscleId,
   onCreateRecovery,
 }) => {
-  let fatigue: number = 0;
+  let status: number = 0;
   let color: string = "";
 
   if (recovery) {
-    fatigue = recovery.fatigue;
+    if ("fatigue" in recovery) {
+      status = recovery.fatigue;
+    } else {
+      status = recovery.recoveryTimeInDays;
+    }
   } else {
-    fatigue = 0;
+    status = 0;
   }
 
-  switch (fatigue) {
+  switch (status) {
     case 5:
       color = "red";
       break;
     case 4:
-      color = "orange";
+      color = "orangered";
       break;
     case 3:
-      color = "yellow";
+      color = "orange";
       break;
     case 2:
-      color = "lime";
+      color = "yellow";
       break;
     case 1:
       color = "lime";
@@ -45,10 +49,6 @@ export const MuscleItem: React.FunctionComponent<Props> = ({
   }
 
   return (
-    <path
-      onClick={() => (recovery ? onCreateRecovery(muscleId) : null)}
-      d={draw}
-      fill={color}
-    />
+    <path onClick={() => onCreateRecovery(muscleId)} d={draw} fill={color} />
   );
 };

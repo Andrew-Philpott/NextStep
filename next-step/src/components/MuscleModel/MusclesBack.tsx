@@ -1,16 +1,16 @@
 import React from "react";
 import { MuscleItem } from "./MuscleItem";
-import { Recovery } from "../../types/types";
+import { Recovery, RecoveryDefinition } from "../../types/types";
 
 type Props = {
   onCreateRecovery: (muscleId: number) => void;
-  calves: Recovery | null;
-  hamstrings: Recovery | null;
-  glutes: Recovery | null;
-  triceps: Recovery | null;
-  forearms: Recovery | null;
-  lats: Recovery | null;
-  trapezius: Recovery | null;
+  calves: Recovery | RecoveryDefinition | null;
+  hamstrings: Recovery | RecoveryDefinition | null;
+  glutes: Recovery | RecoveryDefinition | null;
+  triceps: Recovery | RecoveryDefinition | null;
+  forearms: Recovery | RecoveryDefinition | null;
+  lats: Recovery | RecoveryDefinition | null;
+  trapezius: Recovery | RecoveryDefinition | null;
 };
 
 export const MusclesBack: React.FunctionComponent<Props> = ({
@@ -105,7 +105,7 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="left-forearm"
-          muscleId={14}
+          muscleId={6}
           draw={
             "M69.804,53.41c0,0 3.727,5.905 4.477,10.404c0.75,4.499 -0.094,13.404 2.062,15.466c2.156,2.062 -6.235,3.749 -6.539,1.687c-0.303,-2.062 -9.5,-17.601 -8.458,-20.433c0.282,-0.766 -0.281,-7.405 -0.281,-7.405l3.241,1.866c0,0 0.696,2.821 -0.898,3.664c-1.593,0.844 0.938,3.281 1.969,2.25c1.031,-1.031 1.687,-3 2.905,-3.375c1.219,-0.375 -0.937,-2.104 -0.187,-2.504c0.75,-0.401 1.709,-1.62 1.709,-1.62Z"
           }
@@ -114,7 +114,7 @@ export const MusclesBack: React.FunctionComponent<Props> = ({
         <MuscleItem
           onCreateRecovery={onCreateRecovery}
           key="right-forearm"
-          muscleId={14}
+          muscleId={6}
           draw={
             "M12.444,53.41c0,0 -3.727,5.905 -4.477,10.404c-0.75,4.499 0.094,13.404 -2.062,15.466c-2.156,2.062 6.236,3.749 6.539,1.687c0.303,-2.062 9.5,-17.601 8.458,-20.433c-0.282,-0.766 0.281,-7.405 0.281,-7.405l-3.241,1.866c0,0 -0.696,2.821 0.898,3.664c1.593,0.844 -0.937,3.281 -1.968,2.25c-1.032,-1.031 -1.688,-3 -2.906,-3.375c-1.219,-0.375 0.937,-2.104 0.187,-2.504c-0.749,-0.401 -1.709,-1.62 -1.709,-1.62Z"
           }
