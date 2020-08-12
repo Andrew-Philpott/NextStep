@@ -62,6 +62,7 @@ const Home: React.FunctionComponent<Props> = ({ user, setException }) => {
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
+                style={{ width: "80%" }}
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "center",
@@ -94,9 +95,9 @@ const Home: React.FunctionComponent<Props> = ({ user, setException }) => {
                 </Typography>
               </Popover>
               {recoveryDefintionsVisible ? (
-                <h1>Current recovery profile</h1>
+                <h1>Recovery definitions</h1>
               ) : (
-                <h1>Current fatigue</h1>
+                <h1>Current recovery</h1>
               )}
             </React.Fragment>
           )}
