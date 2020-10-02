@@ -6,12 +6,15 @@ import { recordService } from "../../services/record-service";
 import { Record } from "../../types/types";
 import DeleteOutlinedIcon from "@material-ui/icons/DeleteOutlined";
 
-type Props = {
+interface Props {
   setException: (value: string) => void;
+}
+type Params = {
+  id: string | undefined;
 };
 
 const RecordHistory: React.FunctionComponent<Props> = ({ setException }) => {
-  const { id } = useParams();
+  const { id } = useParams<Params>();
   const [records, setRecords] = React.useState<Array<Record>>([]);
   const history = useHistory();
 

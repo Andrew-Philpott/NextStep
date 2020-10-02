@@ -5,9 +5,12 @@ import { Grid } from "@material-ui/core";
 type Props = {
   setException: (value: string) => void;
 };
+type Params = {
+  id: string | undefined;
+};
 
 const WorkoutDetails: React.FunctionComponent<Props> = ({ setException }) => {
-  const { id } = useParams();
+  const { id } = useParams<Params>();
   return (
     <Grid container>
       <h1>Workout Details Page</h1>

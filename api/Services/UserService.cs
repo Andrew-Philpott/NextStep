@@ -50,13 +50,13 @@ namespace NxtstpApi.Services
     public async Task<User> Register(User model)
     {
       if (string.IsNullOrWhiteSpace(model.FirstName) || string.IsNullOrWhiteSpace(model.LastName))
-        throw new Exception("First name and last name is required.");
+        throw new ArgumentException("First name and last name is required.");
 
       if (string.IsNullOrWhiteSpace(model.UserName) || string.IsNullOrWhiteSpace(model.Password))
-        throw new Exception("Username and password is required.");
+        throw new ArgumentException("Username and password is required.");
 
       if (string.IsNullOrWhiteSpace(model.Email))
-        throw new Exception("Email is required.");
+        throw new ArgumentException("Email is required.");
 
       if (await _context.Users.AsAsyncEnumerable().AnyAsync(x => x.UserName == model.UserName))
         throw new Exception($"Username {model.UserName} is already taken.");

@@ -106,18 +106,21 @@ const Home: React.FunctionComponent<Props> = ({ user, setException }) => {
             user={user}
             defineRecoveries={recoveryDefintionsVisible}
           />
-          <Button
-            onClick={() =>
-              setRecoveryDefinitionsVisible(!recoveryDefintionsVisible)
-            }
-            className="button blue-background"
-          >
-            {recoveryDefintionsVisible ? (
-              <span>View fatigue profile</span>
-            ) : (
-              <span>View recovery profile</span>
-            )}
-          </Button>
+
+          {user && (
+            <Button
+              onClick={() =>
+                setRecoveryDefinitionsVisible(!recoveryDefintionsVisible)
+              }
+              className="button blue-background"
+            >
+              {recoveryDefintionsVisible ? (
+                <span>View fatigue profile</span>
+              ) : (
+                <span>View recovery profile</span>
+              )}
+            </Button>
+          )}
         </Grid>
         <Grid item xs={3} sm={3} md={3} lg={3} xl={3} />
       </Grid>

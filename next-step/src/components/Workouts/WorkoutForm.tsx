@@ -20,6 +20,10 @@ type Props = {
   setException: (value: string) => void;
 };
 
+type PropsTwo = {
+  id: string | undefined;
+};
+
 const blankExercise: Exercise = {
   exerciseId: 0,
   exerciseTypeId: "",
@@ -42,7 +46,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
   exerciseTypes,
   setException,
 }) => {
-  const { id } = useParams();
+  const { id } = useParams<PropsTwo>();
   const { values, setValues, errors, setErrors, handleInputChange } = useForm(
     initialFieldValues
   );
@@ -55,7 +59,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
     if (id) {
       (async () => {
         try {
-          const response = await workoutService.getWorkout(id);
+          const response = await workoutService.getWorkout(parseInt(id));
           setValues(response);
         } catch {
           setException(
@@ -128,7 +132,7 @@ const WorkoutForm: React.FunctionComponent<Props> = ({
       try {
         let response: Promise<Response>;
         if (id) {
-          response = await workoutService.updateWorkout(id, values);
+          response = await workoutService.updateWorkout(parseInt(id), values);
         } else {
           response = await workoutService.createWorkout(values);
         }
